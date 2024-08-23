@@ -1,0 +1,28 @@
+<!-- vendor -->
+1: create products;
+    <!-- product:
+    name
+    image
+    category
+    vendorID
+    quantity
+    rate
+    description
+    brandName
+    measurement
+    supportedCountry -->
+    
+
+
+1: list products by vendor;
+
+<!-- user -->
+1: list products by country;
+
+
+2: add to cart
+    - remove from cart at order else save to storage;
+
+3: place order
+
+4: 
