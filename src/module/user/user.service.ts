@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { InjectModel } from  '@nestjs/mongoose';
 import { Model } from  'mongoose';
 import { User, UserDocument } from './entities/user.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -27,10 +28,15 @@ export class UserService {
     // return await  this.userModel.findById(id).exec();
   }
 
-  async update(id: number, updateUserDto: User):Promise<User> {
+  async update(id: string, updateUserDto: UpdateUserDto):Promise<User> {
+    console.log("ID--::",id)
+    console.log("updateUserDto--::",updateUserDto)
     return await  this.userModel.findByIdAndUpdate(id, updateUserDto, {new: true})
   }
-
+  async addPreferredCountry(id: string, preferredCountry: string):Promise<User> {
+    console.log("ID--::",id)
+    return await  this.userModel.findByIdAndUpdate(id,{ preferredCountry },{new:true}    )
+  }
   // async remove(id):Promise<any> {
   //   return await  this.userModel.findByIdAndDelete(id);
   // }

@@ -21,7 +21,6 @@ export class AuthController {
     try{
       return await this.authService.registerUser(createAuthDto);
     } catch (e) {
-      // console.log('ERROR:_: ', e);
       throw new BadRequestException(this.vendorService.formatErrors(e));
 
     }

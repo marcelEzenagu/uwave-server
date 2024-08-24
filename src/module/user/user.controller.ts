@@ -38,9 +38,9 @@ export class UserController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: User) {
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     try {
-      return this.userService.update(+id, updateUserDto);
+      return await this.userService.addPreferredCountry(id, updateUserDto.preferredCountry);
     } catch (e) {
       throw new BadRequestException(this.userService.formatErrors(e));
     }

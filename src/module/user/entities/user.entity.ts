@@ -31,8 +31,10 @@ export class User {
     firstName:string;
     
     @Prop({ required:true})
-    // @IsNotEmpty({ message: 'lastName should not be empty' })
     lastName:string;
+    
+    @Prop({ type:String})
+    preferredCountry?:string;
     
     @Prop({ required:true,unique:true})
     @IsEmail()
