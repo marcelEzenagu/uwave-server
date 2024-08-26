@@ -28,4 +28,11 @@
 4: 
 
 
-<!-- save UserCountry --> preferredCountry
+<!-- save UserCountry preferredCountry -->
+
+
+<!-- cart -->
+image
+name
+price
+productID

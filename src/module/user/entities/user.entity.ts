@@ -15,6 +15,7 @@ export type UserDocument = User & Document
     },
     timestamps: true,
   })
+  
 export class User {
 
     @Prop({

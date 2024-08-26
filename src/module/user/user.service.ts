@@ -11,6 +11,7 @@ export class UserService {
 
   create(createUserDto: User) {
     console.log("HERE NEO")
+
     const newUser = new this.userModel(createUserDto)
     return newUser.save();  
   }
@@ -29,12 +30,9 @@ export class UserService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto):Promise<User> {
-    console.log("ID--::",id)
-    console.log("updateUserDto--::",updateUserDto)
-    return await  this.userModel.findByIdAndUpdate(id, updateUserDto, {new: true})
+   return await  this.userModel.findByIdAndUpdate(id, updateUserDto, {new: true})
   }
   async addPreferredCountry(id: string, preferredCountry: string):Promise<User> {
-    console.log("ID--::",id)
     return await  this.userModel.findByIdAndUpdate(id,{ preferredCountry },{new:true}    )
   }
   // async remove(id):Promise<any> {

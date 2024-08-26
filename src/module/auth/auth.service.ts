@@ -141,7 +141,7 @@ export class AuthService {
 
   generateToken(userID: string, role:string) {
     const payload = { sub: userID, role: role };
-    return jwt.sign(payload, 'process.env.JWT_SECRET', { expiresIn: '5m' });
+    return jwt.sign(payload, 'process.env.JWT_SECRET', { expiresIn: '3600m' });
   }
 
   async verifyAccessToken(token: string): Promise<any> {

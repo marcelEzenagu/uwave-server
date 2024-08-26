@@ -1,34 +1,48 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller,UseGuards, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
+import { Cart } from './entities/cart.entity';
+import { Request } from 'express';
 
-@Controller('cart')
+@Controller('carts')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Post()
-  create(@Body() createCartDto: CreateCartDto) {
-    return this.cartService.addToCart(createCartDto);
+  create(@Req() req: Request,
+  @Body() createCartDto: Cart) {
+    try {
+      // check for possible validation b4 an add;
+
+      const userID = req['user'].sub
+      createCartDto.userID = userID
+      return this.cartService.addToCart(createCartDto);
+    } catch (error) {
+      console.log("error:: ",error)
+    }
   }
 
+ 
   @Get()
-  findAll() {
-    return this.cartService.findAll();
+  findOne(
+    @Req() req: Request) {
+      const userID = req['user'].sub
+    return this.cartService.findOne(userID);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cartService.findOne(+id);
+  @Patch()
+  update(
+    @Req() req: Request, 
+    @Body() updateCartDto: UpdateCartDto) {
+      const userID = req['user'].sub
+
+    return this.cartService.update(userID, updateCartDto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
-    return this.cartService.update(+id, updateCartDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartService.remove(+id);
+  @Delete()
+  remove(
+    @Req() req: Request)  {
+      const userID = req['user'].sub
+    return this.cartService.remove(userID);
   }
 }

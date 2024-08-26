@@ -8,16 +8,16 @@ export class AccessTokenMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers['authorization'];
-
+console.log("req:: ",req)
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new UnauthorizedException('Authorization header missing or malformed');
     }
 
+    console.log("authHeader:: ",authHeader)
     const token = authHeader.split(' ')[1];
 
     try {
       const decoded = await this.authService.verifyAccessToken(token);
-      console.log("decoded__:: ",decoded)
 
       req['user'] = decoded; // Store the decoded user information in the request object
       const requiredRole = this.getRequiredRole(req.path);

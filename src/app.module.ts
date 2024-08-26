@@ -18,14 +18,13 @@ import { HealthController } from './health/health.controller';
     MongooseModule.forRoot(process.env.URI,),
             MongooseModule.forFeature(forFeatureDb),
     UserModule, VendorModule, AdminModule, ProductModule, OrderModule, AuthModule, CartModule, LogisticsModule],
-
     providers:[
       // {
       //   provide: APP_FILTER,
       //   useClass: AllExceptionsFilter,
       // },
     ],
-
     controllers: [HealthController]
 })
+
 export class AppModule {}

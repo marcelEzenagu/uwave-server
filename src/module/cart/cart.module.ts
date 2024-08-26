@@ -10,12 +10,11 @@ import { AuthModule } from '../auth/auth.module';
   controllers: [CartController],
   providers: [CartService],
   imports: [MongooseModule.forFeature(forFeatureDb),AuthModule],
-
 })
+
 export class CartModule {
   configure(consumer:MiddlewareConsumer){
     consumer.apply(AccessTokenMiddleware)
-    .forRoutes({path:'cart',method:RequestMethod.ALL})
+    .forRoutes({path:'carts*',method:RequestMethod.ALL})
   }
-
 }

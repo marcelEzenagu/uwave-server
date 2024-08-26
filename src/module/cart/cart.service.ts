@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { Cart, CartDocument } from './entities/cart.entity';
 import { InjectModel } from  '@nestjs/mongoose';
@@ -10,26 +9,33 @@ import { Model } from  'mongoose';
 export class CartService {
   constructor(@InjectModel(Cart.name) private cartModel: Model<CartDocument>) {}
 
-
-
-  addToCart(createCartDto: CreateCartDto) {
-    return 'This action adds a new cart';
+  addToCart(createCartDto: Cart) {
+    console.log("HERE addToCart")
+    const newUserCart = new this.cartModel(createCartDto)
+    return newUserCart.save();
   }
 
   findAll() {
     return `This action returns all cart`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cart`;
+  async findOne(userID: string) {
+    const where = {userID}
+    return await  this.cartModel.findOne().where(where).exec();
   }
 
-  update(id: number, updateCartDto: UpdateCartDto) {
-    return `This action updates a #${id} cart`;
+ async update(userID: string, updateCartDto: UpdateCartDto) {
+    const where = {userID}
+    return await  this.cartModel.findOneAndUpdate(where,updateCartDto,{new:true}    )
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
+ async remove(userID: string) {
+  const where = {userID}
+
+    return await  this.cartModel.findOneAndDelete(where)
+
+    // return `This action removes a #${id} cart`;
   }
 
   async findWhere(where:{}):Promise<Cart> {

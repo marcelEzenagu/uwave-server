@@ -8,6 +8,16 @@ import { Type } from "class-transformer";
 import {Product,ProductSchema} from "../../product/entities/product.entity"
 export type CartDocument = Cart & Document
 
+
+@Schema({
+  toJSON: {
+    getters: true,
+    virtuals: true,
+  },
+  timestamps: true,
+
+})
+
 export class Cart {
 
     @Prop({
@@ -19,9 +29,18 @@ export class Cart {
     })
     cartID : string;
 
+    @Prop({
+      type: [{ 
+        productID: { type: String, required: true },
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+        quantity: { type: Number, required: true },
+        _id: false 
+      }],
+      default: [],
+    })
+  products: [];
 
-  @Prop({ type: [ProductSchema], required: true })
-  products: Product[];
 
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     userID: Types.ObjectId;
