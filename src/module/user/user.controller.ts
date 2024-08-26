@@ -4,20 +4,18 @@ import {
   BadRequestException,
   Post,
   Body,
-  Patch,
-  Param,
+  Patch,Req,
+  Param,UnauthorizedException,
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+import { Request } from 'express';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  
 
   @Get()
   findAll() {
@@ -29,9 +27,18 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(
+    @Param('id') id: string,
+  @Req() req: Request, 
+
+) {
     try {
-      return this.userService.findOne(+id);
+      const userID = req['user'].sub
+
+      if(id != userID){
+        throw new UnauthorizedException("invalid access")
+      }
+      return this.userService.findOne(id);
     } catch (e) {
       throw new BadRequestException(this.userService.formatErrors(e));
     }

@@ -14,6 +14,6 @@ import { AuthModule } from '../auth/auth.module';
 export class UserModule {
   configure(consumer:MiddlewareConsumer){
     consumer.apply(AccessTokenMiddleware)
-    .forRoutes({path:'users',method:RequestMethod.ALL})
+    .forRoutes({path:'users*',method:RequestMethod.ALL})
   }
 }

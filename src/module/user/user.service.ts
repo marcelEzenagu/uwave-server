@@ -21,7 +21,8 @@ export class UserService {
   }
 
   async findOne(id):Promise<User> {
-    return await  this.userModel.findById(id).exec();
+    const where = {"userID":id}
+    return await  this.userModel.findOne().where(where).exec();
   }
   
   async findWhere(where:{}):Promise<User> {
@@ -32,6 +33,7 @@ export class UserService {
   async update(id: string, updateUserDto: UpdateUserDto):Promise<User> {
    return await  this.userModel.findByIdAndUpdate(id, updateUserDto, {new: true})
   }
+
   async addPreferredCountry(id: string, preferredCountry: string):Promise<User> {
     return await  this.userModel.findByIdAndUpdate(id,{ preferredCountry },{new:true}    )
   }
@@ -47,7 +49,7 @@ export class UserService {
     }
     
   formatErrors(error: any) {
-    console.log("ERROR:: ",error.name)
+    console.log("ERROR:: ",error)
 
     if(error.name === 'MongoServerError'){
      const field = Object.keys(error.keyPattern)[0];
