@@ -22,6 +22,7 @@ export class UserService {
 
   async findOne(id):Promise<User> {
     const where = {"userID":id}
+    console.log("where: ",where)
     return await  this.userModel.findOne().where(where).exec();
   }
   
@@ -34,8 +35,8 @@ export class UserService {
    return await  this.userModel.findByIdAndUpdate(id, updateUserDto, {new: true})
   }
 
-  async addPreferredCountry(id: string, preferredCountry: string):Promise<User> {
-    return await  this.userModel.findByIdAndUpdate(id,{ preferredCountry },{new:true}    )
+  async addPreferredCountry(where :{}, preferredCountry: string):Promise<User> {
+    return await  this.userModel.findOneAndUpdate(where,{ preferredCountry },{new:true}    )
   }
   // async remove(id):Promise<any> {
   //   return await  this.userModel.findByIdAndDelete(id);
@@ -45,7 +46,7 @@ export class UserService {
   async remove(where):Promise<any> {
     // async remove(id):Promise<any> {
       // return await  this.userModel.findByIdAndDelete(id);
-      return await  this.userModel.findOneAndDelete(where)
+      // return await  this.userModel.findOneAndDelete(where)
     }
     
   formatErrors(error: any) {

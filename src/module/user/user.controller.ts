@@ -26,28 +26,28 @@ export class UserController {
     }
   }
 
-  @Get(':id')
-  findOne(
-    @Param('id') id: string,
-  @Req() req: Request, 
-
-) {
+  @Get('/details')
+ async findOne(
+  @Req() req: Request, ) {
     try {
       const userID = req['user'].sub
-
-      if(id != userID){
-        throw new UnauthorizedException("invalid access")
-      }
-      return this.userService.findOne(id);
+      
+      return await this.userService.findOne(userID);
     } catch (e) {
       throw new BadRequestException(this.userService.formatErrors(e));
     }
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  @Patch()
+  async update(
+    @Req() req: Request,
+    @Body() updateUserDto: UpdateUserDto) {
+
     try {
-      return await this.userService.addPreferredCountry(id, updateUserDto.preferredCountry);
+      const userID = req['user'].sub
+
+      const where = {userID}
+      return await this.userService.addPreferredCountry(where, updateUserDto.preferredCountry.toLowerCase());
     } catch (e) {
       throw new BadRequestException(this.userService.formatErrors(e));
     }
