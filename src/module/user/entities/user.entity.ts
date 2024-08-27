@@ -40,13 +40,16 @@ export class User {
     @Prop({ required:true,unique:true})
     @IsEmail()
     email:string;
+
+    @Prop({ required:true,unique:true})
+    phoneNumber:string;
     
     @Prop({ required:true})
     @IsNotEmpty()
     @Length(6, 20)
     @Matches(/(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/,
       { message: 'Password must contain at least one uppercase letter, one number, and one special character.' })
-        password:string;
+    password:string;
 
 
   @Prop({ type: Date, default: null })

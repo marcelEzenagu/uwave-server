@@ -3,6 +3,7 @@ import { InjectModel } from  '@nestjs/mongoose';
 import { Model } from  'mongoose';
 import { Vendor, VendorDocument } from '../vendor/entities/vendor.entity';
 
+
 @Injectable()
 export class VendorService {
   constructor(@InjectModel(Vendor.name) private readonly vendorModel: Model<VendorDocument>) {}
