@@ -12,11 +12,18 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({}));
   app.useGlobalFilters(new AllExceptionsFilter());
   app.enableCors({
-    origin: true,
+    // origin:true,
+    origin:  (origin, callback) => {
+      if (['http://localhost:3000',].indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,}
+    credentials: true,
+  }
   )
   await app.listen(process.env.PORT);
 }
-
 bootstrap();
