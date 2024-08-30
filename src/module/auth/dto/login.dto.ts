@@ -14,6 +14,7 @@ export class LogInDto {
       { message: 'Password must contain at least one uppercase letter, one number, and one special character.' })
   password: string;
 }
+
 export class VendorLogInDto {
   @Prop({ required:true,unique:true})
   @IsEmail()

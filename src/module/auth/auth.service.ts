@@ -66,7 +66,7 @@ export class AuthService {
 
   async loginVendor(dto: VendorLogInDto): Promise<LogInVendorResponseDto> {
     try {
-      const vendor = await this.vendorService.findWhere({ email: dto.businessEmail });
+      const vendor = await this.vendorService.findWhere({ businessEmail: dto.businessEmail });
 
       if (!vendor) {
         throw new NotFoundException();

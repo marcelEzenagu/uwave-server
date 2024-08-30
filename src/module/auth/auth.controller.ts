@@ -28,6 +28,7 @@ export class AuthController {
 
   @Post("vendors")
   async loginVendor(@Body() createAuthDto: VendorLogInDto):Promise<LogInVendorResponseDto> {
+    
     return this.authService.loginVendor(createAuthDto);
   }
   @Post("vendors/register")
