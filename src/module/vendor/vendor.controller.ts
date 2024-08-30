@@ -12,7 +12,6 @@ export class VendorController {
   @Post()
   async create(@Res() response, @Body() createVendorDto: Vendor) {
     try{
-      console.log("createVendorDto===>",createVendorDto)
       const newVendor = await this.vendorService.create(createVendorDto);
       return response.status(HttpStatus.CREATED).json({
         newVendor

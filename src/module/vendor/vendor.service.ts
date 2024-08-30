@@ -47,7 +47,6 @@ export class VendorService {
     if(error.name === 'MongoServerError'){
      const field = Object.keys(error.keyPattern)[0];
      const value =Object.values(error.keyValue)[0];
-      //  return `Duplicate value for field: ${field}`;
        return `this ${field},${value} already exists in our record` ;
  
      }else{
