@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, BadRequestException,Patch, Param, Delete } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LogInDto,LogInUserResponseDto,LogInVendorResponseDto } from './dto/login.dto';
+import { LogInDto,VendorLogInDto,LogInUserResponseDto,LogInVendorResponseDto } from './dto/login.dto';
 import { User } from '../user/entities/user.entity';
 import { Vendor } from '../vendor/entities/vendor.entity';
 import { VendorService } from '../vendor/vendor.service';
@@ -27,7 +27,7 @@ export class AuthController {
   }
 
   @Post("vendors")
-  async loginVendor(@Body() createAuthDto: LogInDto):Promise<LogInVendorResponseDto> {
+  async loginVendor(@Body() createAuthDto: VendorLogInDto):Promise<LogInVendorResponseDto> {
     return this.authService.loginVendor(createAuthDto);
   }
   @Post("vendors/register")

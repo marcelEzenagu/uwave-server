@@ -6,7 +6,7 @@ import {
 import {
   LogInDto,
   LogInUserResponseDto,
-  LogInVendorResponseDto,
+  LogInVendorResponseDto,VendorLogInDto
 } from './dto/login.dto';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
@@ -64,9 +64,9 @@ export class AuthService {
     }
   }
 
-  async loginVendor(dto: LogInDto): Promise<LogInVendorResponseDto> {
+  async loginVendor(dto: VendorLogInDto): Promise<LogInVendorResponseDto> {
     try {
-      const vendor = await this.vendorService.findWhere({ email: dto.email });
+      const vendor = await this.vendorService.findWhere({ email: dto.businessEmail });
 
       if (!vendor) {
         throw new NotFoundException();
