@@ -3,7 +3,6 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 
 import { Document, Types } from 'mongoose';
-import { v4 as uuid } from "uuid";
 
 @Schema({
     toJSON: {

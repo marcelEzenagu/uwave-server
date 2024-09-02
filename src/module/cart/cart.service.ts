@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable,UnauthorizedException, } from '@nestjs/common';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { Cart, CartDocument } from './entities/cart.entity';
 import { InjectModel } from  '@nestjs/mongoose';
 import { Model } from  'mongoose';
+import { error } from 'console';
 
 
 @Injectable()
@@ -21,21 +22,30 @@ export class CartService {
 
   async findOne(userID: string) {
     const where = {userID}
-    return await  this.cartModel.findOne().where(where).exec();
+    const result= await  this.cartModel.findOne().where(where).exec();
+    if (result == undefined){
+      throw new UnauthorizedException('cart not found for this user');
+    }else{
+  return result
+    }
   }
 
- async update(userID: string, updateCartDto: UpdateCartDto) {
+  async update(userID: string, updateCartDto: UpdateCartDto) {
     const where = {userID}
     return await  this.cartModel.findOneAndUpdate(where,updateCartDto,{new:true}    )
-
   }
 
  async remove(userID: string) {
   const where = {userID}
 
-    return await  this.cartModel.findOneAndDelete(where)
+  const result = await  this.cartModel.findOneAndDelete(where)
+  if (result == undefined){
+    throw new UnauthorizedException('user-cart not found');
+  }else{
+return "cart deleted successfully"   
 
-    // return `This action removes a #${id} cart`;
+  }
+
   }
 
   async findWhere(where:{}):Promise<Cart> {

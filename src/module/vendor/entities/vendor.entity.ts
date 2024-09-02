@@ -10,6 +10,12 @@ export type VendorDocument = Vendor & Document;
   toJSON: {
     getters: true,
     virtuals: true,
+    transform: (doc, ret) => {
+      delete ret._id;
+      delete ret.id;
+      delete ret.__v;
+      return ret;
+    },
   },
   timestamps: true,
 })
@@ -23,31 +29,31 @@ export class Vendor {
   })
   vendorID: string;
 
-  @Prop()
+  @Prop({type: String})
   country?: string;
 
-  @Prop({ unique: true })
+  @Prop({ unique: true,type: String })
   phoneNumber?: string;
   
-  @Prop()
+  @Prop({type: String})
   homeAddress?: string;
 
-  @Prop()
+  @Prop({type: String})
   idDocumentType?: string;
   
-  @Prop()
+  @Prop({type: String})
   idDocument?: string;
 
-  @Prop({ unique: true })
+  @Prop({ unique: true,type: String })
   businessName?: string;
 
-  @Prop()
+  @Prop({type: String})
   businessAddress?: string;
 
-  @Prop()
+  @Prop({type: String})
   cacDocument?: string;
 
-  @Prop({ unique: true })
+  @Prop({ unique: true,type: String })
   cacNumber?: string;
 
   @Prop({ required: true })
@@ -56,10 +62,10 @@ export class Vendor {
   @Prop({ required: true })
   lastName: string;
 
-  @Prop()
+  @Prop({type: String})
   businessProfilePicture?: string;
 
-  @Prop({ unique: false, })
+  @Prop({ unique: true,type: String })
   @IsOptional()
   @IsEmail()
   businessEmail?: string;
@@ -68,10 +74,10 @@ export class Vendor {
   @IsEmail()
   email: string;
 
-  @Prop({ unique: true })
+  @Prop({ unique: true ,type: String })
   storeName?: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, })
   @IsNotEmpty()
   @Length(6, 20)
   @Matches(/(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/, {

@@ -128,7 +128,7 @@ export class AuthService {
       const returnedVendorUser = await newVendor.save();
       const role = 'vendor'
 
-      const token =  this.generateToken(returnedVendorUser.id,role);
+      const token = this.generateToken(returnedVendorUser.vendorID,role);
 
       return {
         vendor: returnedVendorUser,
@@ -141,7 +141,9 @@ export class AuthService {
   }
 
   generateToken(userID: string, role:string) {
-    const payload = { sub: userID, role: role };
+  
+    const payload = { sub:userID, role: role };
+   
     return jwt.sign(payload, 'process.env.JWT_SECRET', { expiresIn: '3600m' });
   }
 

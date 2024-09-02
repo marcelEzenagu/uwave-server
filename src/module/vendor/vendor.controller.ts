@@ -34,12 +34,11 @@ export class VendorController {
     return this.vendorService.findOne(+id);
   }
 
-  @Patch("up")
+  @Patch("")
   update(@Req() req: Request, @Body() updateVendorDto: UpdateVendorDto) {
    
     const vendorID = req['user'].sub
     try{
-
       return this.vendorService.update(vendorID,updateVendorDto);
     }catch(e){
       throw new BadRequestException(e)

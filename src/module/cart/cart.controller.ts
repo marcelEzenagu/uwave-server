@@ -1,4 +1,4 @@
-import { Controller,UseGuards, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+import { Controller,UseGuards, Get, Post, Body, Patch, Param, Delete, Req, BadRequestException } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { Cart } from './entities/cart.entity';
@@ -42,7 +42,14 @@ export class CartController {
   @Delete()
   remove(
     @Req() req: Request)  {
-      const userID = req['user'].sub
-    return this.cartService.remove(userID);
+      // try {
+        const userID = req['user'].sub
+        
+        return this.cartService.remove(userID);
+      // } catch (e) {
+      //   console.log("CART ERROR",e)
+      //   throw new BadRequestException(this.cartService.formatErrors(e));
+
+      // }
   }
 }

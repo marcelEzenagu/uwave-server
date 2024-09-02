@@ -4,8 +4,7 @@ import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 
 import { Document, Types } from 'mongoose';
 import { v4 as uuid } from "uuid";
-import { Type } from "class-transformer";
-import {Product,ProductSchema} from "../../product/entities/product.entity"
+
 export type CartDocument = Cart & Document
 
 

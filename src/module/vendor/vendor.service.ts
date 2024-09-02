@@ -26,18 +26,16 @@ export class VendorService {
   }
   
   async update(id: string, updateVendorDto: UpdateVendorDto):Promise<Vendor> {
-    // const {firstName,lastName,email,password,...updateFields}= updateVendorDto
+   
     const where= {"vendorID":id}
-    return await  this.vendorModel.findOneAndUpdate(where,updateVendorDto, {new: true, runValidators: true })
+    return await  this.vendorModel.findOneAndUpdate(where,updateVendorDto, {new: true })
   }
   async findWhere(where:{}):Promise<Vendor> {
     return await  this.vendorModel.findOne().where(where).exec();
   }
   
   async remove(where):Promise<any> {
-  // async remove(id):Promise<any> {
-    // return await  this.vendorModel.findByIdAndDelete(id);
-    return await  this.vendorModel.where(where).findOneAndDelete().exec;
+  return await  this.vendorModel.where(where).findOneAndDelete().exec;
   }
 
   formatErrors(error: any) {
