@@ -16,6 +16,6 @@ import { AuthModule } from '../auth/auth.module';
 export class VendorModule {
   configure(consumer:MiddlewareConsumer){
     consumer.apply(AccessTokenMiddleware)
-    .forRoutes({path:'vendors',method:RequestMethod.ALL})
+    .forRoutes({path:'vendors*',method:RequestMethod.ALL})
   }
 }

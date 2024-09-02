@@ -1,4 +1,4 @@
-import { Controller, Get, Post,HttpStatus, Body, Patch, Param, Delete, Res, BadRequestException } from '@nestjs/common';
+import { Controller,Req, Get, Post,HttpStatus, Body, Patch, Param, Delete, Res, BadRequestException } from '@nestjs/common';
 import { VendorService } from './vendor.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
@@ -9,9 +9,10 @@ import { ErrorFormat } from 'src/helpers/errorFormat';
 export class VendorController {
   constructor(private readonly vendorService: VendorService) {}
 
-  @Post()
+  // @Post()
   async create(@Res() response, @Body() createVendorDto: Vendor) {
     try{
+
       const newVendor = await this.vendorService.create(createVendorDto);
       return response.status(HttpStatus.CREATED).json({
         newVendor
@@ -33,9 +34,16 @@ export class VendorController {
     return this.vendorService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVendorDto: Vendor) {
-    return this.vendorService.update(+id, updateVendorDto);
+  @Patch("up")
+  update(@Req() req: Request, @Body() updateVendorDto: UpdateVendorDto) {
+   
+    const vendorID = req['user'].sub
+    try{
+
+      return this.vendorService.update(vendorID,updateVendorDto);
+    }catch(e){
+      throw new BadRequestException(e)
+    }
   }
 
   @Delete(':id')

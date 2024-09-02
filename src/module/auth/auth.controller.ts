@@ -33,8 +33,10 @@ export class AuthController {
   }
   @Post("vendors/register")
   async registerVendor(@Body() createAuthDto: Vendor):Promise <LogInVendorResponseDto> {
+    console.log("createAuthDto:: ")
   try {
     
+    console.log("createAuthDto:: ",createAuthDto)
       return await this.authService.registerVendor(createAuthDto);
     } catch (e) {
       throw new BadRequestException(this.vendorService.formatErrors(e));

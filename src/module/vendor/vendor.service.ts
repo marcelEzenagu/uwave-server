@@ -2,6 +2,7 @@ import { Injectable,BadRequestException } from '@nestjs/common';
 import { InjectModel } from  '@nestjs/mongoose';
 import { Model } from  'mongoose';
 import { Vendor, VendorDocument } from '../vendor/entities/vendor.entity';
+import { UpdateVendorDto } from './dto/update-vendor.dto';
 
 
 @Injectable()
@@ -24,8 +25,10 @@ export class VendorService {
     return await  this.vendorModel.findById(id).exec();
   }
   
-  async update(id: number, updateVendorDto: Vendor):Promise<Vendor> {
-    return await  this.vendorModel.findByIdAndUpdate(id, updateVendorDto, {new: true})
+  async update(id: string, updateVendorDto: UpdateVendorDto):Promise<Vendor> {
+    // const {firstName,lastName,email,password,...updateFields}= updateVendorDto
+    const where= {"vendorID":id}
+    return await  this.vendorModel.findOneAndUpdate(where,updateVendorDto, {new: true, runValidators: true })
   }
   async findWhere(where:{}):Promise<Vendor> {
     return await  this.vendorModel.findOne().where(where).exec();

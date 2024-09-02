@@ -66,7 +66,7 @@ export class AuthService {
 
   async loginVendor(dto: VendorLogInDto): Promise<LogInVendorResponseDto> {
     try {
-      const vendor = await this.vendorService.findWhere({ businessEmail: dto.businessEmail });
+      const vendor = await this.vendorService.findWhere({ email: dto.email });
 
       if (!vendor) {
         throw new NotFoundException();
@@ -120,7 +120,8 @@ export class AuthService {
   async registerVendor(
     createVendorDto: Vendor,
   ): Promise<LogInVendorResponseDto> {
-    // try {
+    console.log("registerVendor:: ")
+
       createVendorDto.password = await this.hashData(createVendorDto.password);
       const newVendor = new this.vendorModel(createVendorDto);
 

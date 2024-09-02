@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { v4 as uuid } from 'uuid';
 import { Type } from 'class-transformer';
-import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, Length, Matches } from 'class-validator';
 
 export type VendorDocument = Vendor & Document;
 
@@ -23,41 +23,53 @@ export class Vendor {
   })
   vendorID: string;
 
+  @Prop()
+  country?: string;
+
+  @Prop({ unique: true })
+  phoneNumber?: string;
+  
+  @Prop()
+  homeAddress?: string;
+
+  @Prop()
+  idDocumentType?: string;
+  
+  @Prop()
+  idDocument?: string;
+
+  @Prop({ unique: true })
+  businessName?: string;
+
+  @Prop()
+  businessAddress?: string;
+
+  @Prop()
+  cacDocument?: string;
+
+  @Prop({ unique: true })
+  cacNumber?: string;
+
   @Prop({ required: true })
-  country: string;
-  @Prop({ required: true })
-  phoneNumber: string;
-  @Prop({ required: true })
-  homeAddress: string;
-  @Prop({ required: true })
-  idDocumentType: string;
-  @Prop({ required: true })
-  idDocument: string;
-  @Prop({ required: true })
-  businessName: string;
-  @Prop({ required: true })
-  businessAddress: string;
-  @Prop({ required: true })
-  businessPhone: string;
-  @Prop({ required: true })
-  cacDocument: string;
-  @Prop({ required: true })
-  cacNumber: string;
-  @Prop({ required: true })
-  fullName: string;
+  firstName: string;
 
   @Prop({ required: true })
   lastName: string;
-  @Prop({ type: String })
-  businessProfilePicture?: string;
-  
-  @Prop({ required: true, unique: true })
-  @IsEmail()
-  businessEmail: string;
 
-  @Prop({ required: true, unique: true })
-  // @IsUnique("Vendor","storeName",{ message: 'this storeName already exists' })
-  storeName: string;
+  @Prop()
+  businessProfilePicture?: string;
+
+  @Prop({ unique: false, })
+  @IsOptional()
+  @IsEmail()
+  businessEmail?: string;
+
+  @Prop({ unique: true, required: true })
+  @IsEmail()
+  email: string;
+
+  @Prop({ unique: true })
+  storeName?: string;
 
   @Prop({ required: true })
   @IsNotEmpty()

@@ -18,7 +18,7 @@ export class LogInDto {
 export class VendorLogInDto {
   @Prop({ required:true,unique:true})
   @IsEmail()
-    businessEmail:string;
+    email:string;
   @Prop({ required:true})
   @IsNotEmpty()
   @Length(6, 20)
