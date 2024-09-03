@@ -1,4 +1,4 @@
-import { Injectable,UnauthorizedException, } from '@nestjs/common';
+import { Injectable,NotFoundException,UnauthorizedException, } from '@nestjs/common';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { Cart, CartDocument } from './entities/cart.entity';
 import { InjectModel } from  '@nestjs/mongoose';
@@ -10,10 +10,19 @@ import { error } from 'console';
 export class CartService {
   constructor(@InjectModel(Cart.name) private cartModel: Model<CartDocument>) {}
 
-  addToCart(createCartDto: Cart) {
-    console.log("HERE addToCart")
-    const newUserCart = new this.cartModel(createCartDto)
-    return newUserCart.save();
+  async addToCart(createCartDto: Cart) {
+    
+    const where = {"userID":createCartDto.userID}
+    const result= await  this.cartModel.findOne().where(where).exec();
+    if (result == undefined){
+      console.log("HERE addToCart")
+      
+      const newUserCart = new this.cartModel(createCartDto)
+      return newUserCart.save();
+    }else{
+      console.log("HERE existing cart")
+  return result
+    }
   }
 
   findAll() {
@@ -24,7 +33,7 @@ export class CartService {
     const where = {userID}
     const result= await  this.cartModel.findOne().where(where).exec();
     if (result == undefined){
-      throw new UnauthorizedException('cart not found for this user');
+      throw new NotFoundException('cart not found for this user');
     }else{
   return result
     }
@@ -40,7 +49,7 @@ export class CartService {
 
   const result = await  this.cartModel.findOneAndDelete(where)
   if (result == undefined){
-    throw new UnauthorizedException('user-cart not found');
+    throw new NotFoundException('user-cart not found');
   }else{
 return "cart deleted successfully"   
 
@@ -53,7 +62,6 @@ return "cart deleted successfully"
   }
 
   formatErrors(error: any) {
-    console.log("ERROR:: ",error)
 
     if(error.name === 'MongoServerError'){
      const field = Object.keys(error.keyPattern)[0];
