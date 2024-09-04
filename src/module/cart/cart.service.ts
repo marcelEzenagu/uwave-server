@@ -3,7 +3,6 @@ import { UpdateCartDto } from './dto/update-cart.dto';
 import { Cart, CartDocument } from './entities/cart.entity';
 import { InjectModel } from  '@nestjs/mongoose';
 import { Model } from  'mongoose';
-import { error } from 'console';
 
 
 @Injectable()
@@ -56,13 +55,24 @@ return "cart deleted successfully"
   }
 
   }
+ async removeCart(cartID,userID: string) {
+  const where = {cartID,userID}
+
+  const result = await  this.cartModel.findOneAndDelete(where)
+  if (result == undefined){
+    throw new NotFoundException('user-cart not found');
+  }else{
+return "cart deleted successfully"   
+
+  }
+
+  }
 
   async findWhere(where:{}):Promise<Cart> {
     return await  this.cartModel.findOne().where(where).exec();
   }
 
   formatErrors(error: any) {
-
     if(error.name === 'MongoServerError'){
      const field = Object.keys(error.keyPattern)[0];
        return `Duplicate value for field: ${field}`;

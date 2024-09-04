@@ -12,14 +12,22 @@ import {
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { CartService } from '../cart/cart.service';
 
 @Controller('orders')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(
+    private readonly orderService: OrderService,
+
+    private  cart: CartService) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
+  async create(@Body() createOrderDto: CreateOrderDto,
+  @Req() req: Request
+) {
     try {
+      const userID = req['user'].sub;
+      await this.cart.removeCart(createOrderDto.cartID,userID)
       return this.orderService.create(createOrderDto);
     } catch (e) {
       throw new BadRequestException(e);

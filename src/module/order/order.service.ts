@@ -13,6 +13,8 @@ export class OrderService {
 
   create(createOrderDto: CreateOrderDto) {
     console.log('createOrderDto:: ', createOrderDto);
+    
+    
     const newUserOrder = new this.orderModel(createOrderDto);
     return newUserOrder.save();
   }
