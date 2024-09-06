@@ -4,6 +4,7 @@ import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { Vendor } from './entities/vendor.entity';
 import { ErrorFormat } from 'src/helpers/errorFormat';
+import { Request } from 'express';
 
 @Controller('vendors')
 export class VendorController {
@@ -35,7 +36,8 @@ export class VendorController {
   }
 
   @Patch("")
-  update(@Req() req: Request, @Body() updateVendorDto: UpdateVendorDto) {
+  update(@Req() req: Request,
+   @Body() updateVendorDto: UpdateVendorDto) {
    
     const vendorID = req['user'].sub
     try{

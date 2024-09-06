@@ -4,6 +4,12 @@ import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 
 import { Document, Types } from 'mongoose';
 
+export enum OptionType {
+  ACCEPTED= "ACCEPTED",
+  CANCELLED="CANCELLED",
+  REJECTED="REJECTED",
+}
+
 @Schema({
     toJSON: {
       getters: true,
@@ -16,8 +22,11 @@ import { Document, Types } from 'mongoose';
       },
     },
     timestamps: true,
-  
   })
+
+
+
+ 
 
 export class Order {
 
@@ -39,24 +48,28 @@ export class Order {
         default: [],
       })
     products: [];
-  
-  
-      @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-      userID: Types.ObjectId;
+
+    @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+    userID: Types.ObjectId;
   
     @Prop({ type: Number, })
     totalCost: number;
     
+    @Prop({ type: String,enum:OptionType,default:OptionType.ACCEPTED})
+    status?: string ;
+
     @Prop({ type: Date, default: null })
     deletedAt: Date | null;
-
 }
 
-export type OrderDocument = Order & Document
 
+
+
+export type OrderDocument = Order & Document
 export const OrderSchema = SchemaFactory.createForClass(Order)
 
 // Create a virtual field `orderID` that points to the `_id` field
 OrderSchema.virtual('orderID').get(function (this: OrderDocument) {
-    return (this._id as Types.ObjectId).toHexString(); // Explicitly cast _id to ObjectId and convert to string
+    return (this._id as Types.ObjectId).toHexString(); 
+    // Explicitly cast _id to ObjectId and convert to string
   });

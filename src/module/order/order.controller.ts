@@ -13,6 +13,8 @@ import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CartService } from '../cart/cart.service';
+import { OptionType } from './entities/order.entity';
+import { Request } from 'express';
 
 @Controller('orders')
 export class OrderController {
@@ -25,6 +27,7 @@ export class OrderController {
   async create(@Body() createOrderDto: CreateOrderDto,
   @Req() req: Request
 ) {
+
     try {
       const userID = req['user'].sub;
       await this.cart.removeCart(createOrderDto.cartID,userID)
@@ -75,11 +78,40 @@ export class OrderController {
 
       const isOrderForUser = await this.orderService.isOrderForUser(id, userID);
       if (!isOrderForUser) {
-        console.log('NOT');
         throw new Error('Invalid access');
       }
-      console.log('yes');
+      if (updateOrderDto.status != OptionType.ACCEPTED){
+        
+        throw new Error('cannot modify order status at this point');
+      }
       return await this.orderService.update(id, userID, updateOrderDto);
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  @Patch(':id/cancel')
+  async cancelOrder(
+    @Param('id')
+    id: string,
+    @Req() req: Request,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ) {
+    try {
+
+// include that only agent can rejectOrder;
+      const userID = req['user'].sub;
+      const role = req['user'].role;
+
+      if(role == "user"){
+        const isOrderForUser = await this.orderService.isOrderForUser(id, userID);
+        if (!isOrderForUser) {
+          throw new Error('Invalid access');
+        }
+        updateOrderDto.status=OptionType.CANCELLED
+      }
+
+      return await this.orderService.updateStatus(id, userID, updateOrderDto);
     } catch (error) {
       throw new BadRequestException(error);
     }

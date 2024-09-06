@@ -30,6 +30,7 @@ export class OrderService {
   async findWhere(where: {}): Promise<Order> {
     return await this.orderModel.findOne().where(where).exec();
   }
+
   async isOrderForUser(orderID,userID: string): Promise<Boolean> {
     const where = {userID,"_id":orderID}
     const result = await this.orderModel.findOne().where(where).exec();
@@ -48,9 +49,18 @@ export class OrderService {
       new: true,
     });
   }
+  async updateStatus(orderID, userID: string, updateOrderDto: UpdateOrderDto) {
+    const where = { userID, _id: orderID };
+
+    const updatedStatus = {"status":updateOrderDto.status}
+    return await this.orderModel.findOneAndUpdate(where, updateOrderDto, {
+      new: true,
+    });
+  }
 
   async remove(where): Promise<any> {
     await this.orderModel.findOneAndDelete(where);
     return `This action removes a #${where?._id} order`;
   }
+  
 }
