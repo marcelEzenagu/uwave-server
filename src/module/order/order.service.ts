@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order, OrderDocument } from './entities/order.entity';
-import { Model } from 'mongoose';
+import { Model,Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
@@ -31,12 +31,23 @@ export class OrderService {
     return await this.orderModel.findOne().where(where).exec();
   }
 
-  async isOrderForUser(orderID,userID: string): Promise<Boolean> {
+  async isOrderForUser(orderID,userID: string) {
+    // const where = {userID,"_id":mongoose.Types.ObjectId(orderID)
+    const objectId = new Types.ObjectId(orderID); // Convert string to ObjectId manually
+
+    // const where = {userID,"_id":objectId}
     const where = {userID,"_id":orderID}
-    const result = await this.orderModel.findOne().where(where).exec();
-    if(result == undefined){
-      return false
+
+    const result = await this.orderModel.findOne(where).exec();
+    console.log("WHERE:: ",where,"result:: ",result)
+    
+    // process.exit()
+    if(result != undefined){
+      console.log("HERE")
+      
+      return {success:true,result}
     }
+    console.log("NHERE")
   }
 
   async findUserOrders(where: {}) {

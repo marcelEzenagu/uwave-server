@@ -76,11 +76,12 @@ export class OrderController {
     try {
       const userID = req['user'].sub;
 
+
       const isOrderForUser = await this.orderService.isOrderForUser(id, userID);
-      if (!isOrderForUser) {
+      if (!isOrderForUser.success) {
         throw new Error('Invalid access');
       }
-      if (updateOrderDto.status != OptionType.ACCEPTED){
+      if (isOrderForUser.result.status != OptionType.ACCEPTED){
         
         throw new Error('cannot modify order status at this point');
       }
@@ -99,15 +100,17 @@ export class OrderController {
   ) {
     try {
 
-// include that only agent can rejectOrder;
       const userID = req['user'].sub;
       const role = req['user'].role;
 
+
       if(role == "user"){
         const isOrderForUser = await this.orderService.isOrderForUser(id, userID);
-        if (!isOrderForUser) {
+          if (!isOrderForUser.success) {
+
           throw new Error('Invalid access');
         }
+
         updateOrderDto.status=OptionType.CANCELLED
       }
 
