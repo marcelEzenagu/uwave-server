@@ -7,11 +7,12 @@ import { UserModule } from '../user/user.module';
 import { VendorModule } from '../vendor/vendor.module';
 import forFeatureDb from 'src/db/for-feature.db';
 import { MongooseModule } from '@nestjs/mongoose';
+import { UWaveUserService } from '../u-wave-user/u-wave-user.service';
 
 @Module({
   controllers: [AuthController],
   exports: [AuthService],
-  providers: [AuthService,UserService,VendorService],
+  providers: [AuthService,UserService,VendorService,UWaveUserService],
   imports: [
     MongooseModule.forFeature(forFeatureDb),
   ],})

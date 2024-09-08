@@ -9,23 +9,28 @@ import {
   LogInVendorResponseDto,VendorLogInDto
 } from './dto/login.dto';
 import { UserService } from '../user/user.service';
+import { VendorService } from '../vendor/vendor.service';
+import { UWaveUserService } from '../u-wave-user/u-wave-user.service';
 import * as bcrypt from 'bcrypt';
+
 import { randomBytes } from 'crypto';
 import { UserDocument, User } from '../user/entities/user.entity';
 import { VendorDocument, Vendor } from '../vendor/entities/vendor.entity';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AccessTokenDto } from './dto/access-token.dto';
-import { VendorService } from '../vendor/vendor.service';
+import { WaveUser, WaveUserDocument } from '../u-wave-user/entities/u-wave-user.entity';
 const jwt = require('jsonwebtoken');
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
+    private waveUserService: UWaveUserService,
     private vendorService: VendorService,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Vendor.name) private vendorModel: Model<VendorDocument>,
+    @InjectModel(WaveUser.name) private uWaveUserModel: Model<WaveUserDocument>,
   ) {}
 
   private generateRandomCharacters(length: number) {
@@ -35,6 +40,12 @@ export class AuthService {
     return characters;
   }
 
+  
+
+  private hashData(data: string) {
+    return bcrypt.hash(data, 10);
+  }
+  
   async loginUser(dto: LogInDto): Promise<LogInUserResponseDto> {
     try {
       const user = await this.userService.findWhere({ email: dto.email });
@@ -62,6 +73,73 @@ export class AuthService {
       }
       throw error;
     }
+  }
+
+  async registerUser(createUserDto: User): Promise<LogInUserResponseDto> {
+    // try {
+      createUserDto.password = await this.hashData(createUserDto.password);
+      const newUser = new this.userModel(createUserDto);
+      // console.log('createUserDto.password1 :: ', createUserDto.password);
+      // createUserDto.password = await this.hashData(createUserDto.password);
+      // console.log('createUserDto.password:: ', createUserDto.password);
+
+      // console.log('newUser:: ', newUser);
+      const returnedUser = await newUser.save();
+      const role = 'user'
+
+      const token = this.generateToken(newUser.userID,role);
+
+      return {
+        access_data: { token, role },
+        user: returnedUser,
+      };
+    
+  }
+
+  async loginUWaveUser(dto: LogInDto): Promise<LogInUserResponseDto> {
+    try {
+      const user = await this.waveUserService.findWhere({ email: dto.email });
+
+      if (!user) {
+        throw new NotFoundException();
+      }
+
+      const passwordMatch = await bcrypt.compare(dto.password, user.password);
+
+      if (!passwordMatch) {
+        throw new UnauthorizedException('Invalid email or password');
+      }
+
+      const  role = 'user' 
+      const accessTokenData = this.generateToken(user.userID,role);
+
+      return {
+        access_data: { access_token: accessTokenData, role },
+        user: user,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException('Invalid email or password');
+      }
+      throw error;
+    }
+  }
+
+  async registerUWaveUser(createUserDto: WaveUser): Promise<LogInUserResponseDto> {
+    // try {
+      createUserDto.password = await this.hashData(createUserDto.password);
+      const newUser = new this.uWaveUserModel(createUserDto);
+      
+      const returnedUser = await newUser.save();
+      const role = 'user'
+
+      const token = this.generateToken(newUser.userID,role);
+
+      return {
+        access_data: { token, role },
+        user: returnedUser,
+      };
+    
   }
 
   async loginVendor(dto: VendorLogInDto): Promise<LogInVendorResponseDto> {
@@ -92,31 +170,7 @@ export class AuthService {
     }
   }
 
-  private hashData(data: string) {
-    return bcrypt.hash(data, 10);
-  }
-
-  async registerUser(createUserDto: User): Promise<LogInUserResponseDto> {
-    // try {
-      createUserDto.password = await this.hashData(createUserDto.password);
-      const newUser = new this.userModel(createUserDto);
-      // console.log('createUserDto.password1 :: ', createUserDto.password);
-      // createUserDto.password = await this.hashData(createUserDto.password);
-      // console.log('createUserDto.password:: ', createUserDto.password);
-
-      // console.log('newUser:: ', newUser);
-      const returnedUser = await newUser.save();
-      const role = 'user'
-
-      const token = this.generateToken(newUser.userID,role);
-
-      return {
-        access_data: { token, role },
-        user: returnedUser,
-      };
-    
-  }
-
+ 
   async registerVendor(
     createVendorDto: Vendor,
   ): Promise<LogInVendorResponseDto> {

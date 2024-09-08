@@ -13,12 +13,14 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './helpers/new'
 import { HealthController } from './health/health.controller';
 import { SavedItemsModule } from './module/saved-items/saved-items.module';
+import { UWaveUserModule } from './module/u-wave-user/u-wave-user.module';
+import { UWaveAdminModule } from './module/u-wave-admin/u-wave-admin.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot(process.env.URI,),
             MongooseModule.forFeature(forFeatureDb),
-    UserModule, VendorModule, AdminModule, ProductModule, OrderModule, AuthModule, CartModule, LogisticsModule, SavedItemsModule],
+    UserModule, VendorModule, AdminModule, ProductModule, OrderModule, AuthModule, CartModule, LogisticsModule, SavedItemsModule, UWaveUserModule, UWaveAdminModule],
   providers:[
     // {
     //   provide: APP_FILTER,

@@ -1,9 +1,9 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { MongooseModule } from "@nestjs/mongoose";
 import { AccessTokenMiddleware } from '../common/middleware/auth.middleware'
+import forFeatureDb from 'src/db/for-feature.db';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import forFeatureDb from 'src/db/for-feature.db';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
