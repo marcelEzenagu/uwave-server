@@ -6,6 +6,7 @@ import { Product,ProductSchema } from "src/module/product/entities/product.entit
 import { Cart,CartSchema } from "src/module/cart/entities/cart.entity";
 import { Logistic,LogisticSchema } from "src/module/logistics/entities/logistic.entity";
 import { Order ,OrderSchema} from "src/module/order/entities/order.entity";
+import { SavedItem,SavedItemSchema } from "src/module/saved-items/entities/saved-item.entity";
 
 export default [
   { name: User.name, schema: UserSchema },
@@ -15,4 +16,5 @@ export default [
   { name: Cart.name, schema: CartSchema },
   { name: Logistic.name, schema: LogisticSchema },
   { name: Order.name, schema: OrderSchema },
+  { name: SavedItem.name, schema: SavedItemSchema },
 ];

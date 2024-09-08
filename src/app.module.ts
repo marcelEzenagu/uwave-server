@@ -12,12 +12,13 @@ import forFeatureDb from './db/for-feature.db';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './helpers/new'
 import { HealthController } from './health/health.controller';
+import { SavedItemsModule } from './module/saved-items/saved-items.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot(process.env.URI,),
             MongooseModule.forFeature(forFeatureDb),
-    UserModule, VendorModule, AdminModule, ProductModule, OrderModule, AuthModule, CartModule, LogisticsModule],
+    UserModule, VendorModule, AdminModule, ProductModule, OrderModule, AuthModule, CartModule, LogisticsModule, SavedItemsModule],
   providers:[
     // {
     //   provide: APP_FILTER,

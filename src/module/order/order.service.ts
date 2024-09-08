@@ -47,6 +47,7 @@ export class OrderService {
       
       return {success:true,result}
     }
+    return {success:false}
     console.log("NHERE")
   }
 
@@ -73,5 +74,67 @@ export class OrderService {
     await this.orderModel.findOneAndDelete(where);
     return `This action removes a #${where?._id} order`;
   }
+
+  async getVendorSales(vendorID: string) {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  
+    return await this.orderModel.aggregate([
+      // Match orders that contain items for the given vendor and are within the last 7 days
+      { 
+        $match: { 
+          'items.vendorID': vendorID,
+          createdAt: { $gte: sevenDaysAgo }  // Only include orders from the last 7 days
+        } 
+      },
+      
+      // Unwind the items array to work with each item individually
+      { $unwind: '$items' },
+      
+      // Group by vendorID and sum the total sales (quantity * price)
+      { 
+        $group: {
+          _id: '$items.vendorID',
+          totalSales: { 
+            $sum: { $multiply: ['$items.quantity', '$items.price'] } 
+          },
+          orderCount: { $sum: 1 } // Count the number of orders
+        }
+      }
+    ]);
+  }
+  
+  async getAllVendorSales(vendorID: string) {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  
+    return await this.orderModel.aggregate([
+      // Match orders that contain items for the given vendor and are within the last 7 days
+      { 
+        $match: { 
+          'items.vendorID': vendorID,
+          createdAt: { $gte: sevenDaysAgo }  // Only include orders from the last 7 days
+        } 
+      },
+      
+      // Unwind the items array to work with each item individually
+      { $unwind: '$items' },
+      
+      // { $match: { 'items.vendorID': vendorID } },
+      
+      // Group by vendorID, sum total sales, and collect the ordered items
+      { 
+        $group: {
+          _id: '$items.vendorID',
+          totalSales: { 
+            $sum: { $multiply: ['$items.quantity', '$items.price'] } 
+          },
+          orderCount: { $sum: 1 }, // Count the number of orders
+          items: { $push: '$items' } // Collect all items belonging to the vendor
+        }
+      }
+    ]);
+  }
+  
   
 }

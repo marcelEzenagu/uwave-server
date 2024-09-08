@@ -110,7 +110,10 @@ export class OrderController {
 
           throw new Error('Invalid access');
         }
-
+        if (isOrderForUser.result.status != OptionType.ACCEPTED){
+        
+          throw new Error('cannot modify order status at this point');
+        }
         updateOrderDto.status=OptionType.CANCELLED
       }
 
