@@ -15,12 +15,13 @@ import { HealthController } from './health/health.controller';
 import { SavedItemsModule } from './module/saved-items/saved-items.module';
 import { UWaveUserModule } from './module/u-wave-user/u-wave-user.module';
 import { UWaveAdminModule } from './module/u-wave-admin/u-wave-admin.module';
+import { FreightModule } from './module/freight/freight.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot(process.env.URI,),
             MongooseModule.forFeature(forFeatureDb),
-    UserModule, VendorModule, AdminModule, ProductModule, OrderModule, AuthModule, CartModule, LogisticsModule, SavedItemsModule, UWaveUserModule, UWaveAdminModule],
+    UserModule, VendorModule, AdminModule, ProductModule, OrderModule, AuthModule, CartModule, LogisticsModule, SavedItemsModule, UWaveUserModule, UWaveAdminModule, FreightModule],
   providers:[
     // {
     //   provide: APP_FILTER,

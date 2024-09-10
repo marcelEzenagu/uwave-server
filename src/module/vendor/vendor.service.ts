@@ -22,7 +22,11 @@ export class VendorService {
   }
   
   async findOne(id):Promise<Vendor> {
-    return await  this.vendorModel.findById(id).exec();
+    const where = {"vendorID":id}
+    console.log("where: ",where)
+    return await  this.vendorModel.findOne().where(where).exec();
+  
+    // return await  this.vendorModel.findById(id).exec();
   }
   
   async update(id: string, updateVendorDto: UpdateVendorDto):Promise<Vendor> {

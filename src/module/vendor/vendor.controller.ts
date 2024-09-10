@@ -10,35 +10,34 @@ import { Request } from 'express';
 export class VendorController {
   constructor(private readonly vendorService: VendorService) {}
 
-  // @Post()
-  async create(@Res() response, @Body() createVendorDto: Vendor) {
-    try{
-
-      const newVendor = await this.vendorService.create(createVendorDto);
-      return response.status(HttpStatus.CREATED).json({
-        newVendor
-      })
-    }catch(e){
-      throw new BadRequestException(this.vendorService.formatErrors(e));
-    }
-  
-  }
-  
-
   @Get()
   findAll() {
     return this.vendorService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.vendorService.findOne(+id);
+  @Get('/details')
+  findOne(@Req() req: Request) {
+    try {
+    const vendorID = req['user'].sub
+    const role = req['user'].role
+
+    if(role !="vendor"){
+      throw new BadRequestException("unaccessible to non-vendors");
+    }
+
+    return this.vendorService.findOne(vendorID);
+  } catch (e) {
+    throw new BadRequestException(e);
+  }
   }
 
   @Patch("")
   update(@Req() req: Request,
    @Body() updateVendorDto: UpdateVendorDto) {
-   
+    const role = req['user'].role
+    if(role !="vendor"){
+      throw new BadRequestException("unaccessible to non-vendors");
+    }
     const vendorID = req['user'].sub
     try{
       return this.vendorService.update(vendorID,updateVendorDto);
