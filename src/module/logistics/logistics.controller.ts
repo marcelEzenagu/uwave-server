@@ -12,6 +12,7 @@ export class LogisticsController {
   create(@Body() createLogisticDto: CreateLogisticDto) {
     return this.logisticsService.create(createLogisticDto);
   }
+  
   @Post("exists")
   createForExisting(@Body() createLogisticDto: CreateLogisticDto) {
     return this.logisticsService.createExistingShipment(createLogisticDto);

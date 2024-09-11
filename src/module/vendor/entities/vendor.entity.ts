@@ -44,7 +44,7 @@ export class Vendor {
   @Prop({type: String})
   idDocument?: string;
 
-  @Prop({ unique: true,type: String })
+  @Prop({ type: String })
   businessName?: string;
 
   @Prop({type: String})
@@ -53,7 +53,7 @@ export class Vendor {
   @Prop({type: String})
   cacDocument?: string;
 
-  @Prop({ unique: true,type: String })
+  @Prop({type: String })
   cacNumber?: string;
 
   @Prop({ required: true })
@@ -65,7 +65,7 @@ export class Vendor {
   @Prop({type: String})
   businessProfilePicture?: string;
 
-  @Prop({ unique: true,type: String })
+  @Prop({ type: String })
   @IsOptional()
   @IsEmail()
   businessEmail?: string;
@@ -74,7 +74,7 @@ export class Vendor {
   @IsEmail()
   email: string;
 
-  @Prop({ unique: true ,type: String })
+  @Prop({ type: String })
   storeName?: string;
 
   @Prop({ required: true, })

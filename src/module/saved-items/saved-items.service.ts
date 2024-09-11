@@ -13,9 +13,7 @@ export class SavedItemsService {
     @InjectModel(SavedItem.name) private savedItemsModel: Model<SavedItemDocument>,
   ){}
 
-  create(createSavedItemDto: CreateSavedItemDto) {
-    return 'This action adds a new savedItem';
-  }
+
   async saveItem(createSavedItemDto: CreateSavedItemDto) {
 
     const where = {"userID":createSavedItemDto.userID,"productID":createSavedItemDto.productID}

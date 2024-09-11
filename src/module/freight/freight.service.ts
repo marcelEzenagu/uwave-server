@@ -1,26 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFreightDto } from './dto/create-freight.dto';
 import { UpdateFreightDto } from './dto/update-freight.dto';
+import { InjectModel } from  '@nestjs/mongoose';
+import { Model } from  'mongoose';
+import { Freight,FreightDocument } from './entities/freight.entity';
 
 @Injectable()
 export class FreightService {
-  create(createFreightDto: CreateFreightDto) {
-    return 'This action adds a new freight';
+  constructor(
+    @InjectModel(Freight.name) private freightModel: Model<FreightDocument>
+    ) {}
+
+  async create(createFreightDto: CreateFreightDto) {
+  
+    const newSavedItem = new this.freightModel(createFreightDto);
+    return newSavedItem.save();
+  
   }
 
-  findAll() {
-    return `This action returns all freight`;
+  async findAll() {
+    return await  this.freightModel.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} freight`;
+  async findOne(userID,id: string) {
+    const where = {"userID":userID,"_id":id}
+    return await  this.freightModel.findOne().where(where).exec();
   }
 
-  update(id: number, updateFreightDto: UpdateFreightDto) {
-    return `This action updates a #${id} freight`;
+  async update(id: string, updateFreightDto: UpdateFreightDto) {
+    return await  this.freightModel.findByIdAndUpdate(id, updateFreightDto, {new: true})
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} freight`;
-  }
+ 
 }

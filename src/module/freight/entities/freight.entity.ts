@@ -17,24 +17,29 @@ import { Document, Types } from 'mongoose';
     },
     timestamps: true,
   })
+
+  
 export class Freight {
 
-    @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+    @Prop({ type: Types.ObjectId, ref: 'WaveUser', required: true })
     userID: Types.ObjectId;
 
-    @Prop({type:String})
+    @Prop({type:String,required:true})
     freightType:string
 
-    @Prop({type:Number})
+    @Prop({type:Number,required:true})
     freightWeight:number
+
     @Prop({
         type: [{ 
         itemID: { type: String},
         name: { type: String, required: true },
        _id: false 
-      }],
-      default: [],
-
+      }]
+      ,required:true
     })
     freightItems:[];
 }
+
+export type FreightDocument = Freight & Document
+export const FreightSchema = SchemaFactory.createForClass(Freight)

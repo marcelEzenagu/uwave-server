@@ -8,6 +8,7 @@ import { Logistic,LogisticSchema } from "src/module/logistics/entities/logistic.
 import { Order ,OrderSchema} from "src/module/order/entities/order.entity";
 import { SavedItem,SavedItemSchema } from "src/module/saved-items/entities/saved-item.entity";
 import { WaveUser,WaveUserSchema } from "src/module/u-wave-user/entities/u-wave-user.entity";
+import { Freight, FreightSchema } from "src/module/freight/entities/freight.entity";
 
 export default [
   { name: User.name, schema: UserSchema },
@@ -19,4 +20,5 @@ export default [
   { name: Order.name, schema: OrderSchema },
   { name: SavedItem.name, schema: SavedItemSchema },
   { name: WaveUser.name, schema: WaveUserSchema },
+  { name: Freight.name, schema: FreightSchema },
 ];
