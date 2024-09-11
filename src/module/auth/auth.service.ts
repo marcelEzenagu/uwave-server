@@ -164,7 +164,7 @@ export class AuthService {
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw new UnauthorizedException('Invalid phone number or password');
+        throw new UnauthorizedException('Invalid email or password');
       }
       throw error;
     }

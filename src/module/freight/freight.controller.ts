@@ -38,6 +38,9 @@ export class FreightController {
 
 ) {
      const userID = req['user'].sub;
+      if (updateFreightDto.agreeToTerms=== false){
+      
+      }
 
     return this.freightService.update(id, updateFreightDto);
   }

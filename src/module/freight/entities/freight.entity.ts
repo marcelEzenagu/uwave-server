@@ -18,7 +18,7 @@ import { Document, Types } from 'mongoose';
     timestamps: true,
   })
 
-  
+
 export class Freight {
 
     @Prop({ type: Types.ObjectId, ref: 'WaveUser', required: true })
@@ -26,6 +26,9 @@ export class Freight {
 
     @Prop({type:String,required:true})
     freightType:string
+
+    @Prop({type:Boolean,required:true})
+    agreeToTerms:boolean
 
     @Prop({type:Number,required:true})
     freightWeight:number
