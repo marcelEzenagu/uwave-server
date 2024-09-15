@@ -4,14 +4,17 @@ import {
   BadRequestException,
   Post,
   Body,
-  Patch,Req,
-  Param,UnauthorizedException,
+  Patch,
+  Req,
+  Param,
+  UnauthorizedException,
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
+import { ResetPasswordDto } from '../auth/dto/reset.dto';
 
 @Controller('users')
 export class UserController {
@@ -27,11 +30,10 @@ export class UserController {
   }
 
   @Get('/details')
- async findOne(
-  @Req() req: Request, ) {
+  async findOne(@Req() req: Request) {
     try {
-      const userID = req['user'].sub
-      
+      const userID = req['user'].sub;
+
       return await this.userService.findOne(userID);
     } catch (e) {
       throw new BadRequestException(this.userService.formatErrors(e));
@@ -39,15 +41,15 @@ export class UserController {
   }
 
   @Patch()
-  async update(
-    @Req() req: Request,
-    @Body() updateUserDto: UpdateUserDto) {
-
+  async update(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
     try {
-      const userID = req['user'].sub
+      const userID = req['user'].sub;
 
-      const where = {userID}
-      return await this.userService.addPreferredCountry(where, updateUserDto.preferredCountry.toLowerCase());
+      const where = { userID };
+      return await this.userService.addPreferredCountry(
+        where,
+        updateUserDto.preferredCountry.toLowerCase(),
+      );
     } catch (e) {
       throw new BadRequestException(this.userService.formatErrors(e));
     }
@@ -60,5 +62,14 @@ export class UserController {
     } catch (e) {
       throw new BadRequestException(this.userService.formatErrors(e));
     }
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: Request) {
+    console.log('');
+    const userID = req['user'].sub;
+    dto.userID = userID;
+
+    return await this.userService.resetUserPassword(dto);
   }
 }

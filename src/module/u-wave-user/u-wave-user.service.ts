@@ -4,6 +4,7 @@ import { UpdateUWaveUserDto } from './dto/update-u-wave-user.dto';
 import { InjectModel } from  '@nestjs/mongoose';
 import { WaveUser,WaveUserDocument } from './entities/u-wave-user.entity';
 import { Model } from  'mongoose';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UWaveUserService {
@@ -12,6 +13,11 @@ constructor(
     WaveUser.name) private wUserModel: Model<WaveUserDocument>
   ) {}
 
+
+  // change import to b e the from auth
+  private hashData(data: string) {
+    return bcrypt.hash(data, 10);
+  }
   create(createWaveUserDto: CreateWaveUserDto) {
     return 'This action adds a new uWaveUser';
   }
@@ -24,7 +30,7 @@ constructor(
     return `This action returns a #${id} uWaveUser`;
   }
 
-  update(id: number, updateUWaveUserDto: UpdateUWaveUserDto) {
+  update(id: string, updateUWaveUserDto: UpdateUWaveUserDto) {
     return `This action updates a #${id} uWaveUser`;
   }
 

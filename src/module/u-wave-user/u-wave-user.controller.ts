@@ -24,7 +24,7 @@ export class UWaveUserController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUWaveUserDto: UpdateUWaveUserDto) {
-    return this.uWaveUserService.update(+id, updateUWaveUserDto);
+    return this.uWaveUserService.update(id, updateUWaveUserDto);
   }
 
   @Delete(':id')

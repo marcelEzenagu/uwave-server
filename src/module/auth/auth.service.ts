@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,BadRequestException,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import {
   LogInDto,
@@ -20,6 +21,10 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AccessTokenDto } from './dto/access-token.dto';
 import { WaveUser, WaveUserDocument } from '../u-wave-user/entities/u-wave-user.entity';
+import { RedisService } from '../redis/redis.service';
+import { MailerService } from '../mailer/mailer.service';
+import { MESSAGE_TEMPLATE } from '../notification/enum';
+import { ForgotPasswordDto, ResetPasswordDto, VerifyResetPasswordDto } from './dto/reset.dto';
 const jwt = require('jsonwebtoken');
 
 @Injectable()
@@ -28,10 +33,14 @@ export class AuthService {
     private userService: UserService,
     private waveUserService: UWaveUserService,
     private vendorService: VendorService,
+    private redisService: RedisService,
+    private mailService: MailerService,
+
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Vendor.name) private vendorModel: Model<VendorDocument>,
     @InjectModel(WaveUser.name) private uWaveUserModel: Model<WaveUserDocument>,
   ) {}
+
 
   private generateRandomCharacters(length: number) {
     const characters = randomBytes(Math.ceil(length / 2))
@@ -40,7 +49,32 @@ export class AuthService {
     return characters;
   }
 
-  
+  generateOtp(): string {
+    let text = '';
+    const possible = '0123456789';
+
+    for (let i = 0; i < 6; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+  }
+
+  async generateTemporaryAccessCode(
+    tokenType: 'create-account' | 'reset-password',
+    value: string,
+  ): Promise<string> {
+  // ): Promise<AccessTokenDto> {
+    const characters = this.generateRandomCharacters(86);
+    
+    console.log("characters---> ",characters)
+    const key = `${tokenType}-${characters}`;
+
+    // save to redis
+    await this.redisService.setValue(key, value)
+   
+    return characters;
+
+  }
 
   private hashData(data: string) {
     return bcrypt.hash(data, 10);
@@ -74,6 +108,79 @@ export class AuthService {
       throw error;
     }
   }
+
+  async forgotUserPassword(dto: ForgotPasswordDto): Promise<{}> {
+    try {
+      const user = await this.userService.findWhere({ email: dto.email });
+
+      if (!user) {
+        throw new NotFoundException("no user with this email");
+      }
+
+      const OTP = this.generateOtp()
+      const requestID = await this.generateTemporaryAccessCode("reset-password",OTP)
+
+      // await this.mailService.send(
+      //   {
+      //     subject:"reset-password",
+      //     to:dto.email,
+      //     template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+      //   }
+      //  )
+
+
+      console.log("GOT HERE")
+      console.log("EMAIL: ",dto.email)
+      return {
+        message: "A Password Reset OTP has been sent to this email",
+        requestID,
+        data:{
+          requestID,
+          OTP
+        }
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException('Invalid email');
+      }
+      throw error;
+    }
+  }
+
+  async verifyResetUserPassword(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
+    try {
+      const key = `reset-password-${dto.requestID}`
+
+      const foundOTP = await this.redisService.getValue(key)
+    
+      if (foundOTP !== dto.otp) {
+        throw new UnprocessableEntityException("invalid otp");
+      }
+
+       const user = await this.userService.findWhere({ email: dto.email });
+
+      if (!user) {
+        throw new NotFoundException("no user with this email");
+      }
+      
+      const  role = 'user' 
+      const accessTokenData = this.generateToken(user.userID,role);
+
+
+      return {
+ access_data: { access_token: accessTokenData, role },
+        user: user,      };
+    } catch (error) {
+      console.log("error: ", error)
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error);
+      }
+
+      throw error;
+    }
+  }
+
+  
 
   async registerUser(createUserDto: User): Promise<LogInUserResponseDto> {
     // try {
@@ -125,6 +232,105 @@ export class AuthService {
     }
   }
 
+  async forgotUWaveUserPassword(dto: ForgotPasswordDto): Promise<{}> {
+    try {
+      const user = await this.waveUserService.findWhere({ email: dto.email });
+
+      if (!user) {
+        throw new NotFoundException("no user with this email");
+      }
+
+      const OTP = this.generateOtp()
+      const requestID = await this.generateTemporaryAccessCode("reset-password",OTP)
+
+      // await this.mailService.send(
+      //   {
+      //     subject:"reset-password",
+      //     to:dto.email,
+      //     template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+      //   }
+      //  )
+
+       
+      return {
+        message: "A Password Reset OTP has been sent to this email",
+        requestID,
+        data:{
+          requestID,
+          OTP
+        }
+      };
+
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException(error);
+      }
+      throw error;
+    }
+  }
+
+  async verifyUWaveUserPassword(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
+    try {
+      const key = `reset-password-${dto.requestID}`
+
+      const foundOTP = await this.redisService.getValue(key)
+      // ({ email: dto.email });
+
+      if (foundOTP !== dto.otp) {
+        throw new UnprocessableEntityException();
+      }
+
+       const user = await this.waveUserService.findWhere({ email: dto.email });
+
+      if (!user) {
+        throw new NotFoundException("no user with this email");
+      }
+      
+      const  role = 'user' 
+      const accessTokenData = this.generateToken(user.userID,role);
+
+
+      return {
+        access_data: { access_token: accessTokenData, role },
+        user: user,      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException(error);
+      }
+      throw error;
+    }
+  }
+
+  async resetUWaveUserPassword(dto: ResetPasswordDto): Promise<{}> {
+    try {
+
+      if(dto.password != dto.confirmPassword){
+        throw new UnauthorizedException("password and confirmPassword don't match");
+        
+      }
+      const userID = dto.userID 
+      const user = await this.waveUserService.findWhere({ userID});
+
+      if (!user) {
+        throw new NotFoundException();
+      }
+
+      user.password = await this.hashData(dto.password);
+
+      this.waveUserService.update(userID,user)
+
+      return {
+        message: "Password Reset successful",
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException(error);
+      }
+      throw error;
+    }
+  }
+
+
   async registerUWaveUser(createUserDto: WaveUser): Promise<LogInUserResponseDto> {
     // try {
       createUserDto.password = await this.hashData(createUserDto.password);
@@ -170,7 +376,80 @@ export class AuthService {
     }
   }
 
- 
+  async forgotVendorPassword(dto: ForgotPasswordDto): Promise<{}> {
+    try {
+
+      const vendor = await this.vendorService.findWhere({ email: dto.email });
+
+      if (!vendor) {
+        throw new NotFoundException("no vendor with this email");
+      }
+      const OTP = this.generateOtp()
+      const requestID = await this.generateTemporaryAccessCode("reset-password",OTP)
+
+      // await this.mailService.send(
+      //   {
+      //     subject:"reset-password",
+      //     to:dto.email,
+      //     template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+      //   }
+      //  )
+
+       
+      return {
+        message: "A Password Reset OTP has been sent to this email",
+        requestID,
+        data:{
+          requestID,
+          OTP
+        }
+      };
+
+
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException('Invalid email');
+      }
+      throw error;
+    }
+  }
+
+  async verifyResetVendorPassword(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
+    try {
+      const key = `reset-password-${dto.requestID}`
+
+    
+      const foundOTP = await this.redisService.getValue(key)
+      // ({ email: dto.email });
+
+      if (foundOTP !== dto.otp) {
+        throw new UnprocessableEntityException();
+      }
+
+       const user = await this.vendorService.findWhere({ email: dto.email });
+
+      if (!user) {
+        throw new NotFoundException("no user with this email");
+      }
+      
+      const  role = 'vendor' 
+      const accessTokenData = this.generateToken(user.vendorID,role);
+
+
+      return {
+        access_data: { access_token: accessTokenData, role },
+        user: user, 
+           };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException(error);
+      }
+      throw error;
+    }
+  }
+
+  
+
   async registerVendor(
     createVendorDto: Vendor,
   ): Promise<LogInVendorResponseDto> {
@@ -208,4 +487,5 @@ export class AuthService {
       throw new UnauthorizedException('Invalid access token');
     }
   }
+
 }

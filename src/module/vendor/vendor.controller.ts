@@ -5,6 +5,7 @@ import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { Vendor } from './entities/vendor.entity';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { Request } from 'express';
+import { ResetPasswordDto } from '../auth/dto/reset.dto';
 
 @Controller('vendors')
 export class VendorController {
@@ -50,4 +51,13 @@ export class VendorController {
   remove(@Param('id') id: string) {
     return this.vendorService.remove(+id);
   }
+
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: Request) {
+    const userID = req['user'].sub;
+    dto.vendorID = userID;
+
+    return await this.vendorService.resetVendorPassword(dto);
+  }
+
 }

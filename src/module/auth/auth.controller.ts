@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, BadRequestException,Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, BadRequestException,Patch, Param, Delete, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LogInDto,VendorLogInDto,LogInUserResponseDto,LogInVendorResponseDto } from './dto/login.dto';
 import { User } from '../user/entities/user.entity';
 import { Vendor } from '../vendor/entities/vendor.entity';
 import { VendorService } from '../vendor/vendor.service';
+import { ForgotPasswordDto, ResetPasswordDto, VerifyResetPasswordDto } from './dto/reset.dto';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -11,7 +13,6 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly vendorService: VendorService,
-
   ) {}
 
   @Post("users/")
@@ -29,6 +30,29 @@ export class AuthController {
     }
   }
 
+  @Post("users/forgot-password")
+  async forgotPassword(@Body() createAuthDto: ForgotPasswordDto):Promise<{}>{
+      return await this.authService.forgotUserPassword(createAuthDto);
+  }
+
+  @Post("users/verify-password")
+  async verifyPassword(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
+      return await this.authService.verifyResetUserPassword(dto);
+  }
+  @Post("wave/users/forgot-password")
+  async forgotWaveUserPassword(@Body() createAuthDto: ForgotPasswordDto):Promise<{}>{
+      return await this.authService.forgotUWaveUserPassword(createAuthDto);
+   
+  }
+
+  @Post("wave/users/verify-password")
+  async verifyResetUWaveUserPassword(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
+      return await this.authService.verifyUWaveUserPassword(dto);
+    
+  }
+
+ 
+
   @Post("wave/users/")
   async uWaveLogin(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
     return await this.authService.loginUWaveUser(createAuthDto);
@@ -44,10 +68,24 @@ export class AuthController {
     }
   }
 
+
   @Post("vendors")
   async loginVendor(@Body() createAuthDto: VendorLogInDto):Promise<LogInVendorResponseDto> {
     
     return this.authService.loginVendor(createAuthDto);
+  }
+
+
+  @Post("vendors/forgot-password")
+  async forgotVendorPassword(@Body() createAuthDto: ForgotPasswordDto):Promise<{}>{
+      return await this.authService.forgotVendorPassword(createAuthDto);
+    
+  }
+
+  @Post("vendors/verify-password")
+  async verifyVendorPassword(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
+      return await this.authService.verifyResetVendorPassword(dto);
+    
   }
 
   @Post("vendors/register")
@@ -62,5 +100,7 @@ export class AuthController {
   
     }
   }
+
+  
  
 }

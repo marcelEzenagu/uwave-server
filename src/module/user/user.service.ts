@@ -1,21 +1,54 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable,
+  NotFoundException,
+  BadRequestException,
+  UnprocessableEntityException, } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectModel } from  '@nestjs/mongoose';
 import { Model } from  'mongoose';
 import { User, UserDocument } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
+import { ResetPasswordDto } from '../auth/dto/reset.dto';
 
 @Injectable()
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-
-  create(createUserDto: User) {
-    console.log("HERE NEO")
-
-    const newUser = new this.userModel(createUserDto)
-    return newUser.save();  
+  
+  // change import to b e the from auth
+  private hashData(data: string) {
+    return bcrypt.hash(data, 10);
   }
+  
+  async resetUserPassword(dto: ResetPasswordDto): Promise<{}> {
+    try {
 
+      if(dto.password != dto.confirmPassword){
+        throw new BadRequestException("password and confirmPassword don't match");
+        
+      }
+
+      const userID = dto.userID 
+      
+      const user = await this.findWhere({ userID});
+
+      if (!user) {
+        throw new NotFoundException("no user with this userID");
+      }
+
+      user.password = await this.hashData(dto.password);
+
+      this.update(userID,user)
+
+      return {
+        message: "Password Reset successful",
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new BadRequestException('Invalid email');
+      }
+      throw error;
+    }
+  }
   async findAll() {
     return await  this.userModel.find().exec();
   }
@@ -35,8 +68,16 @@ export class UserService {
    return await  this.userModel.findByIdAndUpdate(id, updateUserDto, {new: true})
   }
 
-  async addPreferredCountry(where :{}, preferredCountry: string):Promise<User> {
-    return await  this.userModel.findOneAndUpdate(where,{ preferredCountry },{new:true}    )
+  async addPreferredCountry(where :{}, preferredCountry: string):Promise<{}> {
+    
+    const recentUpdate = await  this.userModel.findOneAndUpdate(where,{ preferredCountry },{new:true}    )
+    return {"country":preferredCountry,"baseCurrency":"USD", "currencyCoEfficient":1.2}
+  }
+
+  async startResetPassword(where :{}, preferredCountry: string):Promise<{}> {
+    
+    const recentUpdate = await  this.userModel.findOneAndUpdate(where,{ preferredCountry },{new:true}    )
+    return {"country":preferredCountry,"baseCurrency":"USD", "currencyCoEfficient":1.2}
   }
   // async remove(id):Promise<any> {
   //   return await  this.userModel.findByIdAndDelete(id);

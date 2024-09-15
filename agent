@@ -1,0 +1,15 @@
+// 1: ACCEPTED
+    // CANCELLED
+// 2: PROCESSING vendor packing to move to Lag
+
+// 3: WAREHOUSED // REJECTED
+
+// 4; SHIPPED
+
+// 5: DELIVERED
+
+// 6: COMPLETED
+
+
+
+///AGENT VETTING

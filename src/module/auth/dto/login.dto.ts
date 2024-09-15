@@ -29,7 +29,7 @@ export class VendorLogInDto {
 
 export class LogInUserResponseDto {
   access_data: {};
-  user: User;
+  user: {};
 }
 
 export class LogInVendorResponseDto {

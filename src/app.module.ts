@@ -16,12 +16,19 @@ import { SavedItemsModule } from './module/saved-items/saved-items.module';
 import { UWaveUserModule } from './module/u-wave-user/u-wave-user.module';
 import { UWaveAdminModule } from './module/u-wave-admin/u-wave-admin.module';
 import { FreightModule } from './module/freight/freight.module';
+import { RedisModule } from './module/redis/redis.module';
+import { MailerModule } from './module/mailer/mailer.module';
+import { NotificationModule } from './module/notification/notification.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot(process.env.URI,),
-            MongooseModule.forFeature(forFeatureDb),
-    UserModule, VendorModule, AdminModule, ProductModule, OrderModule, AuthModule, CartModule, LogisticsModule, SavedItemsModule, UWaveUserModule, UWaveAdminModule, FreightModule],
+    MongooseModule.forFeature(forFeatureDb),
+    UserModule,MailerModule,NotificationModule, VendorModule,
+    ProductModule, OrderModule, AuthModule, AdminModule,
+    CartModule, LogisticsModule, SavedItemsModule,
+    UWaveUserModule, UWaveAdminModule, FreightModule, 
+    RedisModule],
   providers:[
     // {
     //   provide: APP_FILTER,

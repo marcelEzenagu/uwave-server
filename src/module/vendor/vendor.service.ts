@@ -1,8 +1,10 @@
-import { Injectable,BadRequestException } from '@nestjs/common';
+import { Injectable,BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from  '@nestjs/mongoose';
 import { Model } from  'mongoose';
 import { Vendor, VendorDocument } from '../vendor/entities/vendor.entity';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
+import * as bcrypt from 'bcrypt';
+import { ResetPasswordDto } from '../auth/dto/reset.dto';
 
 
 @Injectable()
@@ -10,6 +12,39 @@ export class VendorService {
   constructor(@InjectModel(Vendor.name) private readonly vendorModel: Model<VendorDocument>) {}
 
 
+  // change import to b e the from auth
+  private hashData(data: string) {
+    return bcrypt.hash(data, 10);
+  }
+  
+  async resetVendorPassword(dto: ResetPasswordDto): Promise<{}> {
+    try {
+
+      if(dto.password != dto.confirmPassword){
+        throw new BadRequestException("password and confirmPassword don't match");
+        
+      }
+      const vendorID = dto.vendorID 
+      const user = await this.findWhere({ vendorID});
+
+      if (!user) {
+        throw new NotFoundException("no vendor with this email");
+      }
+
+      user.password = await this.hashData(dto.password);
+
+      this.update(vendorID,user)
+
+      return {
+        message: "Password Reset successful",
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new BadRequestException(error);
+      }
+      throw error;
+    }
+  }
   create(createVendorDto: Vendor) {
     const newVendor = new this.vendorModel(createVendorDto)
     return newVendor.save();
