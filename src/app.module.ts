@@ -30,6 +30,7 @@ import { NotificationModule } from './module/notification/notification.module';
     UWaveUserModule, UWaveAdminModule, FreightModule, 
     RedisModule
   ],
+  
   providers:[
     // {
     //   provide: APP_FILTER,
