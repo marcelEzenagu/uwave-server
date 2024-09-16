@@ -144,6 +144,7 @@ export class AuthService {
         throw new UnauthorizedException('Invalid email');
       }
       throw error;
+      
     }
   }
 
