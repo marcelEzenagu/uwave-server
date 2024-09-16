@@ -144,7 +144,6 @@ export class AuthService {
         throw new UnauthorizedException('Invalid email');
       }
       throw error;
-      
     }
   }
 
@@ -419,7 +418,6 @@ export class AuthService {
     try {
       const key = `reset-password-${dto.requestID}`
 
-    
       const foundOTP = await this.redisService.getValue(key)
       // ({ email: dto.email });
 

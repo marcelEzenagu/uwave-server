@@ -30,26 +30,26 @@ export class AuthController {
     }
   }
 
-  @Post("users/forgot-password")
-  async forgotPassword(@Body() createAuthDto: ForgotPasswordDto):Promise<{}>{
-      return await this.authService.forgotUserPassword(createAuthDto);
-  }
+  // @Post("users/forgot-password")
+  // async forgotPassword(@Body() createAuthDto: ForgotPasswordDto):Promise<{}>{
+  //     return await this.authService.forgotUserPassword(createAuthDto);
+  // }
 
-  @Post("users/verify-password")
-  async verifyPassword(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
-      return await this.authService.verifyResetUserPassword(dto);
-  }
-  @Post("wave/users/forgot-password")
-  async forgotWaveUserPassword(@Body() createAuthDto: ForgotPasswordDto):Promise<{}>{
-      return await this.authService.forgotUWaveUserPassword(createAuthDto);
+  // @Post("users/verify-password")
+  // async verifyPassword(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
+  //     return await this.authService.verifyResetUserPassword(dto);
+  // }
+  // @Post("wave/users/forgot-password")
+  // async forgotWaveUserPassword(@Body() createAuthDto: ForgotPasswordDto):Promise<{}>{
+  //     return await this.authService.forgotUWaveUserPassword(createAuthDto);
    
-  }
+  // }
 
-  @Post("wave/users/verify-password")
-  async verifyResetUWaveUserPassword(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
-      return await this.authService.verifyUWaveUserPassword(dto);
+  // @Post("wave/users/verify-password")
+  // async verifyResetUWaveUserPassword(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
+  //     return await this.authService.verifyUWaveUserPassword(dto);
     
-  }
+  // }
 
  
 
@@ -76,17 +76,17 @@ export class AuthController {
   }
 
 
-  @Post("vendors/forgot-password")
-  async forgotVendorPassword(@Body() createAuthDto: ForgotPasswordDto):Promise<{}>{
-      return await this.authService.forgotVendorPassword(createAuthDto);
+  // @Post("vendors/forgot-password")
+  // async forgotVendorPassword(@Body() createAuthDto: ForgotPasswordDto):Promise<{}>{
+  //     return await this.authService.forgotVendorPassword(createAuthDto);
     
-  }
+  // }
 
-  @Post("vendors/verify-password")
-  async verifyVendorPassword(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
-      return await this.authService.verifyResetVendorPassword(dto);
+  // @Post("vendors/verify-password")
+  // async verifyVendorPassword(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
+  //     return await this.authService.verifyResetVendorPassword(dto);
     
-  }
+  // }
 
   @Post("vendors/register")
   async registerVendor(@Body() createAuthDto: Vendor):Promise <LogInVendorResponseDto> {

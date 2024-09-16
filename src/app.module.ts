@@ -28,7 +28,8 @@ import { NotificationModule } from './module/notification/notification.module';
     ProductModule, OrderModule, AuthModule, AdminModule,
     CartModule, LogisticsModule, SavedItemsModule,
     UWaveUserModule, UWaveAdminModule, FreightModule, 
-    RedisModule],
+    // RedisModule
+  ],
   providers:[
     // {
     //   provide: APP_FILTER,
