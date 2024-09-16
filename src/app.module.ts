@@ -19,6 +19,7 @@ import { FreightModule } from './module/freight/freight.module';
 import { RedisModule } from './module/redis/redis.module';
 import { MailerModule } from './module/mailer/mailer.module';
 import { NotificationModule } from './module/notification/notification.module';
+import { ItemsModule } from './module/items/items.module';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { NotificationModule } from './module/notification/notification.module';
     ProductModule, OrderModule, AuthModule, AdminModule,
     CartModule, LogisticsModule, SavedItemsModule,
     UWaveUserModule, UWaveAdminModule, FreightModule, 
-    RedisModule
+    RedisModule, ItemsModule
   ],
   
   providers:[

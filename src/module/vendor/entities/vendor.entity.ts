@@ -32,7 +32,7 @@ export class Vendor {
   @Prop({type: String})
   country?: string;
 
-  @Prop({ unique: true,type: String })
+  @Prop({ type: String })
   phoneNumber?: string;
   
   @Prop({type: String})
@@ -91,3 +91,4 @@ export class Vendor {
 }
 
 export const VendorSchema = SchemaFactory.createForClass(Vendor);
+VendorSchema.index({ firstName: 1, lastName: 1,email:1 }, { unique: true });

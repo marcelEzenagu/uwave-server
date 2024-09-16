@@ -35,7 +35,6 @@ export class SavedItemsController {
   remove(@Param('id') id: string,
   @Req() req: Request,
   ) {
-    try{
 
       const userID = req['user'].sub;
       
@@ -45,8 +44,6 @@ export class SavedItemsController {
       }
       
       return this.savedItemsService.removeItem(where);
-    }catch(e){
-      console.log("ERROR:: ",e)
-    }
+    
   }
 }

@@ -26,36 +26,22 @@ export class Product {
     productID : string;
 
 
-    @Prop({ required:true})
-    name:string;
+    @Prop({ required:true,unique:true})
+    productName:string;
     
-    @Prop({ required:true})
-    image:string;
 
     @Prop({ required:true})
-    category:string;
+    productCategory:string;
 
-    @Prop({ required:true})
-    vendorID:string;
-    
-    @Prop({ required:true})
-    quantity:Number;
-
-    @Prop({ required:true})
-    rate:Number;
-
-    @Prop({ type: String, default: '', maxlength: 1000 })
-    description:string;
-
-    @Prop({ required:true})
-    brandName:string;
+    @Prop({ type:String})
+    productSubCategory:string;
 
 
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
   
   @Prop({ type: [String], default: [] })
-    supportedCountries:string[];
+  productSupportedCountries:string[];
     // name
     // image
     // category

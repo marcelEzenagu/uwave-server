@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductDocument,Product } from './entities/product.entity';
@@ -10,13 +10,19 @@ export class ProductService {
   constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>) {}
 
 
-  create(createProductDto: Product) {
-    const newProduct = new this.productModel(createProductDto)
-    return newProduct.save()
+  create(createProductDto: CreateProductDto) {
+   try{
+
+     const newProduct = new this.productModel(createProductDto)
+     return newProduct.save()
+    }catch(e){
+      console.log("error:: ",e)
+     throw new BadRequestException(e)
+    }
   }
 
-  async findAll() {
-    return await  this.productModel.find().exec();
+  async findAll(where:{}) {
+    return await  this.productModel.find().where(where).exec();
   }
 
   async findOne(id):Promise<Product> {

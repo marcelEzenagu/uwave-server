@@ -16,7 +16,7 @@ export class SavedItemsService {
 
   async saveItem(createSavedItemDto: CreateSavedItemDto) {
 
-    const where = {"userID":createSavedItemDto.userID,"productID":createSavedItemDto.productID}
+    const where = {"userID":createSavedItemDto.userID,"itemID":createSavedItemDto.itemID}
     const result= await  this.savedItemsModel.findOne().where(where).exec();
     if (result == undefined){
       
