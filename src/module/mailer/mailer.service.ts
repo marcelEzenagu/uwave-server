@@ -35,7 +35,7 @@ export class MailerService {
       );
       // const html = await ejs.renderFile(filePath, dto.data);
       const response = await this.transporter.sendMail({
-        from: dto.from || '"U_Save_Market" <no-reply@u_save_market.com>',
+        from: dto.from || '"Kochure" <no-reply@kochure.com>',
         to: dto.to,
         subject: dto.subject,
         // html: "html",
