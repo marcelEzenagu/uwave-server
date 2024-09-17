@@ -25,9 +25,7 @@ export class MailerService {
 
   async send(dto: SendEmailDto): Promise<SendEmailResDto> {
     
-    console.log("GOT HERE")
-    console.log("EMAIL: ",process.env.MAIL_USER)
-
+   
     // process.exit()
     try {
       //load email template
@@ -35,12 +33,13 @@ export class MailerService {
         __dirname,
         `../../views/emails/${dto.template}.ejs`,
       );
-      const html = await ejs.renderFile(filePath, dto.data);
+      // const html = await ejs.renderFile(filePath, dto.data);
       const response = await this.transporter.sendMail({
         from: dto.from || '"Kochure" <no-reply@kochure.com>',
         to: dto.to,
         subject: dto.subject,
-        html: html,
+        // html: "html",
+        html: `<p>Your OTP for password-reset is <strong>${dto.otp}</strong></p>`,
       });
       return {
         message_id: response.messageId,

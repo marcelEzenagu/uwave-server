@@ -120,24 +120,23 @@ export class AuthService {
       const OTP = this.generateOtp()
       const requestID = await this.generateTemporaryAccessCode("reset-password",OTP)
 
-      // await this.mailService.send(
-      //   {
-      //     subject:"reset-password",
-      //     to:dto.email,
-      //     template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
-      //   }
-      //  )
+      await this.mailService.send(
+        {
+          subject:"reset-password",
+          to:dto.email,
+          otp:OTP,
+          template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+        }
+       )
 
 
-      console.log("GOT HERE")
-      console.log("EMAIL: ",dto.email)
-      return {
+     return {
         message: "A Password Reset OTP has been sent to this email",
         requestID,
-        data:{
-          requestID,
-          OTP
-        }
+        // data:{
+        //   requestID,
+        //   OTP
+        // }
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -243,22 +242,24 @@ export class AuthService {
       const OTP = this.generateOtp()
       const requestID = await this.generateTemporaryAccessCode("reset-password",OTP)
 
-      // await this.mailService.send(
-      //   {
-      //     subject:"reset-password",
-      //     to:dto.email,
-      //     template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
-      //   }
-      //  )
+      await this.mailService.send(
+        {
+          subject:"reset-password",
+          to:dto.email,
+          otp:OTP,
+          template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+        }
+       )
+
 
        
       return {
         message: "A Password Reset OTP has been sent to this email",
         requestID,
-        data:{
-          requestID,
-          OTP
-        }
+        // data:{
+        //   requestID,
+        //   OTP
+        // }
       };
 
     } catch (error) {
@@ -387,22 +388,23 @@ export class AuthService {
       const OTP = this.generateOtp()
       const requestID = await this.generateTemporaryAccessCode("reset-password",OTP)
 
-      // await this.mailService.send(
-      //   {
-      //     subject:"reset-password",
-      //     to:dto.email,
-      //     template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
-      //   }
-      //  )
+      await this.mailService.send(
+        {
+          subject:"reset-password",
+          to:dto.email,
+          otp:OTP,
+          template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+        }
+       )
 
        
       return {
         message: "A Password Reset OTP has been sent to this email",
         requestID,
-        data:{
-          requestID,
-          OTP
-        }
+        // data:{
+        //   requestID,
+        //   OTP
+        // }
       };
 
 
@@ -450,6 +452,7 @@ export class AuthService {
   
 
   async registerVendor(
+
     createVendorDto: Vendor,
   ): Promise<LogInVendorResponseDto> {
     console.log("registerVendor:: ")
