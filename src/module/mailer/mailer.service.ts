@@ -26,7 +26,6 @@ export class MailerService {
   async send(dto: SendEmailDto): Promise<SendEmailResDto> {
     
    
-    // process.exit()
     try {
       //load email template
       let filePath = path.resolve(
@@ -46,6 +45,8 @@ export class MailerService {
         provider: this.provider,
       };
     } catch (error) {
+
+      console.log("error:email failed to sent",error)
       this.logger.error('email failed to sent');
       throw error;
     }

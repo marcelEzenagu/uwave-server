@@ -20,19 +20,23 @@ import { RedisModule } from './module/redis/redis.module';
 import { MailerModule } from './module/mailer/mailer.module';
 import { NotificationModule } from './module/notification/notification.module';
 import { ItemsModule } from './module/items/items.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CountryCurrencyModule } from './module/country_currency/country_currency.module';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),  
     MongooseModule.forRoot(process.env.URI,),
     MongooseModule.forFeature(forFeatureDb),
     UserModule,MailerModule,NotificationModule, VendorModule,
     ProductModule, OrderModule, AuthModule, AdminModule,
     CartModule, LogisticsModule, SavedItemsModule,
     UWaveUserModule, UWaveAdminModule, FreightModule, 
-    RedisModule, ItemsModule
+    RedisModule, ItemsModule, CountryCurrencyModule
   ],
   
   providers:[
+
     // {
     //   provide: APP_FILTER,
     //   useClass: AllExceptionsFilter,
