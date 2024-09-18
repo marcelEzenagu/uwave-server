@@ -1,6 +1,4 @@
-import { Injectable,HttpServer } from '@nestjs/common';
-import { CreateCountryCurrencyDto } from './dto/create-country_currency.dto';
-import { UpdateCountryCurrencyDto } from './dto/update-country_currency.dto';
+import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { RedisService } from '../redis/redis.service';
 import axios from 'axios';
@@ -33,7 +31,7 @@ process.env.EXCHANGE_URL    );
       path: '/',
       headers: {
         'x-rapidapi-key': process.env.RAPID_API_KEY,
-        
+
         'x-rapidapi-host': 'country-info.p.rapidapi.com',
       },
     };
