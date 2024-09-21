@@ -54,6 +54,19 @@ export class UserController {
       throw new BadRequestException(this.userService.formatErrors(e));
     }
   }
+  @Patch("/details")
+  async updateDetails(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
+    // try {
+      const userID = req['user'].sub;
+
+      // const where = { userID };
+      return await this.userService.update(
+        userID,
+        updateUserDto,
+      );
+    // } catch (e) {
+    // }
+  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

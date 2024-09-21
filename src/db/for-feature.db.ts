@@ -10,6 +10,8 @@ import { SavedItem,SavedItemSchema } from "src/module/saved-items/entities/saved
 import { WaveUser,WaveUserSchema } from "src/module/u-wave-user/entities/u-wave-user.entity";
 import { Freight, FreightSchema } from "src/module/freight/entities/freight.entity";
 import { ItemSchema,Item } from "src/module/items/entities/item.entity";
+import { ProductCategory,ProductCategorySchema } from "src/module/product-category/entities/product-category.entity";
+import { ProductSubCategory ,ProductSubCategorySchema} from "src/module/product-sub-category/entities/product-sub-category.entity";
 
 export default [
   { name: User.name, schema: UserSchema },
@@ -23,4 +25,6 @@ export default [
   { name: WaveUser.name, schema: WaveUserSchema },
   { name: Freight.name, schema: FreightSchema },
   { name: Item.name, schema: ItemSchema },
+  { name: ProductCategory.name, schema: ProductCategorySchema },
+  { name: ProductSubCategory.name, schema: ProductSubCategorySchema },
 ];

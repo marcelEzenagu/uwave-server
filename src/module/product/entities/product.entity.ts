@@ -3,7 +3,6 @@ import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 
 import { Document } from "mongoose";
 import { v4 as uuid } from "uuid";
-import { Type } from "class-transformer";
 
 
 export type ProductDocument = Product & Document

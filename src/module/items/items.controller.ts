@@ -9,16 +9,9 @@ export class ItemsController {
   constructor(private readonly itemsService: ItemsService) {}
 
   @Post()
-  create(@Body() createItemDto: Item) {
-    // try{
-      
+  create(@Body() createItemDto: Item) {      
       return this.itemsService.create(createItemDto);
-    // }catch(e){
-    //   console.log("ERRORRRRR===>",e)
 
-    //   return
-    //   throw new BadRequestException(this.itemsService.formatErrors(e));
-    // }
   }
 
   @Get()

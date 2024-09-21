@@ -4,6 +4,25 @@ import { RedisService } from '../redis/redis.service';
 import axios from 'axios';
 const http = require('https');
 
+
+interface TransformedData {
+  code: string;
+  name: string;
+  number: string;
+  flag: string;
+  // currency: string;
+  // currencyName: string;
+  currency_code: string;
+}
+
+interface ApiResponse {
+  name: string;
+  flag: string;
+  code: string;
+  dialCode: string;
+  currencyCode: string;
+}
+
 @Injectable()
 export class CountryCurrencyService {
   constructor(private redisClient: RedisService) {}
@@ -21,8 +40,10 @@ process.env.EXCHANGE_URL    );
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_1AM)
+    // @Cron(CronExpression.EVERY_10_SECONDS)    
   async loadCountryCron() {
 
+   
     const options = {
       method: 'GET',
       hostname: 'country-info.p.rapidapi.com',
@@ -39,34 +60,28 @@ process.env.EXCHANGE_URL    );
     const key = 'countries_data';
 
     const resp = await axios(options)
-    //  console.log("RESULT_resp:: ",resp.data)
-      this.redisClient.setValue(key, JSON.stringify(resp.data));
+    let modifiedCountryList:ApiResponse[] = Object.values(resp.data)
+    console.log(modifiedCountryList[1],"countries_data",typeof modifiedCountryList);
 
-    // const req = http.request(options, function (res) {
-    //   const chunks = [];
+  //  for(const item of modifiedCountryList ){
+    let modified : TransformedData[] = modifiedCountryList.map(country => {
 
-    //   res.on('data', function (chunk) {
-    //     chunks.push(chunk);
-    //   });
+      return{
+        name : country.name,
+        code :country.code,
+        number :country.dialCode,
+        flag :country.flag,
+        currency_code :country.currencyCode
 
-    //   res.on('end', function () {
-    //     const body = Buffer.concat(chunks).toLocaleString;
-    //     // console.log(body.toString(),"data");
+      }
+  }
+    )
 
-    //     this.redisClient.setValue(key, JSON.stringify(body));
-    //     // this.redisClient.setValue(key, body.toString('utf-8'));
 
-    //   });
-    // });
-
-    // req.end();
-    //  const result =  await axios.get("https://v6.exchangerate-api.com/v6/0826ca61322074d36f7f943d/latest/USD")
-
-    //  console.log("RESULT:: ",result.data.conversion_rates)
-    //  const responseData = JSON.stringify(result.data.conversion_rates)
-    //   // const key = "country_list"
-    //   this.redisClient.setValue(key,responseData)
-    console.log('loadCountryCron running  EVERY_10_SECONDS');
+    const responseData = JSON.stringify(modified);
+    this.redisClient.setValue(key, responseData);
+  
+    // console.log('loadCountryCron running  EVERY_10_SECONDS');
   }
 
   async getCountries() : Promise<{}>{
@@ -75,7 +90,6 @@ process.env.EXCHANGE_URL    );
    const data = await this.redisClient.getValue(key);
 
    const countries =JSON.parse(data)
-
     return countries
   }
 

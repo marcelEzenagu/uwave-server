@@ -22,6 +22,8 @@ import { NotificationModule } from './module/notification/notification.module';
 import { ItemsModule } from './module/items/items.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CountryCurrencyModule } from './module/country_currency/country_currency.module';
+import { ProductCategoryModule } from './module/product-category/product-category.module';
+import { ProductSubCategoryModule } from './module/product-sub-category/product-sub-category.module';
 
 @Module({
   imports: [
@@ -32,7 +34,7 @@ import { CountryCurrencyModule } from './module/country_currency/country_currenc
     ProductModule, OrderModule, AuthModule, AdminModule,
     CartModule, LogisticsModule, SavedItemsModule,
     UWaveUserModule, UWaveAdminModule, FreightModule, 
-    RedisModule, ItemsModule, CountryCurrencyModule
+    RedisModule, ItemsModule, CountryCurrencyModule, ProductCategoryModule, ProductSubCategoryModule
   ],
   
   providers:[

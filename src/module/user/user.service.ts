@@ -65,7 +65,27 @@ export class UserService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto):Promise<User> {
-   return await  this.userModel.findByIdAndUpdate(id, updateUserDto, {new: true})
+  //  return await  this.userModel.findByIdAndUpdate(id, updateUserDto, {new: true})
+   const where = {"userID":id}
+
+   try{
+  
+   if(updateUserDto.billingDetails){
+    await this.validateIsDefault(updateUserDto.billingDetails,"Billing Details")
+  }
+  if(updateUserDto.cardDetails){
+      await this.validateIsDefault(updateUserDto.cardDetails,"Card Details")
+
+  }
+  if(updateUserDto.shippingDetails){
+     await  this.validateIsDefault(updateUserDto.shippingDetails,"Shipping Details")
+   }
+   return  await  this.userModel.findOneAndUpdate(where,updateUserDto,{new:true}    )
+  
+  }catch(e){
+    console.log("ERROR::: ",e)
+    throw new BadRequestException(e.message);
+  }
   }
 
   async addPreferredCountry(where :{}, preferredCountry: string):Promise<{}> {
@@ -112,5 +132,13 @@ export class UserService {
      }
  
    }
+
+   async validateIsDefault(items: any[], itemType: string) {
+    const defaultCount = items.filter((item) => item.isDefault).length;
+  
+    if (defaultCount > 1) {
+    throw new Error(`Only one ${itemType} can be marked as default.`);
+    }
+  }
 
 }
