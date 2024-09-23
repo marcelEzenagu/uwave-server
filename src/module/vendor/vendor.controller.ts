@@ -6,10 +6,15 @@ import { Vendor } from './entities/vendor.entity';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { Request } from 'express';
 import { ResetPasswordDto } from '../auth/dto/reset.dto';
+import { FileService } from 'src/helpers/upload';
 
 @Controller('vendors')
+
 export class VendorController {
-  constructor(private readonly vendorService: VendorService) {}
+  constructor(
+      private readonly vendorService: VendorService,
+      private readonly fileService: FileService) {}
+
 
   @Get()
   findAll() {
@@ -33,13 +38,30 @@ export class VendorController {
   }
 
   @Patch("")
-  update(@Req() req: Request,
+  async update(@Req() req: Request,
    @Body() updateVendorDto: UpdateVendorDto) {
     const role = req['user'].role
     if(role !="vendor"){
       throw new BadRequestException("unaccessible to non-vendors");
     }
+
     const vendorID = req['user'].sub
+    const vPath = "public/images/vendors"
+    const imageName =`${vendorID}.png`
+    if(updateVendorDto.profilePicture){
+      const imagePath = `${vPath}/profilePicture`
+      const success =  await this.fileService.uploadImage(updateVendorDto.profilePicture,imagePath,imageName)
+       
+      updateVendorDto.profilePicture = `${imagePath}/${imageName}`
+    }
+
+    if(updateVendorDto.businessPicture){
+      const imagePath = `${vPath}/business`
+      const success =  await this.fileService.uploadImage(updateVendorDto.profilePicture,imagePath,imageName)
+      updateVendorDto.businessPicture = `${imagePath}/${imageName}`
+    }
+
+
     try{
       return this.vendorService.update(vendorID,updateVendorDto);
     }catch(e){
@@ -47,16 +69,17 @@ export class VendorController {
     }
   }
 
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.vendorService.remove(+id);
   }
 
+
   @Post('reset-password')
   async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: Request) {
     const userID = req['user'].sub;
     dto.vendorID = userID;
-
     return await this.vendorService.resetVendorPassword(dto);
   }
 

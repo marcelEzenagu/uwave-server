@@ -105,7 +105,10 @@ export class User {
   default: [],
   })
   billingDetails: [];
-
+  
+  @Prop({type: String})
+  profilePicture?: string;
+  
   @Prop({
   type: [{
     cardHolderName: { type: String, required: true },
@@ -121,22 +124,3 @@ export class User {
 
 
 export const UserSchema = SchemaFactory.createForClass(User)
-
-// // Middleware to check for isDefault uniqueness
-// UserSchema.pre<UserDocument>('save', async function (next) {
-//   const user = this;
-//   try{
-//   // Ensure only one default in shippingDetails
-//   await validateIsDefault(user.shippingDetails, 'Shipping Address');
-
-//   // Ensure only one default in billingDetails
-//   await validateIsDefault(user.billingDetails, 'Billing Address');
-
-//   // Ensure only one default in cardDetails
-//   await validateIsDefault(user.cardDetails, 'Card Details');
-//   next(); // Proceed to the next middleware or save operation
-//   } catch (error) {
-//     next(error); // Pass the error to the next middleware for proper handling
-//   }
-// });
-

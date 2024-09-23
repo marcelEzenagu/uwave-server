@@ -31,6 +31,9 @@ export class WaveUser {
     @Prop({ required:true})
     lastName:string;
     
+    @Prop({type: String})
+    profilePicture?: string;
+    
     @Prop({ type:String})
     preferredCountry?:string;
     

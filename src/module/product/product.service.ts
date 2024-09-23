@@ -22,6 +22,8 @@ export class ProductService {
   }
 
   async findAll(where:{}) {
+     where={"deletedAt":null}
+
     return await  this.productModel.find().where(where).exec();
   }
 

@@ -5,10 +5,11 @@ import forFeatureDb from 'src/db/for-feature.db';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { AuthModule } from '../auth/auth.module';
+import { FileService } from 'src/helpers/upload';
 
 @Module({
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService,FileService],
   imports: [MongooseModule.forFeature(forFeatureDb),AuthModule],
 })
 export class UserModule {

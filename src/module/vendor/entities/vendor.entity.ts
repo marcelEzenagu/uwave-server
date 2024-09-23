@@ -63,7 +63,10 @@ export class Vendor {
   lastName: string;
 
   @Prop({type: String})
-  businessProfilePicture?: string;
+  profilePicture?: string;
+  
+  @Prop({type: String})
+  businessPicture?: string;
 
   @Prop({ type: String })
   @IsOptional()

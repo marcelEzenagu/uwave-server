@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateProductCategoryDto } from './dto/create-product-category.dto';
 import { UpdateProductCategoryDto } from './dto/update-product-category.dto';
 import { ProductCategory,ProductCategoryDocument } from './entities/product-category.entity';
@@ -17,15 +17,17 @@ export class ProductCategoryService {
       const newCategory = new this.productCategoryModel(createProductCategoryDto);
       return await newCategory.save();
     }catch(e){
-      throw new Error(e)
+      throw new BadRequestException(this.formatErrors(e))
     }
   }
 
-  async findAll() {
+  async findAll(where:{}) {
     try{
-      return await this.productCategoryModel.find().exec();
+
+
+      return await this.productCategoryModel.find().where(where).exec();
     }catch(e){
-      throw new Error(e)
+      throw new BadRequestException(this.formatErrors(e))
     }  }
 
   findOne(id: number) {
@@ -37,28 +39,53 @@ export class ProductCategoryService {
     try{
       return await this.productCategoryModel.findOne().where(where).exec();
     }catch(e){
-      throw new Error(e)
+      throw new BadRequestException(this.formatErrors(e))
     }
   }
 
-  async update(ID: string, updateProductSubCategoryDto: UpdateProductCategoryDto) {
+  async update(ID: string, updateProductSubCategoryDto: UpdateProductCategoryDto):Promise<ProductCategory> {
     try{
-      const where = { "productSubCategoryID": ID };
+      const where = { "_id": ID };
       return await this.productCategoryModel.findOneAndUpdate(where, updateProductSubCategoryDto, {
         new: true,
       });
     }catch(e){
-      throw new Error(e)
+      throw new BadRequestException(this.formatErrors(e))
     }
   }
-
+  
   async remove(where):Promise<any> {
     try{
-      await this.productCategoryModel.findOneAndDelete(where);
+      let foundCat = await this.productCategoryModel.findById(where);
+      foundCat.deletedAt = new Date()
+       await this.productCategoryModel.findByIdAndUpdate(where, foundCat, {new:true})
       return `This action removes a #${where?._id} productSubCategory`;
     }catch(e){
-      throw new Error(e)
+      throw new BadRequestException(this.formatErrors(e))
     }
-  }
+}
  
+
+  formatErrors(error: any) {
+    console.log("ERROR:: ",error)
+
+    if(error.name === 'MongoServerError'){
+     const field = Object.keys(error.keyPattern)[0];
+       return `Duplicate value for field: ${field}`;
+ 
+     }else{
+       const formattedErrors = [];
+       for (const key in error.errors) {
+         if (error.errors.hasOwnProperty(key)) {
+           formattedErrors.push({
+             field: key,
+             message: error.errors[key].message,
+           });
+         }
+       }
+       return formattedErrors;
+ 
+     }
+ 
+   }
 }

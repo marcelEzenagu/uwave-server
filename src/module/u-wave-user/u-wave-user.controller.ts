@@ -2,10 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UWaveUserService } from './u-wave-user.service';
 import { CreateWaveUserDto } from './dto/create-u-wave-user.dto';
 import { UpdateUWaveUserDto } from './dto/update-u-wave-user.dto';
+import { FileService } from 'src/helpers/upload';
 
 @Controller('u-wave-user')
 export class UWaveUserController {
-  constructor(private readonly uWaveUserService: UWaveUserService) {}
+  constructor(
+    private readonly uWaveUserService: UWaveUserService,
+private readonly fileService: FileService) {}
 
   @Post()
   create(@Body() CreateWaveUserDto: CreateWaveUserDto) {
@@ -24,6 +27,19 @@ export class UWaveUserController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUWaveUserDto: UpdateUWaveUserDto) {
+   
+    return this.uWaveUserService.update(id, updateUWaveUserDto);
+  }
+  @Patch('details/:id')
+  async updateDetails(@Param('id') id: string, @Body() updateUWaveUserDto: UpdateUWaveUserDto) {
+    const vPath = "public/images/users"
+      const imageName =`${"userID"}.png`
+      if(updateUWaveUserDto.profilePicture){
+        const imagePath = `${vPath}/profilePicture`
+         await this.fileService.uploadImage(updateUWaveUserDto.profilePicture,imagePath,imageName)
+         
+        updateUWaveUserDto.profilePicture = `${imagePath}/${"imageName"}`
+      }
     return this.uWaveUserService.update(id, updateUWaveUserDto);
   }
 

@@ -7,7 +7,7 @@ import { AccessTokenMiddleware } from '../common/middleware/auth.middleware'
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  controllers: [ProductSubCategoryController],
+  // controllers: [ProductSubCategoryController],
   providers: [ProductSubCategoryService],
   imports: [MongooseModule.forFeature(forFeatureDb),AuthModule],
 

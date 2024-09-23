@@ -24,7 +24,7 @@ export class ProductSubCategory {
     subCategoryName:string;
     
     @Prop({ type: Types.ObjectId, ref: 'ProductCategory', required: true })
-    ProductCategoryID ?: string;
+    productCategory ?: string;
     
     @Prop({ type: Date, default: null })
     deletedAt: Date | null;

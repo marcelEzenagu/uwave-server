@@ -6,10 +6,11 @@ import { VendorController } from './vendor.controller';
 import forFeatureDb from 'src/db/for-feature.db';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { AuthModule } from '../auth/auth.module';
+import { FileService } from 'src/helpers/upload';
 
 @Module({
   controllers: [VendorController],
-  providers: [VendorService,],
+  providers: [VendorService,FileService],
   imports: [AuthModule,MongooseModule.forFeature(forFeatureDb),ErrorFormat],
 
 })

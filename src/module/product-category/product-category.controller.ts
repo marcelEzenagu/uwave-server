@@ -13,15 +13,12 @@ export class ProductCategoryController {
     return this.productCategoryService.create(createProductCategoryDto);
   }
 
-  @Get()
-  findAll() {
-    return this.productCategoryService.findAll();
+ 
+  @Patch(":id")
+  async updateCategory(@Param('id') id: string, @Body() updateAdminDto: UpdateProductCategoryDto) {
+    return await this.productCategoryService.update(id, updateAdminDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productCategoryService.findOne(+id);
-  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProductCategoryDto: UpdateProductCategoryDto) {
