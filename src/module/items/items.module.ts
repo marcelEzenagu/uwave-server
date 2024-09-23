@@ -5,10 +5,11 @@ import forFeatureDb from 'src/db/for-feature.db';
 import { AccessTokenMiddleware } from '../common/middleware/auth.middleware';
 import { AuthModule } from '../auth/auth.module';
 import { MongooseModule } from "@nestjs/mongoose";
+import { FileService } from 'src/helpers/upload';
 
 @Module({
   controllers: [ItemsController],
-  providers: [ItemsService],
+  providers: [ItemsService,FileService],
   imports: [AuthModule,MongooseModule.forFeature(forFeatureDb)],
 
 })
