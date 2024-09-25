@@ -13,7 +13,7 @@ export class VendorService {
 
 
   // change import to b e the from auth
-  private hashData(data: string) {
+   hashData(data: string) {
     return bcrypt.hash(data, 10);
   }
   

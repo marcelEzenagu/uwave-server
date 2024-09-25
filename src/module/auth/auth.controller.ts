@@ -17,6 +17,10 @@ export class AuthController {
 
   @Post("users/")
   async login(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
+   
+    console.log("createAuthDto.password).oldPassword===== ","createAuthDto.password")
+    console.log("createAuthDto.password).oldPassword===== ",createAuthDto.password)
+
     return await this.authService.loginUser(createAuthDto);
   }
 

@@ -6,11 +6,12 @@ import forFeatureDb from 'src/db/for-feature.db';
 import { AccessTokenMiddleware } from '../common/middleware/auth.middleware'
 import { AuthModule } from '../auth/auth.module';
 import { CartService } from '../cart/cart.service';
+import { StripePayment } from 'src/helpers/stripePayment';
 
 
 @Module({
   controllers: [OrderController],
-  providers: [OrderService,CartService],
+  providers: [OrderService,CartService,StripePayment],
   imports: [MongooseModule.forFeature(forFeatureDb),AuthModule],
 })
 

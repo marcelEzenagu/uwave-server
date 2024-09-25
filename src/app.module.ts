@@ -28,11 +28,13 @@ import { ProductSubCategoryModule } from './module/product-sub-category/product-
 import { join } from 'path';
 
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { StatusController } from './app.controller';
 
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      rootPath: join(__dirname, '..', 'public',
+     ),
       serveRoot:"/public"
     }),
     ScheduleModule.forRoot(),
@@ -66,13 +68,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     //   useClass: AllExceptionsFilter,
     // },
   ],
-  controllers: [HealthController],
+  controllers: [StatusController,HealthController,],
 })
-export class AppModule  {
-
-  // configure(app: NestExpressApplication) {
-  //   app.useStaticAssets(join(__dirname, '..', 'public'), {
-  //     prefix: '/static/', // This sets the URL prefix for accessing static files
-  //   });
-  // }
-}
+export class AppModule  {}

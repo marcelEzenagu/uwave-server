@@ -54,6 +54,8 @@ export class Order {
     
     @Prop({ type: Number, })
     totalCost: number;
+    @Prop({ type: String, })
+    paymentID: string;
     
     @Prop({ type: String,enum:OptionType,default:OptionType.ACCEPTED})
     status?: string ;

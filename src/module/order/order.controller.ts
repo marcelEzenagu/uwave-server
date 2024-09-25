@@ -15,11 +15,13 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { CartService } from '../cart/cart.service';
 import { OptionType } from './entities/order.entity';
 import { Request } from 'express';
+import { StripePayment } from 'src/helpers/stripePayment';
 
 @Controller('orders')
 export class OrderController {
   constructor(
     private readonly orderService: OrderService,
+    private readonly stripeService: StripePayment,
 
     private  cart: CartService) {}
 
@@ -29,9 +31,28 @@ export class OrderController {
 ) {
 
     try {
+
       const userID = req['user'].sub;
-      await this.cart.removeCart(createOrderDto.cartID,userID)
+      // await this.cart.removeCart(createOrderDto.cartID,userID)
       return this.orderService.create(createOrderDto);
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
+  }
+
+  @Post("pay-intent")
+  async createPayIntent(@Body() createOrderDto: CreateOrderDto,
+  @Req() req: Request
+) {
+
+    try {
+
+     
+     
+      const intentRes = await this.stripeService.createSession(createOrderDto.totalCost)
+      console.log("USL_intentRes::::: ",intentRes)
+
+      return intentRes;
     } catch (e) {
       throw new BadRequestException(e);
     }

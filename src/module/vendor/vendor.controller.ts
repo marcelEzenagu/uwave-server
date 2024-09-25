@@ -5,8 +5,9 @@ import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { Vendor } from './entities/vendor.entity';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { Request } from 'express';
-import { ResetPasswordDto } from '../auth/dto/reset.dto';
+import { ChangePasswordDto, ResetPasswordDto } from '../auth/dto/reset.dto';
 import { FileService } from 'src/helpers/upload';
+import * as bcrypt from 'bcrypt';
 
 @Controller('vendors')
 
@@ -44,7 +45,10 @@ export class VendorController {
     if(role !="vendor"){
       throw new BadRequestException("unaccessible to non-vendors");
     }
+    updateVendorDto.email=undefined
+    updateVendorDto.password=undefined
 
+   
     const vendorID = req['user'].sub
     const vPath = "public/images/vendors"
     const imageName =`${vendorID}.png`
@@ -81,6 +85,28 @@ export class VendorController {
     const userID = req['user'].sub;
     dto.vendorID = userID;
     return await this.vendorService.resetVendorPassword(dto);
+  }
+
+  @Patch("change-password")
+  async changePassword(@Req() req: Request, @Body() updateUserDto: ChangePasswordDto) {
+   const vendorID = req['user'].sub;
+
+     const passwordHarsh = await this.vendorService.hashData(updateUserDto.newPassword);
+      const where = {vendorID}
+      let user = await this.vendorService.findWhere(where)
+      
+       const matches = await bcrypt.compare(updateUserDto.oldPassword, user.password)
+       if(!matches){
+        throw new BadRequestException("old password don't match")
+       }
+
+       user.password=passwordHarsh
+
+        return await this.vendorService.update(
+          vendorID,
+        user,
+      );
+    
   }
 
 }

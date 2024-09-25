@@ -15,7 +15,7 @@ export class VerifyResetPasswordDto {
 }
 
 export class ResetPasswordDto {
-  @Prop({ required:true})
+  @Prop({ type:String})
   userID:string;
   
   @Prop({ type:String})
@@ -34,6 +34,31 @@ export class ResetPasswordDto {
   @Matches(/(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/,
     { message: 'confirmPassword must contain at least one uppercase letter, one number, and one special character.' })
     confirmPassword: string;
+    
+
+}
+
+export class ChangePasswordDto {
+  @Prop({ type:String})
+  userID:string;
+  
+  @Prop({ type:String})
+  vendorID:string;
+
+
+  @Prop({ required:true})
+  @IsNotEmpty()
+  @Length(6, 20)
+  @Matches(/(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/,
+    { message: 'newPassword must contain at least one uppercase letter, one number, and one special character.' })
+    newPassword: string;
+
+  @Prop({ type:String})
+  @IsNotEmpty()
+  @Length(6, 20)
+  @Matches(/(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/,
+    { message: 'oldPassword must contain at least one uppercase letter, one number, and one special character.' })
+    oldPassword: string;
 
 }
 

@@ -16,24 +16,13 @@ async function bootstrap() {
 
   app.enableCors({
     origin:true,
-    // origin:  (origin, callback) => {
-    //   if (['http://localhost:3000',"*"].indexOf(origin) !== -1) {
-    //     callback(null, true);
-    //   } 
-    //   // else {
-    //   //   callback(new Error('Not allowed by CORS'));
-    //   // }
-    // },
+ 
+    
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   }
   )
 
-
-
-  // app.useStaticAssets(join(__dirname, '..', 'public'));
-  // app.setBaseViewsDir(join(__dirname, '..', 'views'));
-  // app.setViewEngine('ejs');
   await app.listen(process.env.PORT);
 }
 bootstrap();

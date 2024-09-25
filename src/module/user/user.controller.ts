@@ -14,8 +14,9 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
-import { ResetPasswordDto } from '../auth/dto/reset.dto';
+import { ChangePasswordDto, ResetPasswordDto } from '../auth/dto/reset.dto';
 import { FileService } from 'src/helpers/upload';
+import * as bcrypt from 'bcrypt';
 
 @Controller('users')
 export class UserController {
@@ -58,11 +59,36 @@ export class UserController {
       throw new BadRequestException(this.userService.formatErrors(e));
     }
   }
+ 
+  @Patch("change-password")
+  async changePassword(@Req() req: Request, @Body() updateUserDto: ChangePasswordDto) {
+   const userID = req['user'].sub;
+
+     const passwordHarsh = await this.userService.hashData(updateUserDto.newPassword);
+      const where = {userID}
+      let user = await this.userService.findWhere(where)
+      
+       const matches = await bcrypt.compare(updateUserDto.oldPassword, user.password)
+       if(!matches){
+        throw new BadRequestException("old password don't match")
+       }
+
+       user.password=passwordHarsh
+
+        return await this.userService.update(
+        userID,
+        user,
+      );
+    
+  }
+
   @Patch("/details")
   async updateDetails(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
-    // try {
       const userID = req['user'].sub;
 
+      updateUserDto.email=undefined
+      updateUserDto.password=undefined
+      
       const vPath = "public/images/users"
       const imageName =`${userID}.png`
       if(updateUserDto.profilePicture){

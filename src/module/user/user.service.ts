@@ -15,7 +15,7 @@ export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
   
   // change import to b e the from auth
-  private hashData(data: string) {
+  hashData(data: string) {
     return bcrypt.hash(data, 10);
   }
   
@@ -61,7 +61,6 @@ export class UserService {
   
   async findWhere(where:{}):Promise<User> {
     return await  this.userModel.findOne().where(where).exec();
-    // return await  this.userModel.findById(id).exec();
   }
 
   async update(id: string, updateUserDto: UpdateUserDto):Promise<User> {
