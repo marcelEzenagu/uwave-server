@@ -45,13 +45,10 @@ export class OrderController {
   @Req() req: Request
 ) {
 
+  // /http://localhost:3600/public/images/vendors/profilePicture/7f5b3938-6c19-4c09-8732-fbf654c0590c.png
+  // http://localhost:3600/public/images/vendors/business/7f5b3938-6c19-4c09-8732-fbf654c0590c.png
     try {
-
-     
-     
       const intentRes = await this.stripeService.createSession(createOrderDto.totalCost)
-      console.log("USL_intentRes::::: ",intentRes)
-
       return intentRes;
     } catch (e) {
       throw new BadRequestException(e);
