@@ -1,3 +1,10 @@
 email formatting using ejs;
 
 change all search fields to lowercase
+
+add strtegy o reduceQuantity when order is placed(include locking of the quantity )
+
+
+TODO vendor
+uploads aside profilepics
+
