@@ -33,8 +33,14 @@ export class OrderController {
     try {
 
       const userID = req['user'].sub;
-      // await this.cart.removeCart(createOrderDto.cartID,userID)
-      return this.orderService.create(createOrderDto);
+
+
+      const intentRes = await this.stripeService.createSession(createOrderDto.totalCost)
+      createOrderDto.paymentIntentID =intentRes.paymentIntentID
+      await this.orderService.create(createOrderDto);
+      intentRes.paymentIntentID =undefined
+      return intentRes;
+
     } catch (e) {
       throw new BadRequestException(e);
     }
@@ -48,6 +54,8 @@ export class OrderController {
   // /http://localhost:3600/public/images/vendors/profilePicture/7f5b3938-6c19-4c09-8732-fbf654c0590c.png
   // http://localhost:3600/public/images/vendors/business/7f5b3938-6c19-4c09-8732-fbf654c0590c.png
     try {
+            // await this.cart.removeCart(createOrderDto.cartID,userID)
+
       const intentRes = await this.stripeService.createSession(createOrderDto.totalCost)
       return intentRes;
     } catch (e) {

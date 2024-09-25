@@ -19,8 +19,9 @@ export class StripePayment {
     });
 
     // return {dpmCheckerLink:paymentIntent.
-    return {dpmCheckerLink:`https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=${paymentIntent.id}`,
- 
+    return {
+      dpmCheckerLink:`https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=${paymentIntent.id}`,
+      paymentIntentID:paymentIntent.id,
       clientSecret:paymentIntent.client_secret}
   }
 
