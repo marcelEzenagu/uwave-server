@@ -55,7 +55,19 @@ export class Item {
     quantity:Number;
 
     @Prop({ required:true})
-    rate:Number;
+    salesPrice:Number;
+    @Prop({ required:true})
+    originalPrice:Number;
+    @Prop({ required:true})
+    profit:Number;
+    @Prop({ })
+    discount?:Number;
+    @Prop({ })
+    newPrice?:Number;
+    @Prop({ required:true})
+    weight:Number;
+    @Prop({ required:true,type: String})
+    weight_unit?:string;
 
     @Prop({ type: String, default: '', maxlength: 1000 })
     description:string;

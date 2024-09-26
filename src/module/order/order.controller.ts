@@ -13,9 +13,10 @@ import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CartService } from '../cart/cart.service';
-import { OptionType } from './entities/order.entity';
+import { OptionType, PaymentStatusType } from './entities/order.entity';
 import { Request } from 'express';
 import { StripePayment } from 'src/helpers/stripePayment';
+import axios from 'axios';
 
 @Controller('orders')
 export class OrderController {
@@ -26,37 +27,58 @@ export class OrderController {
     private  cart: CartService) {}
 
   @Post()
-  async create(@Body() createOrderDto: CreateOrderDto,
+  async create(@Body() updateOrderDto: UpdateOrderDto,
   @Req() req: Request
 ) {
 
     try {
+      // change amount to cent for
+      // include paymentIntentID, clientSecret and paymentStatus
+      // check using the URL that payment on stripe is successful;
+      // check db that the client Secret is not with paymentStatus as successful;
+      
+      // check using the URL
 
       const userID = req['user'].sub;
+     const link =  `https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=`
+ 
 
+     const paymentIntentID = updateOrderDto.paymentIntentID
+     const paymentCheck = await axios.get(`${link}/${updateOrderDto.paymentIntentID}`)
+     console.log("paymentCheck::: ",paymentCheck)
 
-      const intentRes = await this.stripeService.createSession(createOrderDto.totalCost)
-      createOrderDto.paymentIntentID =intentRes.paymentIntentID
-      await this.orderService.create(createOrderDto);
-      intentRes.paymentIntentID =undefined
-      return intentRes;
+     if(updateOrderDto.paymentStatus != PaymentStatusType.SUCCESS ){
+       throw new BadRequestException("order not paid for.");
+     }
+
+     const existingOrder = await this.orderService.findWhere(paymentIntentID);
+      if(existingOrder.paymentStatus == PaymentStatusType.SUCCESS ){
+        throw new BadRequestException("order already completed.");
+      }
+    
+     return await this.orderService.updatePayment(paymentIntentID, userID, updateOrderDto);
+
 
     } catch (e) {
       throw new BadRequestException(e);
     }
   }
 
+
   @Post("pay-intent")
   async createPayIntent(@Body() createOrderDto: CreateOrderDto,
   @Req() req: Request
 ) {
 
-  // /http://localhost:3600/public/images/vendors/profilePicture/7f5b3938-6c19-4c09-8732-fbf654c0590c.png
-  // http://localhost:3600/public/images/vendors/business/7f5b3938-6c19-4c09-8732-fbf654c0590c.png
     try {
-            // await this.cart.removeCart(createOrderDto.cartID,userID)
 
+      
       const intentRes = await this.stripeService.createSession(createOrderDto.totalCost)
+      createOrderDto.paymentIntentID =intentRes.paymentIntentID
+      createOrderDto.clientSecret =intentRes.clientSecret
+      intentRes.paymentIntentID =undefined
+
+      await this.orderService.create(createOrderDto);
       return intentRes;
     } catch (e) {
       throw new BadRequestException(e);

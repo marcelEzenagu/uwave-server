@@ -10,6 +10,11 @@ export enum OptionType {
   REJECTED="REJECTED",
 }
 
+export enum PaymentStatusType {
+  SUCCESS= "SUCCESS",
+  FAILED= "FAILED",
+}
+
 @Schema({
     toJSON: {
       getters: true,
@@ -56,6 +61,12 @@ export class Order {
     totalCost: number;
     @Prop({ type: String, })
     paymentIntentID: string;
+
+    @Prop({ type: String, })
+    clientSecret: string;
+
+    @Prop({ type: String,enum:PaymentStatusType,default:PaymentStatusType.FAILED })
+    paymentStatus: string;
     
     @Prop({ type: String,enum:OptionType,default:OptionType.ACCEPTED})
     status?: string ;

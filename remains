@@ -7,8 +7,14 @@ add strtegy o reduceQuantity when order is placed(include locking of the quantit
 
 TODO vendor
 uploads aside profilepics
+totlProducts: countProducts by vendor
+totlSections: countCategories by vendor
+newCustomers: countCategories by vendor
 
+orders:list orders by vendor
+bestsellers:
 
+deleteAccount -soft-delete
 
 TODO users
 

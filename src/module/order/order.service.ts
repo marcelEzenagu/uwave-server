@@ -54,6 +54,13 @@ export class OrderService {
     return await this.orderModel.find().where(where).exec();
   }
 
+  async updatePayment(paymentIntentID, userID: string, updateOrderDto: UpdateOrderDto) {
+    const where = { userID, paymentIntentID };
+    return await this.orderModel.findOneAndUpdate(where, updateOrderDto, {
+      new: true,
+    });
+  }
+  
   async update(orderID, userID: string, updateOrderDto: UpdateOrderDto) {
     const where = { userID, _id: orderID };
     return await this.orderModel.findOneAndUpdate(where, updateOrderDto, {

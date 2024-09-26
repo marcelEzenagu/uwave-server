@@ -11,7 +11,7 @@ export class StripePayment {
     
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount,
+      amount: amount*100,
       currency: process.env.CURRENCY_TYPE,
       automatic_payment_methods: {
         enabled: true,
