@@ -7,11 +7,12 @@ import { AccessTokenMiddleware } from '../common/middleware/auth.middleware'
 import { AuthModule } from '../auth/auth.module';
 import { CartService } from '../cart/cart.service';
 import { StripePayment } from 'src/helpers/stripePayment';
+import { ItemsService } from '../items/items.service';
 
 
 @Module({
   controllers: [OrderController],
-  providers: [OrderService,CartService,StripePayment],
+  providers: [OrderService,CartService,StripePayment,ItemsService],
   imports: [MongooseModule.forFeature(forFeatureDb),AuthModule],
 })
 
@@ -21,7 +22,6 @@ export class OrderModule {
     consumer.apply(AccessTokenMiddleware)
     .forRoutes(
         { path: 'orders*', method: RequestMethod.ALL },      // Matches localhost:3600/orders/
-        // { path: 'orders/*', method: RequestMethod.ALL },    // Matches localhost:3600/orders/:id
     )
   }
 }

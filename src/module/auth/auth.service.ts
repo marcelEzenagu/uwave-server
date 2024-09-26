@@ -82,7 +82,9 @@ export class AuthService {
   
   async loginUser(dto: LogInDto): Promise<LogInUserResponseDto> {
     try {
-      const user = await this.userService.findWhere({ email: dto.email });
+      dto.email = dto.email.toLowerCase()
+
+      const user = await this.userService.findWhere({ email: dto.email.toLowerCase() });
 
       if (!user) {
         throw new NotFoundException();
@@ -111,6 +113,8 @@ export class AuthService {
 
   async forgotUserPassword(dto: ForgotPasswordDto): Promise<{}> {
     try {
+      dto.email = dto.email.toLowerCase()
+
       const user = await this.userService.findWhere({ email: dto.email });
 
       if (!user) {
@@ -148,6 +152,8 @@ export class AuthService {
 
   async verifyResetUserPassword(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
     try {
+      dto.email = dto.email.toLowerCase()
+
       const key = `reset-password-${dto.requestID}`
 
       const foundOTP = await this.redisService.getValue(key)
@@ -183,6 +189,8 @@ export class AuthService {
 
   async registerUser(createUserDto: User): Promise<LogInUserResponseDto> {
     // try {
+      createUserDto.email = createUserDto.email.toLowerCase()
+
       createUserDto.password = await this.hashData(createUserDto.password);
       const newUser = new this.userModel(createUserDto);
       // console.log('createUserDto.password1 :: ', createUserDto.password);
@@ -204,6 +212,8 @@ export class AuthService {
 
   async loginUWaveUser(dto: LogInDto): Promise<LogInUserResponseDto> {
     try {
+      dto.email = dto.email.toLowerCase()
+
       const user = await this.waveUserService.findWhere({ email: dto.email });
 
       if (!user) {
@@ -233,6 +243,8 @@ export class AuthService {
 
   async forgotUWaveUserPassword(dto: ForgotPasswordDto): Promise<{}> {
     try {
+      dto.email = dto.email.toLowerCase()
+
       const user = await this.waveUserService.findWhere({ email: dto.email });
 
       if (!user) {
@@ -272,6 +284,8 @@ export class AuthService {
 
   async verifyUWaveUserPassword(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
     try {
+      dto.email = dto.email.toLowerCase()
+
       const key = `reset-password-${dto.requestID}`
 
       const foundOTP = await this.redisService.getValue(key)
@@ -334,6 +348,8 @@ export class AuthService {
 
   async registerUWaveUser(createUserDto: WaveUser): Promise<LogInUserResponseDto> {
     // try {
+      createUserDto.email = createUserDto.email.toLowerCase()
+
       createUserDto.password = await this.hashData(createUserDto.password);
       const newUser = new this.uWaveUserModel(createUserDto);
       
@@ -351,6 +367,8 @@ export class AuthService {
 
   async loginVendor(dto: VendorLogInDto): Promise<LogInVendorResponseDto> {
     try {
+      dto.email = dto.email.toLowerCase()
+
       const vendor = await this.vendorService.findWhere({ email: dto.email });
 
       if (!vendor) {
@@ -379,7 +397,7 @@ export class AuthService {
 
   async forgotVendorPassword(dto: ForgotPasswordDto): Promise<{}> {
     try {
-
+      dto.email = dto.email.toLowerCase()
       const vendor = await this.vendorService.findWhere({ email: dto.email });
 
       if (!vendor) {
@@ -418,6 +436,8 @@ export class AuthService {
 
   async verifyResetVendorPassword(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
     try {
+      dto.email = dto.email.toLowerCase()
+
       const key = `reset-password-${dto.requestID}`
 
       const foundOTP = await this.redisService.getValue(key)
@@ -459,6 +479,7 @@ export class AuthService {
 
       createVendorDto.password = await this.hashData(createVendorDto.password);
       const newVendor = new this.vendorModel(createVendorDto);
+      createVendorDto.email = createVendorDto.email.toLowerCase()
 
       const returnedVendorUser = await newVendor.save();
       const role = 'vendor'

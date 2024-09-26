@@ -1,14 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order, OrderDocument } from './entities/order.entity';
 import { Model,Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { CartService } from '../cart/cart.service';
+import { ItemsService } from '../items/items.service';
+import { StripePayment } from 'src/helpers/stripePayment';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
+    private readonly stripeService: StripePayment,
+
+    private  cart: CartService,
+    private  item: ItemsService
   ) {}
 
   create(createOrderDto: CreateOrderDto) {
@@ -18,8 +25,22 @@ export class OrderService {
     return newUserOrder.save();
   }
 
-  async findAll() {
-    return await this.orderModel.find().exec();
+  async findAll(page: number, limit: number,where :{}) {
+    const skip = (page - 1) * limit;
+
+   const data = await this.orderModel.find()
+      .where(where)
+      .skip(skip)
+      .limit(limit)
+      .exec();
+
+      const total = await this.orderModel.countDocuments();
+      return {
+        data,
+        total,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+      };
   }
 
   findOne(id: number) {
@@ -31,9 +52,7 @@ export class OrderService {
   }
 
   async isOrderForUser(orderID,userID: string) {
-    // const where = {userID,"_id":mongoose.Types.ObjectId(orderID)
-    const objectId = new Types.ObjectId(orderID); // Convert string to ObjectId manually
-
+   
     // const where = {userID,"_id":objectId}
     const where = {userID,"_id":orderID}
 
@@ -55,10 +74,22 @@ export class OrderService {
   }
 
   async updatePayment(paymentIntentID, userID: string, updateOrderDto: UpdateOrderDto) {
-    const where = { userID, paymentIntentID };
-    return await this.orderModel.findOneAndUpdate(where, updateOrderDto, {
-      new: true,
-    });
+    try {
+      const where = { userID, paymentIntentID };
+  
+      await  Promise.all([
+       await this.stripeService.confirmPaymentIntent(paymentIntentID),
+        
+        await this.item.decreaseItem(updateOrderDto.products),
+        await this.cart.removeCart(updateOrderDto.cartID,userID),
+        await this.orderModel.findOneAndUpdate(where, updateOrderDto)
+      ])
+      return "order completed successfully"
+    } catch (e) {
+      console.error('Error fetching data:', e);
+      throw new BadRequestException(e)
+    }
+  
   }
   
   async update(orderID, userID: string, updateOrderDto: UpdateOrderDto) {

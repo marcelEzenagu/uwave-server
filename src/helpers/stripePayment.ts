@@ -1,6 +1,7 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
+import { PaymentStatusType } from 'src/module/order/entities/order.entity';
 const stripe = require('stripe')(process.env.STRIPE_KEY)
 
 
@@ -30,7 +31,9 @@ export class StripePayment {
     
      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
-   
+    if(paymentIntent.status != PaymentStatusType.SUCCESS ){
+       throw new BadRequestException("order not-yet paid for.");
+     }
     return paymentIntent
 
   }

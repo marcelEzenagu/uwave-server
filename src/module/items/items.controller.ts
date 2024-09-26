@@ -29,6 +29,9 @@ export class ItemsController {
       
       createItemDto.images = productImages
     }
+
+    createItemDto.itemName = createItemDto.itemName.toLowerCase()
+
       return this.itemsService.create(createItemDto);
 
   }

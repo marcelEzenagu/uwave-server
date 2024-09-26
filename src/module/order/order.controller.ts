@@ -6,13 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-  Req,
+  Req,Query,
   BadRequestException,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { CartService } from '../cart/cart.service';
 import { OptionType, PaymentStatusType } from './entities/order.entity';
 import { Request } from 'express';
 import { StripePayment } from 'src/helpers/stripePayment';
@@ -23,15 +22,14 @@ export class OrderController {
   constructor(
     private readonly orderService: OrderService,
     private readonly stripeService: StripePayment,
-
-    private  cart: CartService) {}
+  ) {}
 
   @Post()
   async create(@Body() updateOrderDto: UpdateOrderDto,
   @Req() req: Request
 ) {
 
-    try {
+    // try {
       // change amount to cent for
       // include paymentIntentID, clientSecret and paymentStatus
       // check using the URL that payment on stripe is successful;
@@ -42,24 +40,13 @@ export class OrderController {
      const userID = req['user'].sub;
    
      const paymentIntentID = updateOrderDto.clientSecret.split("_secret")[0]
-     const PaymentIntent = await this.stripeService.confirmPaymentIntent(paymentIntentID)
-     
-     if(PaymentIntent.status != PaymentStatusType.SUCCESS ){
-       throw new BadRequestException("order not-yet paid for.");
-     }
-
-
+    
      const existingOrder = await this.orderService.findWhere(paymentIntentID);
       if(existingOrder.paymentStatus == PaymentStatusType.SUCCESS ){
         throw new BadRequestException("order already completed.");
       }
     
      return await this.orderService.updatePayment(paymentIntentID, userID, updateOrderDto);
-
-
-    } catch (e) {
-      throw new BadRequestException(e);
-    }
   }
 
 
@@ -85,8 +72,22 @@ export class OrderController {
   }
 
   @Get()
-  findAll() {
-    return this.orderService.findAll();
+  findAll(
+
+    @Query('vendorID') vendorID?: string,
+    @Query('page') page: number = 1, 
+    @Query('limit') limit: number = 50 
+  ) {
+    let where :any = {}
+    if (vendorID)where.vendorID = vendorID
+
+    page = Number(page);
+    limit = Number(limit);
+
+    if (page < 1) page = 1;  // Page should be at least 1
+    if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+
+    return this.orderService.findAll(page,limit,where);
   }
 
   

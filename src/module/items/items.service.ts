@@ -17,7 +17,31 @@ export class ItemsService {
       return await newProduct.save()
      }catch(e){
        console.log("error:: ",e)
-      return new BadRequestException(this.formatErrors(e))
+      throw new BadRequestException(this.formatErrors(e))
+     }  
+  }
+
+  async decreaseItem(items:Item[]) {
+    try{
+      const updatedItems: Item[] = [];
+
+      for (const { productID, quantity } of items) {
+        const updatedItem = await this.itemModel.findOneAndUpdate(
+          { _id: productID, quantity: { $gte: quantity } },  // Ensure sufficient stock is available
+          { $inc: { quantity: -quantity } },               // Atomically decrement the quantity
+          { new: true }  
+        )
+        
+        if (!updatedItem) {
+          throw new Error('Not enough quantity available.');
+        }     
+        updatedItems.push(updatedItem)
+      }
+      return updatedItems;
+
+    }catch(e){
+       console.log("error:: ",e)
+      throw new BadRequestException(this.formatErrors(e))
      }  
   }
 
