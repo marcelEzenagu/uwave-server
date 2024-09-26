@@ -39,17 +39,15 @@ export class OrderController {
       
       // check using the URL
 
-      const userID = req['user'].sub;
-     const link =  `https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=`
- 
-
-     const paymentIntentID = updateOrderDto.paymentIntentID
-     const paymentCheck = await axios.get(`${link}/${updateOrderDto.paymentIntentID}`)
-     console.log("paymentCheck::: ",paymentCheck)
-
-     if(updateOrderDto.paymentStatus != PaymentStatusType.SUCCESS ){
-       throw new BadRequestException("order not paid for.");
+     const userID = req['user'].sub;
+   
+     const paymentIntentID = updateOrderDto.clientSecret.split("_secret")[0]
+     const PaymentIntent = await this.stripeService.confirmPaymentIntent(paymentIntentID)
+     
+     if(PaymentIntent.status != PaymentStatusType.SUCCESS ){
+       throw new BadRequestException("order not-yet paid for.");
      }
+
 
      const existingOrder = await this.orderService.findWhere(paymentIntentID);
       if(existingOrder.paymentStatus == PaymentStatusType.SUCCESS ){
@@ -72,7 +70,8 @@ export class OrderController {
 
     try {
 
-      
+      const userID = req['user'].sub;
+      createOrderDto.userID = userID
       const intentRes = await this.stripeService.createSession(createOrderDto.totalCost)
       createOrderDto.paymentIntentID =intentRes.paymentIntentID
       createOrderDto.clientSecret =intentRes.clientSecret

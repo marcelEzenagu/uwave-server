@@ -11,8 +11,10 @@ export enum OptionType {
 }
 
 export enum PaymentStatusType {
-  SUCCESS= "SUCCESS",
-  FAILED= "FAILED",
+  SUCCESS= "succeeded",
+  REQUIRES_PAYMENT_METHOD= "requires_payment_method",
+  REQUIRES_ACTION= "requires_action",
+  CANCELLED= "canceled",
 }
 
 @Schema({
@@ -65,7 +67,7 @@ export class Order {
     @Prop({ type: String, })
     clientSecret: string;
 
-    @Prop({ type: String,enum:PaymentStatusType,default:PaymentStatusType.FAILED })
+    @Prop({ type: String,enum:PaymentStatusType,default:PaymentStatusType.REQUIRES_PAYMENT_METHOD })
     paymentStatus: string;
     
     @Prop({ type: String,enum:OptionType,default:OptionType.ACCEPTED})
