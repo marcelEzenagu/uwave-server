@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 
 import { Document, Types } from 'mongoose';
+import { PaymentStatusType } from "src/module/order/entities/order.entity";
 
 @Schema({
     toJSON: {
@@ -42,6 +43,25 @@ export class Freight {
       ,required:true
     })
     freightItems:[];
+
+
+    @Prop({ type: String,enum:PaymentStatusType,default:PaymentStatusType.REQUIRES_PAYMENT_METHOD })
+    paymentStatus: string;
+
+    @Prop({ type: String, })
+    paymentIntentID: string;
+
+    @Prop({ type: String, })
+    clientSecret: string;
+
+
+    @Prop({ type: Number, })
+    totalCost: number;
+    
+    @Prop({ type: Date, default: null })
+    deletedAt: Date | null;
+
+
 }
 
 export type FreightDocument = Freight & Document

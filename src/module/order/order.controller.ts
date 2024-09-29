@@ -45,7 +45,6 @@ export class OrderController {
       if(existingOrder.paymentStatus == PaymentStatusType.SUCCESS ){
         throw new BadRequestException("order already completed.");
       }
-    
      return await this.orderService.updatePayment(paymentIntentID, userID, updateOrderDto);
   }
 

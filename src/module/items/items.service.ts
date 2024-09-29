@@ -46,12 +46,29 @@ export class ItemsService {
   }
 
   async findAll(where:{}) {
-try{
-    return await  this.itemModel.find().where(where).exec();
-  }catch(e){
-    console.log("error:: ",e)
-   throw new BadRequestException(this.formatErrors(e))
-  }  }
+    
+    try{
+      return await  this.itemModel.find().where(where).exec();
+    }catch(e){
+      console.log("error:: ",e)
+    throw new BadRequestException(this.formatErrors(e))
+    }   
+  }
+
+   async searchItem(query,country: string) {
+    query = query.trim()
+    
+  
+    
+    const filter: any = { $text: { $search: query },
+      itemSupportedCountries:
+      { $regex: new RegExp(`^${country}`, 'i')}
+  };
+
+
+    return await  this.itemModel.find(filter).exec();
+
+  }
   
 
   async findOne(id: string):Promise<Item> {

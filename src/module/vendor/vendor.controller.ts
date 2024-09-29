@@ -1,4 +1,4 @@
-import { Controller,Req, Get, Post,HttpStatus, Body, Patch, Param, Delete, Res, BadRequestException } from '@nestjs/common';
+import { Controller,Req, Query,Get, Post,HttpStatus, Body, Patch, Param, Delete, Res, BadRequestException } from '@nestjs/common';
 import { VendorService } from './vendor.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
@@ -8,18 +8,45 @@ import { Request } from 'express';
 import { ChangePasswordDto, ResetPasswordDto } from '../auth/dto/reset.dto';
 import { FileService } from 'src/helpers/upload';
 import * as bcrypt from 'bcrypt';
+import { OrderService } from '../order/order.service';
 
 @Controller('vendors')
 
 export class VendorController {
   constructor(
       private readonly vendorService: VendorService,
+      private readonly orderService: OrderService,
       private readonly fileService: FileService) {}
 
 
   @Get()
   findAll() {
     return this.vendorService.findAll();
+  }
+
+  @Get('/customers')
+
+  async findNewCustomers(
+    @Req() req: Request,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    try {
+
+
+    const vendorID = req['user'].sub
+    const role = req['user'].role
+
+    if(role !="vendor"){
+      throw new BadRequestException("unaccessible to non-vendors");
+    }
+
+    const resp = await this.orderService.getNewCustomers(vendorID,startDate,endDate);
+    console.log("resp::::::> ",resp)
+    return resp
+  } catch (e) {
+    throw new BadRequestException(e);
+  }
   }
 
   @Get('/details')
@@ -63,6 +90,21 @@ export class VendorController {
       const imagePath = `${vPath}/business`
       const success =  await this.fileService.uploadImage(updateVendorDto.profilePicture,imagePath,imageName)
       updateVendorDto.businessPicture = `${imagePath}/${imageName}`
+    }
+    if(updateVendorDto.permitDocument){
+      const imagePath = `${vPath}/vendorPermit`
+      const success =  await this.fileService.uploadImage(updateVendorDto.profilePicture,imagePath,imageName)
+      updateVendorDto.permitDocument = `${imagePath}/${imageName}`
+    }
+    if(updateVendorDto.foodLicenseDocument){
+      const imagePath = `${vPath}/foodLicense`
+      const success =  await this.fileService.uploadImage(updateVendorDto.profilePicture,imagePath,imageName)
+      updateVendorDto.foodLicenseDocument = `${imagePath}/${imageName}`
+    }
+    if(updateVendorDto.cacDocument){
+      const imagePath = `${vPath}/CAC`
+      const success =  await this.fileService.uploadImage(updateVendorDto.profilePicture,imagePath,imageName)
+      updateVendorDto.cacDocument = `${imagePath}/${imageName}`
     }
 
 

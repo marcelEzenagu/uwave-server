@@ -57,16 +57,13 @@ export class OrderService {
     const where = {userID,"_id":orderID}
 
     const result = await this.orderModel.findOne(where).exec();
-    console.log("WHERE:: ",where,"result:: ",result)
     
     // process.exit()
     if(result != undefined){
-      console.log("HERE")
       
       return {success:true,result}
     }
     return {success:false}
-    console.log("NHERE")
   }
 
   async findUserOrders(where: {}) {
@@ -174,5 +171,33 @@ export class OrderService {
     ]);
   }
   
-  
+  async getNewCustomers(vendorID, start, end :string) {
+    
+    const startDate = new Date(start)
+    const endDate = new Date(end)
+    const newCustomers = await this.orderModel.aggregate([
+      {
+        // Step 1: Match orders from the specific vendor within the date range
+        $match: {
+          "products.vendorID": vendorID,
+          createdAt: { $gte: startDate, $lte: endDate }
+        }
+      },
+      {
+        // Step 2: Group by customerID, and calculate the firstOrderDate
+        $group: {
+          _id: '$userID',  // Group orders by customerID
+          firstOrderDate: { $min: '$createdAt' }  // Get the earliest order date per customer
+        }
+      },
+      {
+        // Step 3: Filter customers whose first order falls within the date range
+        $match: {
+          firstOrderDate: { $gte: startDate, $lte: endDate }
+        }
+      },
+      // Optionally: Lookup or project customer details
+    ]);
+return newCustomers
+}
 }

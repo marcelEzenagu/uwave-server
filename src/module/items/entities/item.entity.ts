@@ -15,6 +15,7 @@ export type ItemDocument = Item & Document
     },
     timestamps: true,
   })
+
 export class Item {
     @Prop({
         type:String,
@@ -99,4 +100,15 @@ export class Item {
 }
 export const ItemSchema = SchemaFactory.createForClass(Item)
 
-ItemSchema.index({ vendorID: 1, productID: 1,itemName:1 }, { unique: true });
+ItemSchema.index({ vendorID: 1, productID: 1,itemName: 1, itemCategory: 1, itemSubCategory: 1, salesPrice: 1 }, { unique: true });
+
+
+ItemSchema.index({
+    vendorID: 1,
+    itemName: 1,
+    itemCategory: 1,
+    itemSubCategory: 1,
+    itemSupportedCountries: 1,
+  }, { unique: true });
+// Full-text index on itemName, itemCategory, and itemSubCategory for full-text search
+ItemSchema.index({ itemName: 'text', itemCategory: 'text', itemSubCategory: 'text' });

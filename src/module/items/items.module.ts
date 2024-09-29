@@ -1,4 +1,4 @@
-import { Module ,MiddlewareConsumer} from '@nestjs/common';
+import { Module ,MiddlewareConsumer,RequestMethod} from '@nestjs/common';
 import { ItemsService } from './items.service';
 import { ItemsController } from './items.controller';
 import forFeatureDb from 'src/db/for-feature.db';
@@ -17,6 +17,6 @@ import { FileService } from 'src/helpers/upload';
 export class ItemsModule {
   configure(consumer:MiddlewareConsumer){
     consumer.apply(AccessTokenMiddleware)
-    // .forRoutes({path:'products',method:RequestMethod.ALL})
+    .forRoutes({path:'items*',method:RequestMethod.ALL})
   }
 }

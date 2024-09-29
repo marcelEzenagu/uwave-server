@@ -5,10 +5,11 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { AccessTokenMiddleware } from '../common/middleware/auth.middleware'
 import forFeatureDb from 'src/db/for-feature.db';
 import { AuthModule } from '../auth/auth.module';
+import { StripePayment } from 'src/helpers/stripePayment';
 
 @Module({
   controllers: [FreightController],
-  providers: [FreightService],
+  providers: [FreightService,StripePayment],
   imports: [MongooseModule.forFeature(forFeatureDb),AuthModule],
 
 })

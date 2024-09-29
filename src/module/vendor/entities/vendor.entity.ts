@@ -44,6 +44,15 @@ export class Vendor {
   @Prop({type: String})
   idDocument?: string;
 
+  @Prop({type: String})
+  permitDocument?: string;
+
+  @Prop({type: String})
+  tax_number?: string;
+
+  @Prop({type: String})
+  foodLicenseDocument?: string;
+
   @Prop({ type: String })
   businessName?: string;
 
@@ -67,6 +76,12 @@ export class Vendor {
   
   @Prop({type: String})
   businessPicture?: string;
+  
+  @Prop({type: String})
+  businessBank?: string;
+  
+  @Prop({type: String})
+  businessBankAccount?: string;
 
   @Prop({ type: String })
   @IsOptional()

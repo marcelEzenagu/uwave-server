@@ -5,11 +5,17 @@ import { Vendor, VendorDocument } from '../vendor/entities/vendor.entity';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
 import * as bcrypt from 'bcrypt';
 import { ResetPasswordDto } from '../auth/dto/reset.dto';
+import { OrderService } from '../order/order.service';
 
 
 @Injectable()
 export class VendorService {
-  constructor(@InjectModel(Vendor.name) private readonly vendorModel: Model<VendorDocument>) {}
+  constructor(
+    @InjectModel(Vendor.name) private readonly vendorModel: Model<VendorDocument>,
+    private readonly orderService: OrderService,
+
+) {}
+
 
 
   // change import to b e the from auth
@@ -70,6 +76,7 @@ export class VendorService {
     return await  this.vendorModel.findOneAndUpdate(where,updateVendorDto, {new: true })
   }
   async findWhere(where:{}):Promise<Vendor> {
+    console.log("WHERE:===>",where)
     return await  this.vendorModel.findOne().where(where).exec();
   }
   

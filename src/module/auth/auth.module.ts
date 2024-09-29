@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module,forwardRef } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserService } from '../user/user.service';
@@ -10,16 +10,21 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UWaveUserService } from '../u-wave-user/u-wave-user.service';
 import { RedisService } from '../redis/redis.service';
 import { MailerService } from '../mailer/mailer.service';
+import { OrderModule } from '../order/order.module';
 
 
 @Module({
   controllers: [AuthController],
   exports: [AuthService],
-  providers: [AuthService,UserService,VendorService,UWaveUserService,
+  providers: [AuthService,UserService,UWaveUserService,
   RedisService,MailerService
 
   ],
+
   imports: [
     MongooseModule.forFeature(forFeatureDb),
+
+    forwardRef(() => VendorModule),
+    forwardRef(() => OrderModule),
   ],})
 export class AuthModule {}

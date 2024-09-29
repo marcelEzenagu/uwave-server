@@ -1,9 +1,10 @@
-import { Controller,Query, Get, Post, BadRequestException,Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller,Query, Get, Post, BadRequestException,Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { Item } from './entities/item.entity';
 import { FileService } from 'src/helpers/upload';
+import { Request } from 'express';
 
 @Controller('items')
 export class ItemsController {
@@ -12,8 +13,11 @@ export class ItemsController {
     private readonly fileService: FileService) {}
 
   @Post()
-  async create(@Body() createItemDto: Item) { 
-    
+  async create(@Req() req: Request,
+    @Body() createItemDto: Item) { 
+    const vendorID = req['user'].sub;
+
+    createItemDto.vendorID = vendorID
     if(createItemDto.images){
       const vPath = "public/images/items"
       const productImages :string[] = []
@@ -47,7 +51,17 @@ export class ItemsController {
     if (category)where.productCategory = category.toLowerCase()
     if(subCategory)where.productSubCategory = subCategory.toLowerCase()
     return this.itemsService.findAll(where);
+}
+
+@Get('search')
+async searchItem(
+  @Query('query') query: string, 
+  @Query('country') country: string, 
+) {
+   
+  return await this.itemsService.searchItem(query,country);
   }
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {

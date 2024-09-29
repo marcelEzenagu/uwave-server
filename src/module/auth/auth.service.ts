@@ -87,13 +87,13 @@ export class AuthService {
       const user = await this.userService.findWhere({ email: dto.email.toLowerCase() });
 
       if (!user) {
-        throw new NotFoundException();
+        throw new NotFoundException("invalid email");
       }
 
       const passwordMatch = await bcrypt.compare(dto.password, user.password);
 
       if (!passwordMatch) {
-        throw new UnauthorizedException('Invalid email or password');
+        throw new UnauthorizedException('Invalid password');
       }
 
       const  role = 'user' 
@@ -105,7 +105,7 @@ export class AuthService {
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw new UnauthorizedException('Invalid email or password');
+        throw new UnauthorizedException(error);
       }
       throw error;
     }
@@ -193,11 +193,7 @@ export class AuthService {
 
       createUserDto.password = await this.hashData(createUserDto.password);
       const newUser = new this.userModel(createUserDto);
-      // console.log('createUserDto.password1 :: ', createUserDto.password);
-      // createUserDto.password = await this.hashData(createUserDto.password);
-      // console.log('createUserDto.password:: ', createUserDto.password);
-
-      // console.log('newUser:: ', newUser);
+      
       const returnedUser = await newUser.save();
       const role = 'user'
 
@@ -217,13 +213,13 @@ export class AuthService {
       const user = await this.waveUserService.findWhere({ email: dto.email });
 
       if (!user) {
-        throw new NotFoundException();
+        throw new NotFoundException("invalid email");
       }
 
       const passwordMatch = await bcrypt.compare(dto.password, user.password);
 
       if (!passwordMatch) {
-        throw new UnauthorizedException('Invalid email or password');
+        throw new UnauthorizedException('Invalid  password');
       }
 
       const  role = 'user' 
@@ -235,7 +231,7 @@ export class AuthService {
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw new UnauthorizedException('Invalid email or password');
+        throw new UnauthorizedException(error);
       }
       throw error;
     }
@@ -370,9 +366,9 @@ export class AuthService {
       dto.email = dto.email.toLowerCase()
 
       const vendor = await this.vendorService.findWhere({ email: dto.email });
-
+      
       if (!vendor) {
-        throw new NotFoundException();
+        throw new NotFoundException("Invalid email");
       }
 
       const passwordMatch = await bcrypt.compare(dto.password, vendor.password);
@@ -387,11 +383,12 @@ export class AuthService {
         access_data: { access_token: accessTokenData, role },
         vendor,
       };
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new UnauthorizedException('Invalid email or password');
+    } catch (e) {
+      console.log("e:: ",e)
+      if (e instanceof NotFoundException) {
+        throw new UnauthorizedException(e);
       }
-      throw error;
+      throw e;
     }
   }
 
@@ -478,8 +475,8 @@ export class AuthService {
     console.log("registerVendor:: ")
 
       createVendorDto.password = await this.hashData(createVendorDto.password);
-      const newVendor = new this.vendorModel(createVendorDto);
       createVendorDto.email = createVendorDto.email.toLowerCase()
+      const newVendor = new this.vendorModel(createVendorDto);
 
       const returnedVendorUser = await newVendor.save();
       const role = 'vendor'

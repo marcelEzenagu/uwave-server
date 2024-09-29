@@ -39,7 +39,6 @@ export class Order {
 
     @Prop({
         type:String,
-        unique:true,
     })
     cartID ?: string;
     
@@ -49,6 +48,7 @@ export class Order {
           name: { type: String, required: true },
           price: { type: Number, required: true },
           quantity: { type: Number, required: true },
+          vendorID: { type: String,  required: true },
           _id: false 
         }],
         default: [],

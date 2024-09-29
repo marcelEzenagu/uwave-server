@@ -1,13 +1,18 @@
-import { Controller, Get,Req, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get,Req,BadRequestException, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { FreightService } from './freight.service';
 import { CreateFreightDto } from './dto/create-freight.dto';
 import { UpdateFreightDto } from './dto/update-freight.dto';
 import { Request } from 'express';
+import { StripePayment } from 'src/helpers/stripePayment';
 
 @Controller('freights')
 export class FreightController {
-  constructor(private readonly freightService: FreightService) {}
+  constructor(private readonly freightService: FreightService,
 
+    private readonly stripeService: StripePayment,
+
+  ) {}
+  
   @Post()
   create(@Body() createFreightDto: CreateFreightDto,
   @Req() req: Request,
@@ -18,6 +23,29 @@ export class FreightController {
     return this.freightService.create(createFreightDto);
   }
 
+
+
+
+  @Post("pay-intent")
+  async createPayIntent(@Body() createOrderDto: CreateFreightDto,
+  @Req() req: Request
+) {
+
+    try {
+
+      const userID = req['user'].sub;
+      createOrderDto.userID = userID
+      const intentRes = await this.stripeService.createSession(createOrderDto.totalCost)
+      createOrderDto.paymentIntentID =intentRes.paymentIntentID
+      createOrderDto.clientSecret =intentRes.clientSecret
+      intentRes.paymentIntentID =undefined
+
+      await this.freightService.create(createOrderDto);
+      return intentRes;
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
+  }
   @Get()
   findAll() {
     return this.freightService.findAll();
