@@ -4,16 +4,35 @@ import { UpdateItemDto } from './dto/update-item.dto';
 import { Item, ItemDocument } from './entities/item.entity';
 import { InjectModel } from  '@nestjs/mongoose';
 import { Model } from  'mongoose';
+import { FileService } from 'src/helpers/upload';
 
 @Injectable()
 export class ItemsService {
-  constructor(@InjectModel(Item.name) private itemModel: Model<ItemDocument>) {}
+  constructor(@InjectModel(Item.name) private itemModel: Model<ItemDocument>,
+
+  private readonly fileService: FileService) {}
 
 
   async create(createItemDto: Item) {
     try{
 
-      const newProduct = new this.itemModel(createItemDto)
+      let newProduct = new this.itemModel(createItemDto)
+      if(createItemDto.images){
+        const vPath = "public/images/items"
+        const productImages :string[] = []
+        const imagePath = `${vPath}/${createItemDto.vendorID}/${createItemDto.itemName}`
+        for(let i= 0; i < createItemDto.images.length; i++){
+          const imageName =`${createItemDto.itemName}-${i}.png`
+          await this.fileService.uploadImage(createItemDto.images[i],imagePath,imageName)
+          
+          const itemImage = `${imagePath}/${imageName}`
+          productImages.push(itemImage)
+  
+        }
+        
+        createItemDto.images = productImages
+      }
+
       return await newProduct.save()
      }catch(e){
        console.log("error:: ",e)

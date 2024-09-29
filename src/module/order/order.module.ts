@@ -9,16 +9,18 @@ import { CartService } from '../cart/cart.service';
 import { StripePayment } from 'src/helpers/stripePayment';
 import { ItemsService } from '../items/items.service';
 import { VendorModule } from '../vendor/vendor.module';
+import { ItemsModule } from '../items/items.module';
 
 
 @Module({
   controllers: [OrderController],
   // exports:[forwardRef(() =>VendorModule)],
   exports:[OrderService],
-  providers: [OrderService,CartService,StripePayment,ItemsService],
+  providers: [OrderService,CartService,StripePayment],
   imports: [MongooseModule.forFeature(forFeatureDb),
     forwardRef(() => AuthModule),
     forwardRef(() => VendorModule),
+    forwardRef(() => ItemsModule),
 
     ],
 })

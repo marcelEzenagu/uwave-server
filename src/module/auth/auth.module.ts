@@ -11,6 +11,7 @@ import { UWaveUserService } from '../u-wave-user/u-wave-user.service';
 import { RedisService } from '../redis/redis.service';
 import { MailerService } from '../mailer/mailer.service';
 import { OrderModule } from '../order/order.module';
+import { ItemsModule } from '../items/items.module';
 
 
 @Module({
@@ -26,5 +27,6 @@ import { OrderModule } from '../order/order.module';
 
     forwardRef(() => VendorModule),
     forwardRef(() => OrderModule),
+    forwardRef(() => ItemsModule),
   ],})
 export class AuthModule {}

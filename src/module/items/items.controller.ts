@@ -3,14 +3,15 @@ import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { Item } from './entities/item.entity';
-import { FileService } from 'src/helpers/upload';
+// import { FileService } from 'src/helpers/upload';
 import { Request } from 'express';
 
 @Controller('items')
 export class ItemsController {
   constructor(
     private readonly itemsService: ItemsService,
-    private readonly fileService: FileService) {}
+    // private readonly fileService: FileService
+  ) {}
 
   @Post()
   async create(@Req() req: Request,
@@ -18,21 +19,7 @@ export class ItemsController {
     const vendorID = req['user'].sub;
 
     createItemDto.vendorID = vendorID
-    if(createItemDto.images){
-      const vPath = "public/images/items"
-      const productImages :string[] = []
-      const imagePath = `${vPath}/${createItemDto.itemName}`
-      for(let i= 0; i < createItemDto.images.length; i++){
-        const imageName =`${createItemDto.itemName}-${i}.png`
-        await this.fileService.uploadImage(createItemDto.images[i],imagePath,imageName)
-        
-        const itemImage = `${imagePath}/${imageName}`
-        productImages.push(itemImage)
-
-      }
-      
-      createItemDto.images = productImages
-    }
+    
 
     createItemDto.itemName = createItemDto.itemName.toLowerCase()
 
