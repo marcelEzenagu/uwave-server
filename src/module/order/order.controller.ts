@@ -16,7 +16,9 @@ import { OptionType, PaymentStatusType } from './entities/order.entity';
 import { Request } from 'express';
 import { StripePayment } from 'src/helpers/stripePayment';
 import axios from 'axios';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('orders')
 @Controller('orders')
 export class OrderController {
   constructor(

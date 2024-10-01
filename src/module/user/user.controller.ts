@@ -18,6 +18,10 @@ import { ChangePasswordDto, ResetPasswordDto } from '../auth/dto/reset.dto';
 import { FileService } from 'src/helpers/upload';
 import * as bcrypt from 'bcrypt';
 
+
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(

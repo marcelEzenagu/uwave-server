@@ -4,6 +4,10 @@ import { CreateSavedItemDto } from './dto/create-saved-item.dto';
 import { UpdateSavedItemDto } from './dto/update-saved-item.dto';
 import { Request } from 'express';
 
+
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('saved-items')
 @Controller('saved-items')
 export class SavedItemsController {
   constructor(private readonly savedItemsService: SavedItemsService) {}

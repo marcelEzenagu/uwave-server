@@ -5,7 +5,9 @@ import { UpdateItemDto } from './dto/update-item.dto';
 import { Item } from './entities/item.entity';
 // import { FileService } from 'src/helpers/upload';
 import { Request } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('items')
 @Controller('items')
 export class ItemsController {
   constructor(

@@ -6,7 +6,9 @@ import { ProductCategoryService } from '../product-category/product-category.ser
 import { ProductSubCategoryService } from '../product-sub-category/product-sub-category.service';
 import { ProductCategory } from '../product-category/entities/product-category.entity';
 import { ProductSubCategory } from '../product-sub-category/entities/product-sub-category.entity';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Admin')
 @Controller('admin')
 export class AdminController {
   constructor(

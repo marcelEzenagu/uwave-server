@@ -7,6 +7,9 @@ import { VendorService } from '../vendor/vendor.service';
 import { ForgotPasswordDto, ResetPasswordDto, VerifyResetPasswordDto } from './dto/reset.dto';
 import { Request } from 'express';
 
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
 

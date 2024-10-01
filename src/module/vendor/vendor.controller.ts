@@ -10,6 +10,10 @@ import { FileService } from 'src/helpers/upload';
 import * as bcrypt from 'bcrypt';
 import { OrderService } from '../order/order.service';
 
+
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('vendors')
 @Controller('vendors')
 
 export class VendorController {

@@ -4,6 +4,10 @@ import { CreateWaveUserDto } from './dto/create-u-wave-user.dto';
 import { UpdateUWaveUserDto } from './dto/update-u-wave-user.dto';
 import { FileService } from 'src/helpers/upload';
 
+
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('u-wave-user')
 @Controller('u-wave-user')
 export class UWaveUserController {
   constructor(

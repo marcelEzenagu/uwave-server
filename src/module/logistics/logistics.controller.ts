@@ -4,6 +4,10 @@ import { CreateLogisticDto } from './dto/create-logistic.dto';
 import { UpdateLogisticDto } from './dto/update-logistic.dto';
 import { LogisticDocument } from './entities/logistic.entity';
 
+
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('logistics')
 @Controller('logistics')
 export class LogisticsController {
   constructor(private readonly logisticsService: LogisticsService) {}

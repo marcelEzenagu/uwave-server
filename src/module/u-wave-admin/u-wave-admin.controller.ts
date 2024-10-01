@@ -3,9 +3,14 @@ import { UWaveAdminService } from './u-wave-admin.service';
 import { CreateUWaveAdminDto } from './dto/create-u-wave-admin.dto';
 import { UpdateUWaveAdminDto } from './dto/update-u-wave-admin.dto';
 
+
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('u-wave-admin')
 @Controller('u-wave-admin')
 export class UWaveAdminController {
   constructor(private readonly uWaveAdminService: UWaveAdminService) {}
+
 
   @Post()
   create(@Body() createUWaveAdminDto: CreateUWaveAdminDto) {

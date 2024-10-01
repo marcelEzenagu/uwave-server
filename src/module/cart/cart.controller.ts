@@ -4,6 +4,11 @@ import { UpdateCartDto } from './dto/update-cart.dto';
 import { Cart } from './entities/cart.entity';
 import { Request } from 'express';
 
+
+
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('Carts')
 @Controller('carts')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
