@@ -12,6 +12,7 @@ import { Freight, FreightSchema } from "src/module/freight/entities/freight.enti
 import { ItemSchema,Item } from "src/module/items/entities/item.entity";
 import { ProductCategory,ProductCategorySchema } from "src/module/product-category/entities/product-category.entity";
 import { ProductSubCategory ,ProductSubCategorySchema} from "src/module/product-sub-category/entities/product-sub-category.entity";
+import { Agent, AgentSchema } from "src/module/agent/entities/agent.entity";
 
 export default [
   { name: User.name, schema: UserSchema },
@@ -27,4 +28,5 @@ export default [
   { name: Item.name, schema: ItemSchema },
   { name: ProductCategory.name, schema: ProductCategorySchema },
   { name: ProductSubCategory.name, schema: ProductSubCategorySchema },
+  { name: Agent.name, schema: AgentSchema },
 ];

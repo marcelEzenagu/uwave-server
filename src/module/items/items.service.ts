@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-import { Item, ItemDocument } from './entities/item.entity';
+import { Item, ItemDocument, ItemFilter } from './entities/item.entity';
 import { InjectModel } from  '@nestjs/mongoose';
 import { Model } from  'mongoose';
 import { FileService } from 'src/helpers/upload';
@@ -47,7 +47,7 @@ export class ItemsService {
       for (const { productID, quantity } of items) {
         const updatedItem = await this.itemModel.findOneAndUpdate(
           { _id: productID, quantity: { $gte: quantity } },  // Ensure sufficient stock is available
-          { $inc: { quantity: -quantity } },               // Atomically decrement the quantity
+          { $inc: { quantity: -quantity, salesCount: +quantity } },               // Atomically decrement the quantity
           { new: true }  
         )
         
@@ -74,7 +74,7 @@ export class ItemsService {
     }   
   }
 
-   async searchItem(query,country: string) {
+   async searchItem(query,country,filterTag: string) {
     query = query.trim()
     
   
@@ -82,10 +82,21 @@ export class ItemsService {
     const filter: any = { $text: { $search: query },
       itemSupportedCountries:
       { $regex: new RegExp(`^${country}`, 'i')}
-  };
+    };
 
 
-    return await  this.itemModel.find(filter).exec();
+  var sortOption :any = {}
+  if(filterTag == ItemFilter.BEST_SELLER){
+    sortOption.salesCount = -1; // Sort bestsellers first
+  }else if(filterTag == ItemFilter.HIGH_TO_LOW){
+    sortOption.salesPrice = -1; // Sort by price high to low
+
+  }else if(filterTag == ItemFilter.LOW_TO_HIGH){
+    sortOption.salesPrice = 1; // Sort by price low to high
+
+  }
+
+    return await  this.itemModel.find(filter).sort(sortOption).exec();
 
   }
   

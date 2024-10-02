@@ -2,10 +2,9 @@ import { Controller,Query, Get, Post, BadRequestException,Body, Patch, Param, De
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-import { Item } from './entities/item.entity';
-// import { FileService } from 'src/helpers/upload';
+import { Item, ItemFilter } from './entities/item.entity';
 import { Request } from 'express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('items')
 @Controller('items')
@@ -43,12 +42,32 @@ export class ItemsController {
 }
 
 @Get('search')
+@ApiQuery({
+  name: 'query',
+  required: false,
+  description: 'Search word for item search',
+  type: String,
+})
+@ApiQuery({
+  name: 'country',
+  required: false,
+  description: 'Country for filtering items',
+  type: String,
+})
+@ApiQuery({
+  name: 'filter',
+  required: false,
+  enum: ItemFilter,
+  description: 'Filter for item sorting (bestseller, priceLowToHigh, priceHighToLow)',
+})
+
 async searchItem(
-  @Query('query') query: string, 
+  @Query('query') searchWord: string, 
   @Query('country') country: string, 
+  @Query('filter') filter: ItemFilter, 
 ) {
    
-  return await this.itemsService.searchItem(query,country);
+  return await this.itemsService.searchItem(searchWord.trim(),country.trim(),filter.trim());
   }
 
 

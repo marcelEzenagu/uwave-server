@@ -51,6 +51,7 @@ export class VendorService {
       throw error;
     }
   }
+
   create(createVendorDto: Vendor) {
     const newVendor = new this.vendorModel(createVendorDto)
     return newVendor.save();
@@ -76,7 +77,6 @@ export class VendorService {
     return await  this.vendorModel.findOneAndUpdate(where,updateVendorDto, {new: true })
   }
   async findWhere(where:{}):Promise<Vendor> {
-    console.log("WHERE:===>",where)
     return await  this.vendorModel.findOne().where(where).exec();
   }
   

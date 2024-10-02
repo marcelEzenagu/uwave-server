@@ -29,6 +29,7 @@ import { join } from 'path';
 
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { StatusController } from './app.controller';
+import { AgentModule } from './module/agent/agent.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { StatusController } from './app.controller';
     CountryCurrencyModule,
     ProductCategoryModule,
     ProductSubCategoryModule,
+    AgentModule,
   ],
 
   providers: [

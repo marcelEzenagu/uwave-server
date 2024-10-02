@@ -4,11 +4,14 @@ import {
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+
 import {
   LogInDto,
   LogInUserResponseDto,
   LogInVendorResponseDto,VendorLogInDto
 } from './dto/login.dto';
+
+
 import { UserService } from '../user/user.service';
 import { VendorService } from '../vendor/vendor.service';
 import { UWaveUserService } from '../u-wave-user/u-wave-user.service';
@@ -25,6 +28,8 @@ import { RedisService } from '../redis/redis.service';
 import { MailerService } from '../mailer/mailer.service';
 import { MESSAGE_TEMPLATE } from '../notification/enum';
 import { ForgotPasswordDto, ResetPasswordDto, VerifyResetPasswordDto } from './dto/reset.dto';
+import { AgentService } from '../agent/agent.service';
+import { Agent, AgentDocument } from '../agent/entities/agent.entity';
 const jwt = require('jsonwebtoken');
 
 @Injectable()
@@ -34,9 +39,11 @@ export class AuthService {
     private waveUserService: UWaveUserService,
     private vendorService: VendorService,
     private redisService: RedisService,
+    private agentService: AgentService,
     private mailService: MailerService,
 
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Agent.name) private agentModel: Model<AgentDocument>,
     @InjectModel(Vendor.name) private vendorModel: Model<VendorDocument>,
     @InjectModel(WaveUser.name) private uWaveUserModel: Model<WaveUserDocument>,
   ) {}
@@ -110,6 +117,8 @@ export class AuthService {
       throw error;
     }
   }
+
+ 
 
   async forgotUserPassword(dto: ForgotPasswordDto): Promise<{}> {
     try {
@@ -185,8 +194,6 @@ export class AuthService {
     }
   }
 
-  
-
   async registerUser(createUserDto: User): Promise<LogInUserResponseDto> {
     // try {
       createUserDto.email = createUserDto.email.toLowerCase()
@@ -204,6 +211,127 @@ export class AuthService {
         user: returnedUser,
       };
     
+  }
+
+  async loginAgent(dto: LogInDto): Promise<LogInUserResponseDto> {
+    try {
+      dto.email = dto.email.toLowerCase()
+
+      const agent = await this.agentService.findWhere({ email: dto.email.toLowerCase() });
+      if (!agent) {
+        throw new NotFoundException("invalid email");
+      }
+
+      const passwordMatch = await bcrypt.compare(dto.password, agent.password);
+      if (!passwordMatch) {
+        throw new UnauthorizedException('Invalid password');
+      }
+
+      const  role = 'agent' 
+      const accessTokenData = this.generateToken(agent.agentID,role);
+
+      return {
+        access_data: { access_token: accessTokenData, role },
+        user: agent,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException(error);
+      }
+      throw error;
+    }
+  }
+
+  async forgotAgentPassword(dto: ForgotPasswordDto): Promise<{}> {
+    try {
+      dto.email = dto.email.toLowerCase()
+
+      const user = await this.agentService.findWhere({ email: dto.email });
+
+      if (!user) {
+        throw new NotFoundException("no user with this email");
+      }
+
+      const OTP = this.generateOtp()
+      const requestID = await this.generateTemporaryAccessCode("reset-password",OTP)
+
+      await this.mailService.send(
+        {
+          subject:"reset-password",
+          to:dto.email,
+          otp:OTP,
+          template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+        }
+       )
+
+
+     return {
+        message: "A Password Reset OTP has been sent to this email",
+        requestID,
+        // data:{
+        //   requestID,
+        //   OTP
+        // }
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException('Invalid email');
+      }
+      throw error;
+    }
+  }
+
+  async verifyResetAgentPassword(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
+    try {
+      dto.email = dto.email.toLowerCase()
+
+      const key = `reset-password-${dto.requestID}`
+
+      const foundOTP = await this.redisService.getValue(key)
+    
+      if (foundOTP !== dto.otp) {
+        throw new UnprocessableEntityException("invalid otp");
+      }
+
+      const agent = await this.agentService.findWhere({ email: dto.email });
+      if (!agent) {
+        throw new NotFoundException("no agent with this email");
+      }
+      
+      const  role = 'agent' 
+      const accessTokenData = this.generateToken(agent.agentID,role);
+
+
+      return {
+        access_data: { access_token: accessTokenData, role },
+        user: agent,      
+      };
+    } catch (error) {
+      console.log("error: ", error)
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error);
+      }
+
+      throw error;
+    }
+  }
+
+  async registerAgent(createUserDto: Agent): Promise<LogInUserResponseDto> {
+    createUserDto.email = createUserDto.email.toLowerCase()
+
+    createUserDto.password = await this.hashData(createUserDto.password);
+    const newAgent = new this.agentModel(createUserDto);
+
+    const returnedAgent = await newAgent.save();
+    
+    const role = 'agent'
+    const token = this.generateToken(returnedAgent.agentID,role);
+
+    return {
+      access_data: { token, role },
+      user: returnedAgent,
+    };
+  
   }
 
   async loginUWaveUser(dto: LogInDto): Promise<LogInUserResponseDto> {

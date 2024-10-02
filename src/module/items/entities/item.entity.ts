@@ -5,6 +5,11 @@ import { Document, Types } from 'mongoose';
 import { v4 as uuid } from "uuid";
 import { Type } from "class-transformer";
 
+export enum ItemFilter {
+  BEST_SELLER= "best_seller",
+  LOW_TO_HIGH="low to high",
+  HIGH_TO_LOW="high to low"
+}
 
 export type ItemDocument = Item & Document
 
@@ -26,7 +31,9 @@ export class Item {
     })
     ItemID : string;
 
-
+    @Prop({ default: 0 })
+    salesCount?: number;
+    
     @Prop({ required:true})
     itemName:string;
     
@@ -98,6 +105,7 @@ export class Item {
     // measurement
     // supportedCountry 
 }
+
 export const ItemSchema = SchemaFactory.createForClass(Item)
 
 ItemSchema.index({ vendorID: 1, productID: 1,itemName: 1, itemCategory: 1, itemSubCategory: 1, salesPrice: 1 }, { unique: true });

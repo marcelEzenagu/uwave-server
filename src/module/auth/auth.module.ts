@@ -12,19 +12,21 @@ import { RedisService } from '../redis/redis.service';
 import { MailerService } from '../mailer/mailer.service';
 import { OrderModule } from '../order/order.module';
 import { ItemsModule } from '../items/items.module';
+import { AgentModule } from '../agent/agent.module';
+import { AgentService } from '../agent/agent.service';
 
 
 @Module({
   controllers: [AuthController],
   exports: [AuthService],
-  providers: [AuthService,UserService,UWaveUserService,
+  providers: [AuthService,UserService,UWaveUserService,AgentService,
   RedisService,MailerService
 
   ],
 
   imports: [
     MongooseModule.forFeature(forFeatureDb),
-
+    forwardRef(() => AgentModule),
     forwardRef(() => VendorModule),
     forwardRef(() => OrderModule),
     forwardRef(() => ItemsModule),

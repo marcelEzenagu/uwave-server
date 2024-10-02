@@ -8,6 +8,8 @@ import { ForgotPasswordDto, ResetPasswordDto, VerifyResetPasswordDto } from './d
 import { Request } from 'express';
 
 import { ApiTags } from '@nestjs/swagger';
+import { AgentService } from '../agent/agent.service';
+import { Agent } from '../agent/entities/agent.entity';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -16,6 +18,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly vendorService: VendorService,
+    private readonly agentService: AgentService,
   ) {}
 
   @Post("users/")
@@ -46,6 +49,32 @@ export class AuthController {
   async verifyPassword(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
       return await this.authService.verifyResetUserPassword(dto);
   }
+
+  @Post("agents/")
+  async loginAgent(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
+    return await this.authService.loginAgent(createAuthDto);
+  }
+
+  @Post("agents/register")
+  async registerAgent(@Body() createAuthDto: Agent):Promise <LogInUserResponseDto>{
+    try{
+      return await this.authService.registerAgent(createAuthDto);
+    } catch (e) {
+      throw new BadRequestException(this.vendorService.formatErrors(e));
+
+    }
+  }
+
+  @Post("agents/forgot-password")
+  async forgotAgentPassword(@Body() createAuthDto: ForgotPasswordDto):Promise<{}>{
+      return await this.authService.forgotAgentPassword(createAuthDto);
+  }
+
+  @Post("agents/verify-password")
+  async verifyAgentPassword(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
+      return await this.authService.verifyResetAgentPassword(dto);
+  }
+
   @Post("wave/users/forgot-password")
   async forgotWaveUserPassword(@Body() createAuthDto: ForgotPasswordDto):Promise<{}>{
       return await this.authService.forgotUWaveUserPassword(createAuthDto);
