@@ -2,11 +2,21 @@ import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { User } from '../../user/entities/user.entity'
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Vendor } from 'src/module/vendor/entities/vendor.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class LogInDto {
+  @ApiProperty({
+    example: 'rehmat.sayani@gmail.com',
+    required: true
+ })
     @Prop({ required:true,unique:true})
     @IsEmail()
   email:string;
+
+  @ApiProperty({
+    example: 'rHem23gmail@.m',
+    required: true
+ })
     @Prop({ required:true})
     @IsNotEmpty()
     @Length(6, 20)
