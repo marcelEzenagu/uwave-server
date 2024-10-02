@@ -26,9 +26,18 @@ export class LogInDto {
 }
 
 export class VendorLogInDto {
+  @ApiProperty({
+    example: 'rehmat.sayani@gmail.com',
+    required: true
+ })
   @Prop({ required:true,unique:true})
   @IsEmail()
     email:string;
+    
+  @ApiProperty({
+    example: 'rHem23gmail@.m',
+    required: true
+   })
   @Prop({ required:true})
   @IsNotEmpty()
   @Length(6, 20)
