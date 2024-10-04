@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-import { Item, ItemDocument, ItemFilter } from './entities/item.entity';
+import { Item, ItemDocument, ItemFilter, ItemStatus } from './entities/item.entity';
 import { InjectModel } from  '@nestjs/mongoose';
 import { Model } from  'mongoose';
 import { FileService } from 'src/helpers/upload';
@@ -101,13 +101,53 @@ export class ItemsService {
   }
   
 
+   async searchItemByVendors(query,vendorID: string,daysDifference:number,status?:ItemStatus) {
+    query = query.trim()
+
+    const endDate = new Date(); // Current date
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - daysDifference);
+    
+    const filter: any = { $text: { $search: query },
+    vendorID,
+    createdAt: {
+      $lte: endDate, // greater than or equal to startDate
+      $gte: startDate,   // less than or equal to endDate
+    },
+    // status
+      // { $regex: new RegExp(`^${vendorID}`, 'i')}
+    };
+    if (status){
+      filter.status = status
+      console.log("status__STATTUS:::::> ")
+    }
+console.log("STATTUS:::::> ",filter)
+// process.exit()
+
+  var sortOption :any = {}
+  // if(filterTag == ItemFilter.BEST_SELLER){
+  //   sortOption.salesCount = -1; // Sort bestsellers first
+  // }else if(filterTag == ItemFilter.HIGH_TO_LOW){
+  //   sortOption.salesPrice = -1; // Sort by price high to low
+  // }else if(filterTag == ItemFilter.LOW_TO_HIGH){
+  //   sortOption.salesPrice = 1; // Sort by price low to high
+  // }
+
+  
+    return await  this.itemModel.find(filter).sort(sortOption).exec();
+
+  }
+  
+
   async findOne(id: string):Promise<Item> {
     try{
-    return await  this.itemModel.findById(id).exec();
-  }catch(e){
-    console.log("error:: ",e)
-   throw new BadRequestException(this.formatErrors(e))
-  }  }
+      return await  this.itemModel.findById(id).exec();
+    }catch(e){
+      console.log("error:: ",e)
+    throw new BadRequestException(this.formatErrors(e))
+    }  
+  }
+
 
   async update(id: number, updateItemDto: UpdateItemDto) {
     try{
@@ -145,5 +185,6 @@ export class ItemsService {
  
      }
  
-   }
+  }
+
 }

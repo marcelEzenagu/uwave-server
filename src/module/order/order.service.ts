@@ -77,7 +77,7 @@ export class OrderService {
       await  Promise.all([
        await this.stripeService.confirmPaymentIntent(paymentIntentID),
         
-        await this.item.decreaseItem(updateOrderDto.products),
+        await this.item.decreaseItem(updateOrderDto.items),
         await this.cart.removeCart(updateOrderDto.cartID,userID),
         await this.orderModel.findOneAndUpdate(where, updateOrderDto)
       ])
@@ -110,9 +110,9 @@ export class OrderService {
     return `This action removes a #${where?._id} order`;
   }
 
-  async getVendorSales(vendorID: string) {
+  async getVendorSales(vendorID: string,daysAgo?:number) {
     const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - daysAgo);
   
     return await this.orderModel.aggregate([
       // Match orders that contain items for the given vendor and are within the last 7 days
@@ -200,4 +200,36 @@ export class OrderService {
     ]);
 return newCustomers
 }
+
+async findOrdersByVendorID(vendorID: string, daysAgo:number): Promise<Order[]> {
+  const estimatedDaysAgo = new Date();
+  if(!daysAgo){
+    daysAgo= 7
+  }
+  estimatedDaysAgo.setDate(estimatedDaysAgo.getDate() - (daysAgo));
+  
+  console.log(" estimatedDaysAgo:: ",estimatedDaysAgo)
+  return this.orderModel.aggregate([
+    {
+      $unwind: '$items',  // Unwind the products array
+    },
+    {
+      $match: {
+        'items.vendorID': vendorID, // Ensure this is the correct path to vendorID
+        // createdAt: { $gte: estimatedDaysAgo }  // Only include orders from the last 7 days
+
+      },
+    },
+    {
+      $project: {
+        _id: 1,  // Include orderID (MongoDB _id)
+        products: 1,  // Include the matched product
+        orderCreatedAt: '$createdAt',  // Include createdAt field (renamed to orderCreatedAt)
+        status: 1,  // Include status
+      },
+    }
+  ]).exec(); 
+}
+
+
 }

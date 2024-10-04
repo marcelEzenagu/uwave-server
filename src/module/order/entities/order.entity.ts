@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 
 import { Document, Types } from 'mongoose';
+import { Item } from "src/module/items/entities/item.entity";
 
 export enum OptionType {
   ACCEPTED= "ACCEPTED",
@@ -15,6 +16,23 @@ export enum PaymentStatusType {
   REQUIRES_PAYMENT_METHOD= "requires_payment_method",
   REQUIRES_ACTION= "requires_action",
   CANCELLED= "canceled",
+}
+
+class Product {
+  @Prop({ type: String, required: true })
+  productID: string;
+
+  @Prop({ type: String, required: true })
+  name: string;
+
+  @Prop({ type: Number, required: true })
+  price: number;
+
+  @Prop({ type: Number, required: true })
+  quantity: number;
+
+  @Prop({ type: String, required: true })
+  vendorID: string;  // Ensure vendorID is required and properly typed
 }
 
 @Schema({
@@ -43,17 +61,10 @@ export class Order {
     cartID ?: string;
     
     @Prop({
-        type: [{ 
-          productID: { type: String, required: true },
-          name: { type: String, required: true },
-          price: { type: Number, required: true },
-          quantity: { type: Number, required: true },
-          vendorID: { type: String,  required: true },
-          _id: false 
-        }],
+        type:[{type:Item, default:[]}],
         default: [],
       })
-    products: [];
+    items: Item[];
 
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     userID: Types.ObjectId;

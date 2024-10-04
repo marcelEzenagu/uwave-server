@@ -11,6 +11,12 @@ export enum ItemFilter {
   HIGH_TO_LOW="high to low"
 }
 
+export enum ItemStatus {
+  ACTIVE= "ACTIVE",
+  INACTIVE= "INACTIVE",
+  DRAFT= "DRAFT",
+}
+
 export type ItemDocument = Item & Document
 
 @Schema({
@@ -76,6 +82,9 @@ export class Item {
     weight:Number;
     @Prop({ required:true,type: String})
     weight_unit?:string;
+
+    @Prop({ required:true,enum:ItemStatus,default:ItemStatus.DRAFT})
+    status:string;
 
     @Prop({ type: String, default: '', maxlength: 1000 })
     description:string;

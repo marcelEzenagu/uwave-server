@@ -6,11 +6,22 @@ email formatting using ejs;
 
 TODO vendor
 uploads aside profilepics
-totlProducts: countProducts by vendor
+totlProducts: countitems by vendor
 totlSections: countCategories by vendor
 newCustomers: countCategories by vendor
+newOrders: countOrders by vendor
+
+
+listAllVendorItems by date_created(last 7days, e.t.c)
+listAllVendorItems by status("active,draft and "inActive") 
+            + date
+            + and pagination
+
+search itemsByVendor by name
+
 
 orders:list orders by vendor
+
 bestsellers:
 
 deleteAccount -soft-delete

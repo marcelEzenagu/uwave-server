@@ -12,6 +12,8 @@ import { OrderService } from '../order/order.service';
 
 
 import { ApiTags } from '@nestjs/swagger';
+import { ItemFilter, ItemStatus } from '../items/entities/item.entity';
+import { ItemsService } from '../items/items.service';
 
 @ApiTags('vendors')
 @Controller('vendors')
@@ -20,6 +22,7 @@ export class VendorController {
   constructor(
       private readonly vendorService: VendorService,
       private readonly orderService: OrderService,
+      private readonly itemsService: ItemsService,
       private readonly fileService: FileService) {}
 
 
@@ -68,6 +71,36 @@ export class VendorController {
     throw new BadRequestException(e);
   }
   }
+
+
+  @Get('/items')
+  async searchItem(
+    @Req() req: Request,
+  @Query('query') searchWord: string, 
+  @Query('daysDifference') daysDifference: number, 
+  @Query('filter') filter?: ItemStatus )
+  {
+   
+  const vendorID = req['user'].sub
+  const role = req['user'].role
+
+  return await this.itemsService.searchItemByVendors(searchWord.trim(),vendorID,daysDifference,filter,);
+  }
+  
+  @Get('/orders')
+  async searchOrder(
+    @Req() req: Request, 
+    @Query('daysDifference') daysDifference: number, 
+)
+  {
+   
+    console.log("daysDifference:   ",daysDifference)
+  const vendorID = req['user'].sub
+  const role = req['user'].role
+
+  return await this.orderService.findOrdersByVendorID(vendorID,daysDifference);
+  }
+
 
   @Patch("")
   async update(@Req() req: Request,
