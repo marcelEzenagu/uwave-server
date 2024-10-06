@@ -227,9 +227,8 @@ async findOrdersByVendorID(vendorID: string, daysAgo:number): Promise<Order[]> {
 }
 
 formatErrors(error: any) {
-  console.log("ERROR1:: ",error)
+  console.log("ERROR.BSONError:: ",error.BSONError)
   console.log("error.name:: ",error.name)
-  console.log("error.keyPattern:: ",error.keyPattern)
 
   if(error.name === 'MongoServerError'){
    const field = Object.keys(error.keyPattern)[0];
@@ -237,8 +236,10 @@ formatErrors(error: any) {
 
    }else{
      const formattedErrors = [];
-     console.log("keyerror.errors:::: ",error)
-     for (const key in error.errors) {
+     console.log("keyerror.errors:::: ",error.CastError)
+     console.log("keyerror:::: ",error)
+     if(error.errors != undefined){
+      for (const key in error.errors) {
       console.log("key:::: ",key)
        if (error.errors.hasOwnProperty(key)) {
          formattedErrors.push({
@@ -246,6 +247,11 @@ formatErrors(error: any) {
            message: error.errors[key].message,
          });
        }
+       
+       
+      }
+     }else{
+      formattedErrors.push(error.message)
      }
      return formattedErrors;
 

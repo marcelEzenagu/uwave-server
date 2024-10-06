@@ -49,7 +49,7 @@ export class OrderController {
       }
      return await this.orderService.updatePayment(paymentIntentID, userID, updateOrderDto);
     }catch(e){
-      console.log("e",e)
+      console.log("e.CastError",e.CastError)
       throw new BadRequestException(this.orderService.formatErrors(e))
     }
   }

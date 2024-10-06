@@ -59,8 +59,7 @@ export class ItemsService {
       return updatedItems;
 
     }catch(e){
-       console.log("error:: ",e)
-      throw new BadRequestException(this.formatErrors(e))
+      throw e
      }  
   }
 
@@ -115,7 +114,7 @@ export class ItemsService {
       $lte: endDate, // greater than or equal to startDate
       $gte: startDate,   // less than or equal to endDate
     },
-    
+
     };
     if (status){
       filter.status = status
