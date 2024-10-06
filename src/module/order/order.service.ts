@@ -77,7 +77,7 @@ export class OrderService {
       await  Promise.all([
        await this.stripeService.confirmPaymentIntent(paymentIntentID),
         
-        await this.item.decreaseItem(updateOrderDto.items),
+        // await this.item.decreaseItem(updateOrderDto.items),
         await this.cart.removeCart(updateOrderDto.cartID,userID),
         await this.orderModel.findOneAndUpdate(where, updateOrderDto)
       ])

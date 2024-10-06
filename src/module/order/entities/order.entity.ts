@@ -1,6 +1,7 @@
 
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 import { Document, Types } from 'mongoose';
 import { Item } from "src/module/items/entities/item.entity";
@@ -54,7 +55,10 @@ class Product {
  
 
 export class Order {
-
+  @ApiProperty({
+    example: "a cartID",
+    required: true,
+ })
     @Prop({
         type:String,
     })
