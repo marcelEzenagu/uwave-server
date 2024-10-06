@@ -71,21 +71,16 @@ export class OrderService {
   }
 
   async updatePayment(paymentIntentID, userID: string, updateOrderDto: UpdateOrderDto) {
-    try {
       const where = { userID, paymentIntentID };
-  
       await  Promise.all([
        await this.stripeService.confirmPaymentIntent(paymentIntentID),
         
-        // await this.item.decreaseItem(updateOrderDto.items),
+        await this.item.decreaseItem(updateOrderDto.items),
         await this.cart.removeCart(updateOrderDto.cartID,userID),
         await this.orderModel.findOneAndUpdate(where, updateOrderDto)
       ])
       return "order completed successfully"
-    } catch (e) {
-      console.error('Error fetching data:', e);
-      throw new BadRequestException(e)
-    }
+   
   
   }
   
@@ -231,5 +226,31 @@ async findOrdersByVendorID(vendorID: string, daysAgo:number): Promise<Order[]> {
   ]).exec(); 
 }
 
+formatErrors(error: any) {
+  console.log("ERROR1:: ",error)
+  console.log("error.name:: ",error.name)
+  console.log("error.keyPattern:: ",error.keyPattern)
+
+  if(error.name === 'MongoServerError'){
+   const field = Object.keys(error.keyPattern)[0];
+     return `an item with this vendorID, productID and itemName combination already exists`;
+
+   }else{
+     const formattedErrors = [];
+     console.log("keyerror.errors:::: ",error)
+     for (const key in error.errors) {
+      console.log("key:::: ",key)
+       if (error.errors.hasOwnProperty(key)) {
+         formattedErrors.push({
+           field: key,
+           message: error.errors[key].message,
+         });
+       }
+     }
+     return formattedErrors;
+
+   }
+
+}
 
 }

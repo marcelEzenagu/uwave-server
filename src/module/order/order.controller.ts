@@ -31,7 +31,7 @@ export class OrderController {
   @Req() req: Request
 ) {
 
-    // try {
+    try {
       // change amount to cent for
       // include paymentIntentID, clientSecret and paymentStatus
       // check using the URL that payment on stripe is successful;
@@ -48,8 +48,11 @@ export class OrderController {
         throw new BadRequestException("order already completed.");
       }
      return await this.orderService.updatePayment(paymentIntentID, userID, updateOrderDto);
+    }catch(e){
+      console.log("e",e)
+      throw new BadRequestException(this.orderService.formatErrors(e))
+    }
   }
-
 
   @Post("pay-intent")
   async createPayIntent(@Body() createOrderDto: CreateOrderDto,

@@ -11,13 +11,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     let statusCode = 500;
     let message = 'Internal server error';
-console.log("ERROR",exception) 
    if (exception instanceof BadRequestException) {
       statusCode = exception.getStatus();
       const response = exception.getResponse();
       message = (response as any).message || 'Bad request';
     } else if (exception instanceof HttpException) {
-      console.log("this")
       statusCode = exception.getStatus();
       message = exception.message || 'Error';
     }

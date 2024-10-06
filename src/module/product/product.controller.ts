@@ -18,8 +18,9 @@ export class ProductController {
       createProductDto.productName = createProductDto.productName.toLowerCase()
       createProductDto.productCategory = createProductDto.productCategory.toLowerCase()
       createProductDto.productSubCategory = createProductDto.productSubCategory.toLowerCase()
-      
+
       return await this.productService.create(createProductDto);
+
     } catch (e) {
       throw new BadRequestException(this.productService.formatErrors(e));
   

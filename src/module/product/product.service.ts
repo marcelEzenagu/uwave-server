@@ -10,15 +10,16 @@ export class ProductService {
   constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>) {}
 
 
-  create(createProductDto: CreateProductDto) {
-   try{
+  async create(createProductDto: CreateProductDto) {
+    console.log("createProductDto:: ",createProductDto)
+  //  try{
 
      const newProduct = new this.productModel(createProductDto)
-     return newProduct.save()
-    }catch(e){
-      console.log("error:: ",e)
-     throw new BadRequestException(e)
-    }
+     return await newProduct.save()
+    // }catch(e){
+    //   console.log("error:: ",e)
+    //  throw new BadRequestException(e)
+    // }
   }
 
   async findAll(where:{}) {
@@ -65,4 +66,5 @@ export class ProductService {
      }
  
    }
+   
 }
