@@ -20,6 +20,7 @@ import { Document, Types } from 'mongoose';
 export class SavedItem {
     @Prop({ type: Types.ObjectId, ref: 'Item', required: true })
     itemID: Types.ObjectId;
+    
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     userID: Types.ObjectId;
 }

@@ -3,6 +3,10 @@ import { Document, Types } from 'mongoose';
 import { v4 as uuid } from "uuid";
 export type ProductCategoryDocument = ProductCategory & Document
 
+export enum CategoryStatus {
+  ACTIVE= "ACTIVE",
+  INACTIVE= "INACTIVE",
+}
 
 @Schema({
     toJSON: {
@@ -18,22 +22,18 @@ export type ProductCategoryDocument = ProductCategory & Document
     timestamps: true,
   })
 
-
 export class ProductCategory {
-
+  @Prop({ required:true,unique:true})
+  categoryName:string;
   
+  @Prop({ })
+  categoryImage:string;
 
+  @Prop({ required:true,enum:CategoryStatus,default:CategoryStatus.INACTIVE})
+  status:string;
 
-    @Prop({ required:true,unique:true})
-    categoryName:string;
-    
-
-
-    @Prop({ })
-    categoryImage:string;
-
-    @Prop({ type: Date, default: null })
-    deletedAt: Date | null;
+  @Prop({ type: Date, default: null })
+  deletedAt: Date | null;
 }
 
 export const ProductCategorySchema = SchemaFactory.createForClass(ProductCategory)

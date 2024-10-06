@@ -1,10 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 import { Document } from "mongoose";
 import { v4 as uuid } from "uuid";
 
-
+export enum ProductStatus {
+  ACTIVE= "ACTIVE",
+  INACTIVE= "INACTIVE",
+}
 export type ProductDocument = Product & Document
 
 @Schema({
@@ -24,32 +28,46 @@ export class Product {
     })
     productID : string;
 
-
+    @ApiProperty({
+      example: 'beans',
+      required: true
+   })
     @Prop({ required:true,unique:true})
     productName:string;
     
 
+    @ApiProperty({
+      example: 'proteins',
+      required: true
+   })
     @Prop({ required:true})
     productCategory:string;
 
-    @Prop({ type:String})
+    @ApiProperty({
+      example: 'plant proteins',
+      required: true
+   })
+    @Prop({ type:String,required:true})
     productSubCategory:string;
+
+    @ApiProperty({
+      example:ProductStatus.ACTIVE,
+      required: true,
+      enum:ProductStatus
+   })
+    @Prop({ type:String,enum:ProductStatus,default:ProductStatus.INACTIVE})
+    productStatus:string;
 
 
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
   
+  @ApiProperty({
+    example: ["Nigeria","ghana","oman"],
+    required: true
+ })
   @Prop({ type: [String], default: [] })
   productSupportedCountries:string[];
-    // name
-    // image
-    // category
-    // vendorID
-    // quantity
-    // rate
-    // description
-    // brandName
-    // measurement
-    // supportedCountry 
 }
+
 export const ProductSchema = SchemaFactory.createForClass(Product)

@@ -5,6 +5,7 @@ import { ProductSubCategory,ProductSubCategoryDocument } from './entities/produc
 import { Model,Types,FilterQuery } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { error } from 'console';
+import { CategoryStatus } from '../product-category/entities/product-category.entity';
 
 @Injectable()
 export class ProductSubCategoryService {
@@ -60,7 +61,9 @@ findOne(id: number) {
 }
 
 
-async findWhere(where: {}): Promise<ProductSubCategory> {
+async findWhere(where: any): Promise<ProductSubCategory> {
+
+  where.status = CategoryStatus.ACTIVE
  try{
     return await this.productSubCategoryModel.findOne().where(where).exec();
   }catch(e){
@@ -82,6 +85,8 @@ async update(ID: string, updateProductSubCategoryDto: UpdateProductSubCategoryDt
 
 
 async remove(where):Promise<any> {
+  // where.status = CategoryStatus.ACTIVE
+
   try{
 
     let foundCat = await this.productSubCategoryModel.findById(where);

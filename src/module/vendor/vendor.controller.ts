@@ -14,6 +14,7 @@ import { OrderService } from '../order/order.service';
 import { ApiTags } from '@nestjs/swagger';
 import { ItemFilter, ItemStatus } from '../items/entities/item.entity';
 import { ItemsService } from '../items/items.service';
+import { OptionType } from '../order/entities/order.entity';
 
 @ApiTags('vendors')
 @Controller('vendors')
@@ -31,7 +32,7 @@ export class VendorController {
     return this.vendorService.findAll();
   }
 
-  @Get('/customers')
+  @Get('dashboard/customers')
 
   async findNewCustomers(
     @Req() req: Request,
@@ -77,21 +78,51 @@ export class VendorController {
   async searchItem(
     @Req() req: Request,
   @Query('query') searchWord: string, 
-  @Query('daysDifference') daysDifference: number, 
+  @Query('daysDifference') daysDifference: number,
+  @Query('page') page: number = 1, 
+  @Query('limit') limit: number = 50 , 
   @Query('filter') filter?: ItemStatus )
   {
    
   const vendorID = req['user'].sub
   const role = req['user'].role
 
-  return await this.itemsService.searchItemByVendors(searchWord.trim(),vendorID,daysDifference,filter,);
+  page = Number(page);
+  limit = Number(limit);
+
+  if (page < 1) page = 1;  // Page should be at least 1
+  if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+
+  return await this.itemsService.searchItemByVendors(
+            searchWord.trim(),
+            vendorID,
+            daysDifference,
+            page,
+            limit,
+            filter
+          );
+  }
+
+  @Get('/item-stats')
+  async getItemStats(
+    @Req() req: Request,
+    // @Query('query') searchWord: string, 
+    // @Query('daysDifference') daysDifference: number, 
+    // @Query('filter') filter?: ItemStatus 
+  )
+  {
+   
+  const vendorID = req['user'].sub
+  const role = req['user'].role
+
+  return await this.itemsService.countItemsAndCategories(vendorID);
   }
   
+  // list all orders for a vendor use on the dasboard and orderSection
   @Get('/orders')
   async searchOrder(
     @Req() req: Request, 
-    @Query('daysDifference') daysDifference: number, 
-)
+    @Query('daysDifference') daysDifference: number)
   {
    
     console.log("daysDifference:   ",daysDifference)
@@ -157,7 +188,6 @@ export class VendorController {
   remove(@Param('id') id: string) {
     return this.vendorService.remove(+id);
   }
-
 
   @Post('reset-password')
   async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: Request) {

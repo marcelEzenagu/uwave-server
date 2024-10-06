@@ -1,6 +1,7 @@
 
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from 'mongoose';
+import { CategoryStatus } from "src/module/product-category/entities/product-category.entity";
 import { v4 as uuid } from "uuid";
 export type ProductSubCategoryDocument = ProductSubCategory & Document
 
@@ -26,6 +27,9 @@ export class ProductSubCategory {
     @Prop({ type: Types.ObjectId, ref: 'ProductCategory', required: true })
     productCategory ?: string;
     
+    @Prop({ required:true,enum:CategoryStatus,default:CategoryStatus.INACTIVE})
+    status:string;
+
     @Prop({ type: Date, default: null })
     deletedAt: Date | null;
 }

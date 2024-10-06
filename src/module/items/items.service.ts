@@ -101,8 +101,9 @@ export class ItemsService {
   }
   
 
-   async searchItemByVendors(query,vendorID: string,daysDifference:number,status?:ItemStatus) {
+  async searchItemByVendors(query,vendorID: string,daysDifference,page, limit:number,status?:ItemStatus) {
     query = query.trim()
+    const skip = (page - 1) * limit;
 
     const endDate = new Date(); // Current date
     const startDate = new Date();
@@ -114,27 +115,26 @@ export class ItemsService {
       $lte: endDate, // greater than or equal to startDate
       $gte: startDate,   // less than or equal to endDate
     },
-    // status
-      // { $regex: new RegExp(`^${vendorID}`, 'i')}
+    
     };
     if (status){
       filter.status = status
-      console.log("status__STATTUS:::::> ")
     }
-console.log("STATTUS:::::> ",filter)
-// process.exit()
 
   var sortOption :any = {}
-  // if(filterTag == ItemFilter.BEST_SELLER){
-  //   sortOption.salesCount = -1; // Sort bestsellers first
-  // }else if(filterTag == ItemFilter.HIGH_TO_LOW){
-  //   sortOption.salesPrice = -1; // Sort by price high to low
-  // }else if(filterTag == ItemFilter.LOW_TO_HIGH){
-  //   sortOption.salesPrice = 1; // Sort by price low to high
-  // }
+  const data = await  this.itemModel.find(filter)
+                                    .sort(sortOption)
+                                    .skip(skip)
+                                    .limit(limit)
+                                    .exec();
+  const total = await this.itemModel.countDocuments();
 
-  
-    return await  this.itemModel.find(filter).sort(sortOption).exec();
+
+    return{
+      data,total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit)
+    }
 
   }
   
@@ -163,6 +163,39 @@ console.log("STATTUS:::::> ",filter)
   remove(id: number) {
     return `This action removes a #${id} item`;
   }
+
+  async countItemsAndCategories(vendorID: string): Promise<{ totalItems: number, totalSections: number }> {
+    const result = await this.itemModel.aggregate([
+      // Match items with the given vendorID
+      { $match: { vendorID } },
+  
+      // Group to get distinct itemCategories and count total items
+      {
+        $group: {
+          _id: null,  // We are grouping everything together
+          totalItems: { $sum: 1 },   // Count total items
+          totalSections: { $addToSet: "$itemCategory" },  // Collect distinct categories
+        },
+      },
+  
+      // Project to format the result (count distinct categories)
+      {
+        $project: {
+          _id: 0,                           // Exclude _id
+          totalItems: 1,                    // Keep totalItems
+          totalSections: { $size: "$totalSections" },  // Count the distinct categories
+        },
+      },
+    ]);
+  
+    // If no result, return defaults
+    if (result.length > 0) {
+      return result[0];
+    } else {
+      return { totalItems: 0, totalSections: 0 };
+    }
+  }
+  
 
   formatErrors(error: any) {
     console.log("ERROR:: ",error.name)

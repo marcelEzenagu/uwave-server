@@ -30,6 +30,7 @@ import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { StatusController } from './app.controller';
 import { AgentModule } from './module/agent/agent.module';
+import { ShipmentModule } from './module/shipment/shipment.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { AgentModule } from './module/agent/agent.module';
     ProductCategoryModule,
     ProductSubCategoryModule,
     AgentModule,
+    ShipmentModule,
   ],
 
   providers: [

@@ -13,7 +13,7 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
-  async create(@Body() createProductDto: CreateProductDto) {
+  async create(@Body() createProductDto: Product) {
     try {
       createProductDto.productName = createProductDto.productName.toLowerCase()
       createProductDto.productCategory = createProductDto.productCategory.toLowerCase()

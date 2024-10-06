@@ -64,21 +64,17 @@ export class AgentService {
   }
   
   async findOne(id):Promise<Agent> {
-    const where = {"agentID":id}
-    console.log("where: ",where)
+    const where = {"_id":id}
+
     return await  this.agentModel.findOne().where(where).exec();
-  
-    // return await  this.agentModel.findById(id).exec();
   }
   
   async update(id: string, updateAgentDto: UpdateAgentDto):Promise<Agent> {
-   
-    const where= {"agentID":id}
+    const where= {"_id":id}
     return await  this.agentModel.findOneAndUpdate(where,updateAgentDto, {new: true })
   }
 
   async findWhere(where:{}):Promise<AgentDocument> {
-
     return await  this.agentModel.findOne().where(where).exec();
   }
   

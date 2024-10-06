@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { Order, OrderDocument } from './entities/order.entity';
+import { OptionType, Order, OrderDocument } from './entities/order.entity';
 import { Model,Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CartService } from '../cart/cart.service';
@@ -110,16 +110,17 @@ export class OrderService {
     return `This action removes a #${where?._id} order`;
   }
 
-  async getVendorSales(vendorID: string,daysAgo?:number) {
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - daysAgo);
+  async getVendorSales(vendorID: string,daysAgo?:number,status?:OptionType) {
+    const calculatedDaysAgo = new Date();
+    calculatedDaysAgo.setDate(calculatedDaysAgo.getDate() - daysAgo);
   
     return await this.orderModel.aggregate([
       // Match orders that contain items for the given vendor and are within the last 7 days
       { 
         $match: { 
           'items.vendorID': vendorID,
-          createdAt: { $gte: sevenDaysAgo }  // Only include orders from the last 7 days
+          createdAt: { $gte: calculatedDaysAgo },
+          status : status
         } 
       },
       
@@ -172,7 +173,6 @@ export class OrderService {
   }
   
   async getNewCustomers(vendorID, start, end :string) {
-    
     const startDate = new Date(start)
     const endDate = new Date(end)
     const newCustomers = await this.orderModel.aggregate([

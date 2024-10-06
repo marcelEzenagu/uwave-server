@@ -40,27 +40,6 @@ export class Agent {
   @Prop({type: String})
   idDocument?: string;
 
-  @Prop({type: String})
-  permitDocument?: string;
-
-  @Prop({type: String})
-  tax_number?: string;
-
-  @Prop({type: String})
-  foodLicenseDocument?: string;
-
-  @Prop({ type: String })
-  businessName?: string;
-
-  @Prop({type: String})
-  businessAddress?: string;
-
-  @Prop({type: String})
-  cacDocument?: string;
-
-  @Prop({type: String })
-  cacNumber?: string;
-
   @Prop({ required: true })
   firstName: string;
 
@@ -70,19 +49,15 @@ export class Agent {
   @Prop({type: String})
   profilePicture?: string;
   
-  @Prop({type: String})
-  businessPicture?: string;
   
   @Prop({type: String})
-  businessBank?: string;
+  bankName?: string;
   
   @Prop({type: String})
-  businessBankAccount?: string;
+  bankAccountNumber?: string;
+  @Prop({type: String})
+  bankAccountName?: string;
 
-  @Prop({ type: String })
-  @IsOptional()
-  @IsEmail()
-  businessEmail?: string;
 
   @Prop({ unique: true, required: true })
   @IsEmail()
@@ -97,12 +72,27 @@ export class Agent {
   })
   password: string;
 
+  @Prop({ type: [String], 
+
+    validate: {
+        validator: (servicingCountries: string[]) => servicingCountries.length > 0, // Ensure the array has at least one item
+        message: 'servicingCountries array must contain at least one country',
+    }
+   })
+    servicingCountries:string[];
+    
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
+
+  @Prop({ type: Boolean })
+  hasAcknowledged: Boolean;
+
+  @Prop({ type: Boolean })
+  isVerified: Boolean ;
 }
 
 export const AgentSchema = SchemaFactory.createForClass(Agent);
-AgentSchema.index({ firstName: 1, lastName: 1,email:1 }, { unique: true });
+AgentSchema.index({ firstName: 1, lastName: 1,email:1,servicingCountries:1 }, { unique: true });
 
 AgentSchema.virtual('agentID').get(function (this: AgentDocument) {
     return (this._id as Types.ObjectId).toHexString(); 
