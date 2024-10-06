@@ -9,19 +9,19 @@ export class LogInDto {
     example: 'rehmat.sayani@gmail.com',
     required: true
  })
-    @Prop({ required:true,unique:true})
-    @IsEmail()
+  @Prop({ required:true,unique:true})
+  @IsEmail()
   email:string;
 
   @ApiProperty({
     example: 'rHem23gmail@.m',
     required: true
- })
-    @Prop({ required:true})
-    @IsNotEmpty()
-    @Length(6, 20)
-    @Matches(/(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/,
-      { message: 'Password must contain at least one uppercase letter, one number, and one special character.' })
+  })
+  @Prop({ required:true})
+  @IsNotEmpty()
+  @Length(6, 20)
+  @Matches(/(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/,
+    { message: 'Password must contain at least one uppercase letter, one number, and one special character.' })
   password: string;
 }
 

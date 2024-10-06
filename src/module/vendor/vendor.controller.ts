@@ -32,31 +32,7 @@ export class VendorController {
     return this.vendorService.findAll();
   }
 
-  @Get('dashboard/customers')
-
-  async findNewCustomers(
-    @Req() req: Request,
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
-  ) {
-    try {
-
-
-    const vendorID = req['user'].sub
-    const role = req['user'].role
-
-    if(role !="vendor"){
-      throw new BadRequestException("unaccessible to non-vendors");
-    }
-
-    const resp = await this.orderService.getNewCustomers(vendorID,startDate,endDate);
-    console.log("resp::::::> ",resp)
-    return resp
-  } catch (e) {
-    throw new BadRequestException(e);
-  }
-  }
-
+ 
   @Get('/details')
   findOne(@Req() req: Request) {
     try {
@@ -103,12 +79,33 @@ export class VendorController {
           );
   }
 
+  @Get('dashboard/customers')
+  async findNewCustomers(
+    @Req() req: Request,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    try {
+
+
+    const vendorID = req['user'].sub
+    const role = req['user'].role
+
+    if(role !="vendor"){
+      throw new BadRequestException("unaccessible to non-vendors");
+    }
+
+    const resp = await this.orderService.getNewCustomers(vendorID,startDate,endDate);
+    console.log("resp::::::> ",resp)
+    return resp
+  } catch (e) {
+    throw new BadRequestException(e);
+  }
+  }
+
   @Get('/item-stats')
   async getItemStats(
-    @Req() req: Request,
-    // @Query('query') searchWord: string, 
-    // @Query('daysDifference') daysDifference: number, 
-    // @Query('filter') filter?: ItemStatus 
+    @Req() req: Request, 
   )
   {
    
@@ -125,7 +122,6 @@ export class VendorController {
     @Query('daysDifference') daysDifference: number)
   {
    
-    console.log("daysDifference:   ",daysDifference)
   const vendorID = req['user'].sub
   const role = req['user'].role
 

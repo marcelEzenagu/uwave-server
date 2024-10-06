@@ -4,6 +4,7 @@ import { Document, Types } from 'mongoose';
 
 import { v4 as uuid } from "uuid";
 import { Type } from "class-transformer";
+import { ApiProperty } from '@nestjs/swagger';
 
 export enum ItemFilter {
   BEST_SELLER= "best_seller",
@@ -37,12 +38,21 @@ export class Item {
     })
     ItemID : string;
 
+   
     @Prop({ default: 0 })
     salesCount?: number;
     
+    @ApiProperty({
+      example: 'fishPie',
+      required: true
+   })
     @Prop({ required:true})
     itemName:string;
     
+    @ApiProperty({
+      example: ['rehmat...',"jbhdswnkajs"],
+      required: true
+   })
     @Prop({ required:true, type: [String],
 
         validate: {
@@ -53,39 +63,102 @@ export class Item {
     })
     images:string[];
 
+    @ApiProperty({
+      example: 'Protein',
+      required: true
+   })
     @Prop({ required:true})
     itemCategory:string;
 
+    @ApiProperty({
+      example: 'plant protein',
+      required: true
+   })
     @Prop({ required:true})
     itemSubCategory:string;
 
+    @ApiProperty({
+      example: 'abkiwehi388937828',
+      required: true
+   })
     @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
     productID: Types.ObjectId;
 
+  
     @Prop({ required:true})
     vendorID:string;
     
+    @ApiProperty({
+      example: 5,
+      required: true
+   })
     @Prop({ required:true})
     quantity:Number;
 
+    @ApiProperty({
+      example: 300,
+      required: true
+   })
     @Prop({ required:true})
     salesPrice:Number;
+
+    @ApiProperty({
+      example: 873,
+      required: true
+   })
     @Prop({ required:true})
     originalPrice:Number;
+
+    @ApiProperty({
+      example: 50,
+      required: true
+   })
     @Prop({ required:true})
     profit:Number;
+
+    @ApiProperty({
+      example: 0.5,
+      required: true
+   })
     @Prop({ })
     discount?:Number;
+
+    @ApiProperty({
+      example: 550,
+      required: true
+   })
     @Prop({ })
     newPrice?:Number;
+
+    @ApiProperty({
+      example: 35,
+      required: true
+   })
     @Prop({ required:true})
     weight:Number;
+
+    @ApiProperty({
+      example: "kg",
+      required: true
+   })
     @Prop({ required:true,type: String})
     weight_unit?:string;
 
+    @ApiProperty({
+      example: ItemStatus.ACTIVE,
+      required: true,
+      enum:ItemStatus,
+      default:ItemStatus.DRAFT
+   })
     @Prop({ required:true,enum:ItemStatus,default:ItemStatus.DRAFT})
     status:string;
 
+    @ApiProperty({
+      example: "found in fishes and you would enjoy it",
+      required: true,
+      enum:ItemStatus,
+      default:ItemStatus.DRAFT
+   })
     @Prop({ type: String, default: '', maxlength: 1000 })
     description:string;
 
@@ -94,8 +167,11 @@ export class Item {
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
   
+  @ApiProperty({
+    example: ["nigeria","haiti"],
+    required: true,
+ })
   @Prop({ type: [String], 
-
     validate: {
         validator: (itemSupportedCountries: string[]) => itemSupportedCountries.length > 0, // Ensure the array has at least one item
         message: 'itemSupportedCountries array must contain at least one country',
