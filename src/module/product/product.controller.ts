@@ -20,10 +20,7 @@ export class ProductController {
   @Post()
   async create(@Body() createProductDto: Product) {
     try {
-      createProductDto.productName = createProductDto.productName.toLowerCase()
-      createProductDto.productCategory = createProductDto.productCategory.toLowerCase()
-      createProductDto.productSubCategory = createProductDto.productSubCategory.toLowerCase()
-
+    
       return await this.productService.create(createProductDto);
 
     } catch (e) {

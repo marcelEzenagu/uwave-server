@@ -11,6 +11,10 @@ export class ProductService {
 
 
   async create(createProductDto: Product) {
+    createProductDto.productName = createProductDto?.productName?.toLowerCase()
+    createProductDto.productCategory = createProductDto?.productCategory?.toLowerCase()
+    createProductDto.productSubCategory = createProductDto?.productSubCategory?.toLowerCase()
+
      const newProduct = new this.productModel(createProductDto)
      return await newProduct.save()
   
