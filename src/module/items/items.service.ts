@@ -145,8 +145,19 @@ export class ItemsService {
   
 
   async findOne(id: string):Promise<Item> {
+
     try{
       return await  this.itemModel.findById(id).exec();
+    }catch(e){
+      console.log("error:: ",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }  
+  }
+
+  async findWhere(where: {}):Promise<Item> {
+
+    try{
+      return await  this.itemModel.findOne().where(where).exec();
     }catch(e){
       console.log("error:: ",e)
     throw new BadRequestException(this.errorFormat.formatErrors(e))
@@ -201,7 +212,4 @@ export class ItemsService {
     }
   }
   
-
-  
-
 }

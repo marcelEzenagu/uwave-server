@@ -72,7 +72,8 @@ async searchItem(
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.itemsService.findOne(id);
+    const where ={"itemID":id}
+    return this.itemsService.findWhere(id);
   }
 
   @Patch(':id')
