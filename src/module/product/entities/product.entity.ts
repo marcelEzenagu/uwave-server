@@ -15,6 +15,12 @@ export type ProductDocument = Product & Document
     toJSON: {
       getters: true,
       virtuals: true,
+      transform: (doc, ret) => {
+        delete ret._id;
+        delete ret.id;
+        delete ret.__v;
+        return ret;
+      },
     },
     timestamps: true,
   })

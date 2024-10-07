@@ -21,25 +21,29 @@ export class ItemsService {
 
   async create(createItemDto: Item) {
     try{
-
-      let newProduct = new this.itemModel(createItemDto)
-      if(createItemDto.images){
-        const vPath = "public/images/items"
-        const productImages :string[] = []
-        const imagePath = `${vPath}/${createItemDto.vendorID}/${createItemDto.itemName}`
-        for(let i= 0; i < createItemDto.images.length; i++){
-          const imageName =`${createItemDto.itemName}-${i}.png`
-          await this.fileService.uploadImage(createItemDto.images[i],imagePath,imageName)
+      // const activeItem = await this.itemModel.findOne({ itemName: createItemDto.itemName, vendorID: createItemDto.vendorID, deletedAt: null });
+      // if(!activeItem){
+        let newProduct = new this.itemModel(createItemDto)
+        if(createItemDto.images){
+          const vPath = "public/images/items"
+          const productImages :string[] = []
+          const imagePath = `${vPath}/${createItemDto.vendorID}/${createItemDto.itemName}`
+          for(let i= 0; i < createItemDto.images.length; i++){
+            const imageName =`${createItemDto.itemName}-${i}.png`
+            await this.fileService.uploadImage(createItemDto.images[i],imagePath,imageName)
+            
+            const itemImage = `${imagePath}/${imageName}`
+            productImages.push(itemImage)
+    
+          }
           
-          const itemImage = `${imagePath}/${imageName}`
-          productImages.push(itemImage)
-  
+          createItemDto.images = productImages
         }
-        
-        createItemDto.images = productImages
-      }
+        return await newProduct.save()
 
-      return await newProduct.save()
+      // }else{
+      //   return activeItem
+      // }
      }catch(e){
        console.log("error:: ",e)
       throw new BadRequestException(this.errorFormat.formatErrors(e))
@@ -69,8 +73,18 @@ export class ItemsService {
      }  
   }
 
-  async findAll(where:{}) {
-    
+  async findAll(where:any) {
+    where.deletedAt =null
+    where.status != ItemStatus.DRAFT || ItemStatus.INACTIVE
+    try{
+      return await  this.itemModel.find().where(where).exec();
+    }catch(e){
+      console.log("error:: ",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }   
+  }
+  async adminFindAll(where:any) {
+    where.deletedAt =null
     try{
       return await  this.itemModel.find().where(where).exec();
     }catch(e){
@@ -86,7 +100,10 @@ export class ItemsService {
     
     const filter: any = { $text: { $search: query },
       itemSupportedCountries:
-      { $regex: new RegExp(`^${country}`, 'i')}
+      { $regex: new RegExp(`^${country}`, 'i')},
+      deletedAt:null,
+      status :!ItemStatus.DRAFT || !ItemStatus.INACTIVE
+
     };
 
 
@@ -154,8 +171,9 @@ export class ItemsService {
     }  
   }
 
-  async findWhere(where: {}):Promise<Item> {
-
+  async findWhere(where: any):Promise<Item> {
+    where.status = !ItemStatus.DRAFT || !ItemStatus.INACTIVE
+    where.deletedAt = null
     try{
       return await  this.itemModel.findOne().where(where).exec();
     }catch(e){
@@ -176,7 +194,12 @@ export class ItemsService {
   }  
   }
 
-  remove(id: number) {
+  async remove(id: string) {
+
+    const filter = {"deletedAt":null,"itemID":id}
+  const updateProductDto = {"deletedAt":new Date}
+  await  this.itemModel.findOneAndUpdate(filter, updateProductDto, {new: true})
+   
     return `This action removes a #${id} item`;
   }
 

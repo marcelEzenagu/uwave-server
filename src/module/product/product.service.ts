@@ -48,7 +48,6 @@ export class ProductService {
 async remove(id: string) {
   const filter = {"deletedAt":null,"productID":id}
   const updateProductDto = {"deletedAt":new Date}
-  // return 
   await  this.productModel.findOneAndUpdate(filter, updateProductDto, {new: true})
     return `This action removes a #${id} product`;
   }
