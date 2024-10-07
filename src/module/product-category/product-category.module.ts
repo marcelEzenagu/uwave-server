@@ -5,10 +5,11 @@ import { MongooseModule } from "@nestjs/mongoose";
 import forFeatureDb from 'src/db/for-feature.db';
 import { AccessTokenMiddleware } from '../common/middleware/auth.middleware'
 import { AuthModule } from '../auth/auth.module';
+import { ErrorFormat } from 'src/helpers/errorFormat';
 
 @Module({
   controllers: [ProductCategoryController],
-  providers: [ProductCategoryService],
+  providers: [ProductCategoryService,ErrorFormat],
   imports: [MongooseModule.forFeature(forFeatureDb),AuthModule],
 
 })

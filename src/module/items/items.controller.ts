@@ -11,7 +11,6 @@ import { ApiQuery, ApiTags } from '@nestjs/swagger';
 export class ItemsController {
   constructor(
     private readonly itemsService: ItemsService,
-    // private readonly fileService: FileService
   ) {}
 
   @Post()

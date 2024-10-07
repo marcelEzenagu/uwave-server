@@ -6,12 +6,14 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { AuthModule } from '../auth/auth.module';
 import { FileService } from 'src/helpers/upload';
+import { ErrorFormat } from 'src/helpers/errorFormat';
 
 @Module({
   controllers: [UserController],
-  providers: [UserService,FileService],
+  providers: [UserService,FileService,ErrorFormat],
   imports: [MongooseModule.forFeature(forFeatureDb),AuthModule],
 })
+
 export class UserModule {
   configure(consumer:MiddlewareConsumer){
     consumer.apply(AccessTokenMiddleware)

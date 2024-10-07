@@ -11,12 +11,13 @@ import { ItemsService } from '../items/items.service';
 import { VendorModule } from '../vendor/vendor.module';
 import { ItemsModule } from '../items/items.module';
 
+import { ErrorFormat } from 'src/helpers/errorFormat';
 
 @Module({
   controllers: [OrderController],
   // exports:[forwardRef(() =>VendorModule)],
   exports:[OrderService],
-  providers: [OrderService,CartService,StripePayment],
+  providers: [OrderService,CartService,StripePayment,ErrorFormat],
   imports: [MongooseModule.forFeature(forFeatureDb),
     forwardRef(() => AuthModule),
     forwardRef(() => VendorModule),

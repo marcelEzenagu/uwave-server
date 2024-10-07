@@ -10,6 +10,7 @@ import { Request } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { AgentService } from '../agent/agent.service';
 import { Agent } from '../agent/entities/agent.entity';
+import { ErrorFormat } from 'src/helpers/errorFormat';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -18,7 +19,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly vendorService: VendorService,
-    private readonly agentService: AgentService,
+    private readonly errorFormat: ErrorFormat,
   ) {}
 
   @Post("users/")
@@ -35,7 +36,7 @@ export class AuthController {
     try{
       return await this.authService.registerUser(createAuthDto);
     } catch (e) {
-      throw new BadRequestException(this.vendorService.formatErrors(e));
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
 
     }
   }
@@ -60,7 +61,7 @@ export class AuthController {
     try{
       return await this.authService.registerAgent(createAuthDto);
     } catch (e) {
-      throw new BadRequestException(this.vendorService.formatErrors(e));
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
 
     }
   }
@@ -99,7 +100,7 @@ export class AuthController {
     try{
       return await this.authService.registerUWaveUser(createAuthDto);
     } catch (e) {
-      throw new BadRequestException(this.vendorService.formatErrors(e));
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
 
     }
   }
@@ -132,7 +133,7 @@ export class AuthController {
     console.log("createAuthDto:: ",createAuthDto)
       return await this.authService.registerVendor(createAuthDto);
     } catch (e) {
-      throw new BadRequestException(this.vendorService.formatErrors(e));
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
   
     }
   }

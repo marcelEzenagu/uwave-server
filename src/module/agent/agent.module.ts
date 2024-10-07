@@ -9,10 +9,10 @@ import { AuthModule } from '../auth/auth.module';
 
 @Module({
   controllers: [AgentController],
-  providers: [AgentService],
+  providers: [AgentService,ErrorFormat],
   imports: [
     forwardRef(() => AuthModule),
-    MongooseModule.forFeature(forFeatureDb),ErrorFormat],
+    MongooseModule.forFeature(forFeatureDb)],
 })
 
 export class AgentModule {

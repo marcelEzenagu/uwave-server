@@ -44,27 +44,6 @@ export class ProductService {
     return `This action removes a #${id} product`;
   }
 
-  formatErrors(error: any) {
-    console.log("ERROR:: ",error.name)
 
-    if(error.name === 'MongoServerError'){
-     const field = Object.keys(error.keyPattern)[0];
-       return `Duplicate value for field: ${field}`;
- 
-     }else{
-       const formattedErrors = [];
-       for (const key in error.errors) {
-         if (error.errors.hasOwnProperty(key)) {
-           formattedErrors.push({
-             field: key,
-             message: error.errors[key].message,
-           });
-         }
-       }
-       return formattedErrors;
- 
-     }
- 
-   }
-   
+
 }

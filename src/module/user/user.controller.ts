@@ -18,6 +18,7 @@ import { ChangePasswordDto, ResetPasswordDto } from '../auth/dto/reset.dto';
 import { FileService } from 'src/helpers/upload';
 import * as bcrypt from 'bcrypt';
 
+import { ErrorFormat } from 'src/helpers/errorFormat';
 
 import { ApiTags } from '@nestjs/swagger';
 
@@ -26,6 +27,7 @@ import { ApiTags } from '@nestjs/swagger';
 export class UserController {
   constructor(
     private readonly userService: UserService,
+    private readonly errorFormat: ErrorFormat,
     private readonly fileService: FileService
   ) {}
 
@@ -34,7 +36,7 @@ export class UserController {
     try {
       return this.userService.findAll();
     } catch (e) {
-      throw new BadRequestException(this.userService.formatErrors(e));
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
     }
   }
 
@@ -45,7 +47,7 @@ export class UserController {
 
       return await this.userService.findOne(userID);
     } catch (e) {
-      throw new BadRequestException(this.userService.formatErrors(e));
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
     }
   }
 
@@ -60,7 +62,7 @@ export class UserController {
         updateUserDto.preferredCountry.toLowerCase(),
       );
     } catch (e) {
-      throw new BadRequestException(this.userService.formatErrors(e));
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
     }
   }
  
@@ -113,7 +115,7 @@ export class UserController {
     try {
       return this.userService.remove(+id);
     } catch (e) {
-      throw new BadRequestException(this.userService.formatErrors(e));
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
     }
   }
 

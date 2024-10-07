@@ -3,6 +3,7 @@ import { ProductService } from './product.service';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductDocument,Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
+import { ErrorFormat } from 'src/helpers/errorFormat';
 
 
 import { ApiTags } from '@nestjs/swagger';
@@ -10,7 +11,11 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('product')
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly errorFormat: ErrorFormat
+
+  ) {}
 
   @Post()
   async create(@Body() createProductDto: Product) {
@@ -22,7 +27,7 @@ export class ProductController {
       return await this.productService.create(createProductDto);
 
     } catch (e) {
-      throw new BadRequestException(this.productService.formatErrors(e));
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
   
     }
   }

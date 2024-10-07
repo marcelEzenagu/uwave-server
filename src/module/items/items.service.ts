@@ -5,12 +5,18 @@ import { Item, ItemDocument, ItemFilter, ItemStatus } from './entities/item.enti
 import { InjectModel } from  '@nestjs/mongoose';
 import { Model } from  'mongoose';
 import { FileService } from 'src/helpers/upload';
+import { AuthService } from '../auth/auth.service';
 
+import { ErrorFormat } from 'src/helpers/errorFormat';
 @Injectable()
 export class ItemsService {
-  constructor(@InjectModel(Item.name) private itemModel: Model<ItemDocument>,
+  constructor(
+    @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
 
-  private readonly fileService: FileService) {}
+  private readonly fileService: FileService,
+  private  errorFormat: ErrorFormat,
+
+) {}
 
 
   async create(createItemDto: Item) {
@@ -36,7 +42,7 @@ export class ItemsService {
       return await newProduct.save()
      }catch(e){
        console.log("error:: ",e)
-      throw new BadRequestException(this.formatErrors(e))
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
      }  
   }
 
@@ -69,7 +75,7 @@ export class ItemsService {
       return await  this.itemModel.find().where(where).exec();
     }catch(e){
       console.log("error:: ",e)
-    throw new BadRequestException(this.formatErrors(e))
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
     }   
   }
 
@@ -143,7 +149,7 @@ export class ItemsService {
       return await  this.itemModel.findById(id).exec();
     }catch(e){
       console.log("error:: ",e)
-    throw new BadRequestException(this.formatErrors(e))
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
     }  
   }
 
@@ -155,7 +161,7 @@ export class ItemsService {
     return await  this.itemModel.findByIdAndUpdate(id, updateItemDto, {new: true})
   }catch(e){
     console.log("error:: ",e)
-   throw new BadRequestException(this.formatErrors(e))
+   throw new BadRequestException(this.errorFormat.formatErrors(e))
   }  
   }
 
@@ -196,27 +202,6 @@ export class ItemsService {
   }
   
 
-  formatErrors(error: any) {
-    console.log("ERROR:: ",error.name)
-
-    if(error.name === 'MongoServerError'){
-     const field = Object.keys(error.keyPattern)[0];
-       return `an item with this vendorID, productID and itemName combination already exists`;
- 
-     }else{
-       const formattedErrors = [];
-       for (const key in error.errors) {
-         if (error.errors.hasOwnProperty(key)) {
-           formattedErrors.push({
-             field: key,
-             message: error.errors[key].message,
-           });
-         }
-       }
-       return formattedErrors;
- 
-     }
- 
-  }
+  
 
 }

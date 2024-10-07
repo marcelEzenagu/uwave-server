@@ -15,14 +15,17 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { OptionType, PaymentStatusType } from './entities/order.entity';
 import { Request } from 'express';
 import { StripePayment } from 'src/helpers/stripePayment';
-import axios from 'axios';
+import { ErrorFormat } from 'src/helpers/errorFormat';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthService } from '../auth/auth.service';
 
 @ApiTags('orders')
 @Controller('orders')
 export class OrderController {
   constructor(
     private readonly orderService: OrderService,
+    private  errorFormat: ErrorFormat,
+
     private readonly stripeService: StripePayment,
   ) {}
 
@@ -50,7 +53,7 @@ export class OrderController {
      return await this.orderService.updatePayment(paymentIntentID, userID, updateOrderDto);
     }catch(e){
       console.log("e.CastError",e.CastError)
-      throw new BadRequestException(this.orderService.formatErrors(e))
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
     }
   }
 

@@ -4,11 +4,15 @@ import { UpdateProductCategoryDto } from './dto/update-product-category.dto';
 import { ProductCategory,ProductCategoryDocument } from './entities/product-category.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model,Types } from 'mongoose';
+import { AuthService } from '../auth/auth.service';
+import { ErrorFormat } from 'src/helpers/errorFormat';
 
 @Injectable()
 export class ProductCategoryService {
   constructor(
-    @InjectModel(ProductCategory.name) private productCategoryModel: Model<ProductCategoryDocument>,
+    @InjectModel(ProductCategory.name) 
+    private productCategoryModel: Model<ProductCategoryDocument>,
+    private errorFormat: ErrorFormat,
 
   ){}
 
@@ -17,7 +21,7 @@ export class ProductCategoryService {
       const newCategory = new this.productCategoryModel(createProductCategoryDto);
       return await newCategory.save();
     }catch(e){
-      throw new BadRequestException(this.formatErrors(e))
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
     }
   }
 
@@ -27,7 +31,7 @@ export class ProductCategoryService {
 
       return await this.productCategoryModel.find().where(where).exec();
     }catch(e){
-      throw new BadRequestException(this.formatErrors(e))
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
     }  }
 
   findOne(id: number) {
@@ -39,7 +43,7 @@ export class ProductCategoryService {
     try{
       return await this.productCategoryModel.findOne().where(where).exec();
     }catch(e){
-      throw new BadRequestException(this.formatErrors(e))
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
     }
   }
 
@@ -50,7 +54,7 @@ export class ProductCategoryService {
         new: true,
       });
     }catch(e){
-      throw new BadRequestException(this.formatErrors(e))
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
     }
   }
   
@@ -61,31 +65,10 @@ export class ProductCategoryService {
        await this.productCategoryModel.findByIdAndUpdate(where, foundCat, {new:true})
       return `This action removes a #${where?._id} productSubCategory`;
     }catch(e){
-      throw new BadRequestException(this.formatErrors(e))
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
     }
 }
  
 
-  formatErrors(error: any) {
-    console.log("ERROR:: ",error)
-
-    if(error.name === 'MongoServerError'){
-     const field = Object.keys(error.keyPattern)[0];
-       return `Duplicate value for field: ${field}`;
- 
-     }else{
-       const formattedErrors = [];
-       for (const key in error.errors) {
-         if (error.errors.hasOwnProperty(key)) {
-           formattedErrors.push({
-             field: key,
-             message: error.errors[key].message,
-           });
-         }
-       }
-       return formattedErrors;
- 
-     }
- 
-   }
+  
 }

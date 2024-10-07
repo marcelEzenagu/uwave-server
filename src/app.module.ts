@@ -9,8 +9,6 @@ import { AuthModule } from './module/auth/auth.module';
 import { CartModule } from './module/cart/cart.module';
 import { LogisticsModule } from './module/logistics/logistics.module';
 import forFeatureDb from './db/for-feature.db';
-import { APP_FILTER } from '@nestjs/core';
-import { AllExceptionsFilter } from './helpers/new';
 import { HealthController } from './health/health.controller';
 import { SavedItemsModule } from './module/saved-items/saved-items.module';
 import { UWaveUserModule } from './module/u-wave-user/u-wave-user.module';
@@ -65,13 +63,7 @@ import { ShipmentModule } from './module/shipment/shipment.module';
     AgentModule,
     ShipmentModule,
   ],
-
-  providers: [
-    // {
-    //   provide: APP_FILTER,
-    //   useClass: AllExceptionsFilter,
-    // },
-  ],
+  providers: [],
   controllers: [StatusController,HealthController,],
 })
 export class AppModule  {}

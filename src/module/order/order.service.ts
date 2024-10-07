@@ -226,37 +226,5 @@ async findOrdersByVendorID(vendorID: string, daysAgo:number): Promise<Order[]> {
   ]).exec(); 
 }
 
-formatErrors(error: any) {
-  console.log("ERROR.BSONError:: ",error.BSONError)
-  console.log("error.name:: ",error.name)
-
-  if(error.name === 'MongoServerError'){
-   const field = Object.keys(error.keyPattern)[0];
-     return `an item with this vendorID, productID and itemName combination already exists`;
-
-   }else{
-     const formattedErrors = [];
-     console.log("keyerror.errors:::: ",error.CastError)
-     console.log("keyerror:::: ",error)
-     if(error.errors != undefined){
-      for (const key in error.errors) {
-      console.log("key:::: ",key)
-       if (error.errors.hasOwnProperty(key)) {
-         formattedErrors.push({
-           field: key,
-           message: error.errors[key].message,
-         });
-       }
-       
-       
-      }
-     }else{
-      formattedErrors.push(error.message)
-     }
-     return formattedErrors;
-
-   }
-
-}
 
 }

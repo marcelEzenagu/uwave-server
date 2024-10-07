@@ -13,12 +13,12 @@ import { ItemsModule } from '../items/items.module';
 @Module({
   controllers: [VendorController],
   exports:[VendorService],
-  providers: [VendorService,FileService],
+  providers: [VendorService,FileService,ErrorFormat],
   imports: [
     forwardRef(() => AuthModule),
     forwardRef(() => OrderModule),
     forwardRef(() => ItemsModule),
-    MongooseModule.forFeature(forFeatureDb),ErrorFormat,OrderModule],
+    MongooseModule.forFeature(forFeatureDb),OrderModule],
 })
 
 export class VendorModule {

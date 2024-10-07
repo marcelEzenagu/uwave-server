@@ -14,14 +14,15 @@ import { OrderModule } from '../order/order.module';
 import { ItemsModule } from '../items/items.module';
 import { AgentModule } from '../agent/agent.module';
 import { AgentService } from '../agent/agent.service';
+import { ErrorFormat } from 'src/helpers/errorFormat';
 
 
 @Module({
   controllers: [AuthController],
   exports: [AuthService],
   providers: [AuthService,UserService,UWaveUserService,AgentService,
-  RedisService,MailerService
-
+  RedisService,MailerService,
+    ErrorFormat
   ],
 
   imports: [

@@ -5,10 +5,11 @@ import { MongooseModule } from "@nestjs/mongoose";
 import forFeatureDb from 'src/db/for-feature.db';
 import { ProductCategoryService } from '../product-category/product-category.service';
 import { ProductSubCategoryService } from '../product-sub-category/product-sub-category.service';
+import { ErrorFormat } from 'src/helpers/errorFormat';
 
 @Module({
   controllers: [AdminController],
-  providers: [AdminService,ProductCategoryService,ProductSubCategoryService],
+  providers: [AdminService,ErrorFormat,ProductCategoryService,ProductSubCategoryService],
   imports: [MongooseModule.forFeature(forFeatureDb)],
 
 })
