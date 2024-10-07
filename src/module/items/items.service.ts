@@ -75,7 +75,7 @@ export class ItemsService {
 
   async findAll(where:any) {
     where.deletedAt =null
-    where.status != ItemStatus.DRAFT || ItemStatus.INACTIVE
+    where.status = ItemStatus.ACTIVE
     try{
       return await  this.itemModel.find().where(where).exec();
     }catch(e){
@@ -83,6 +83,7 @@ export class ItemsService {
     throw new BadRequestException(this.errorFormat.formatErrors(e))
     }   
   }
+  
   async adminFindAll(where:any) {
     where.deletedAt =null
     try{
@@ -102,7 +103,7 @@ export class ItemsService {
       itemSupportedCountries:
       { $regex: new RegExp(`^${country}`, 'i')},
       deletedAt:null,
-      status :!ItemStatus.DRAFT || !ItemStatus.INACTIVE
+      status :ItemStatus.ACTIVE
 
     };
 
@@ -172,8 +173,9 @@ export class ItemsService {
   }
 
   async findWhere(where: any):Promise<Item> {
-    where.status = !ItemStatus.DRAFT || !ItemStatus.INACTIVE
+    where.status = ItemStatus.ACTIVE
     where.deletedAt = null
+    
     try{
       return await  this.itemModel.findOne().where(where).exec();
     }catch(e){

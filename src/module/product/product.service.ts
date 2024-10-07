@@ -35,7 +35,6 @@ export class ProductService {
   async findWhere(where:any):Promise<Product> {
     where.deletedAt = null
     return await  this.productModel.findOne().where(where).exec();
-    // return await  this.productModel.findById(id).exec();
   }
 
   async update(id: string, updateProductDto: Product):Promise<Product> {

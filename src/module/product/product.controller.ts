@@ -45,8 +45,8 @@ export class ProductController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    // const where = {"itemID":id}
-    return this.productService.findOne(id);
+    const where = {"productID":id}
+    return this.productService.findWhere(where);
   }
 
   @Patch(':id')
