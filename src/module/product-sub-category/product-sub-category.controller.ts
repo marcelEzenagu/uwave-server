@@ -13,7 +13,4 @@ export class ProductSubCategoryController {
   constructor(private readonly productSubCategoryService: ProductSubCategoryService) {}
 
   
-
-
-  
 }

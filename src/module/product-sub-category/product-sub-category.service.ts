@@ -39,7 +39,12 @@ async findAll(where) {
     if (!where.includeDeleted) {
       query.deletedAt = { $eq: null }; // Only include not deleted (null) entries
     }
-    return await this.productSubCategoryModel.find().where(where).populate("productCategory").exec();
+    return await this.productSubCategoryModel.find().where(where)
+              .populate({
+                path: 'productCategory',  // Populate the referenced field
+                select: 'name',            // Select only the 'name' field
+              })
+              .exec();
   }catch(e){
     throw new Error(e)
   }
@@ -64,8 +69,14 @@ findOne(id: number) {
 async findWhere(where: any): Promise<ProductSubCategory> {
 
   where.status = CategoryStatus.ACTIVE
- try{
-    return await this.productSubCategoryModel.findOne().where(where).exec();
+  try{
+    return await this.productSubCategoryModel.findOne()
+    .where(where)
+    .populate({
+      path: 'productCategory',  // Populate the referenced field
+      select: 'name',            // Select only the 'name' field
+    })
+    .exec();
   }catch(e){
     throw new Error(e)
   }

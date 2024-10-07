@@ -10,7 +10,6 @@ import { AuthModule } from '../auth/auth.module';
   // controllers: [ProductSubCategoryController],
   providers: [ProductSubCategoryService],
   imports: [MongooseModule.forFeature(forFeatureDb),AuthModule],
-
 })
 
 
