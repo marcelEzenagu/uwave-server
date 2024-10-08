@@ -22,9 +22,15 @@ export class FreightController {
   @Req() req: Request,
 
 ) {
-  const userID = req['user'].sub;
-  createFreightDto.userID = userID
+  try{
+    const userID = req['user'].sub;
+    createFreightDto.userID = userID
     return this.freightService.create(createFreightDto);
+    
+      }catch(e){
+    console.log("ERROR:: ",e)
+    throw e
+      }
   }
 
 

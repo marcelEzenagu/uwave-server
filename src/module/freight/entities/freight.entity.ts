@@ -35,12 +35,13 @@ export class Freight {
     freightWeight:number
 
     @Prop({
-        type: [{ 
-        itemID: { type: String},
-        name: { type: String, required: true },
-       _id: false 
-      }]
-      ,required:true
+      //   type: [{ 
+      //   itemID: { type: String},
+      //   name: { type: String, required: true },
+      //  _id: false 
+      // }]
+      // ,
+      required:true
     })
     freightItems:[];
 

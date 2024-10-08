@@ -12,9 +12,15 @@ export class FreightService {
     ) {}
 
   async create(createFreightDto: CreateFreightDto) {
-  
+
+  try{
+
     const newSavedItem = new this.freightModel(createFreightDto);
-    return newSavedItem.save();
+    return await newSavedItem.save();
+   }catch(e){
+    console.log("ERROR:: ",e)
+    throw e
+      }
   
   }
 
