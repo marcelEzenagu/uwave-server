@@ -8,6 +8,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { FileService } from 'src/helpers/upload';
 import { OrderModule } from '../order/order.module';
 import { ErrorFormat } from 'src/helpers/errorFormat';
+import { AdminModule } from '../admin/admin.module';
 
 @Module({
   controllers: [ItemsController],
@@ -15,6 +16,7 @@ import { ErrorFormat } from 'src/helpers/errorFormat';
   imports: [MongooseModule.forFeature(forFeatureDb),
     forwardRef(() => OrderModule),
     forwardRef(() => AuthModule),
+    forwardRef(() => AdminModule),
   ],
   exports:[ItemsService]
 })

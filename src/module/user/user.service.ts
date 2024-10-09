@@ -53,23 +53,62 @@ export class UserService {
     const where ={deletedAt:null}
     return await  this.userModel.find().where(where).exec();
   }
-  
+
   async adminFindAll() {
     return await  this.userModel.find().exec();
   }
 
   async findOne(id):Promise<User> {
-    const where = {"userID":id}
+    const where = {"userID":id,
+      "deletedAt":null
+    }
+    console.log("where: ",where)
+    return await  this.userModel.findOne().where(where).exec();
+  }
+
+  async adminFindOne(id):Promise<User> {
+    const where = {"userID":id,
+      "deletedAt":null
+    }
     console.log("where: ",where)
     return await  this.userModel.findOne().where(where).exec();
   }
   
-  async findWhere(where:{}):Promise<User> {
+  async findWhere(where:any):Promise<User> {
+    where.deletedAt = null
+    return await  this.userModel.findOne().where(where).exec();
+  }
+
+  async adminFindWhere(where:{}):Promise<User> {
     return await  this.userModel.findOne().where(where).exec();
   }
 
   async update(id: string, updateUserDto: UpdateUserDto):Promise<User> {
+    updateUserDto.isActive = undefined
   //  return await  this.userModel.findByIdAndUpdate(id, updateUserDto, {new: true})
+   const where = {"userID":id}
+
+   try{
+  
+   if(updateUserDto.billingDetails){
+    await this.validateIsDefault(updateUserDto.billingDetails,"Billing Details")
+  }
+  if(updateUserDto.cardDetails){
+      await this.validateIsDefault(updateUserDto.cardDetails,"Card Details")
+
+  }
+  if(updateUserDto.shippingDetails){
+     await  this.validateIsDefault(updateUserDto.shippingDetails,"Shipping Details")
+   }
+   return  await  this.userModel.findOneAndUpdate(where,updateUserDto,{new:true}    )
+  
+  }catch(e){
+    console.log("ERROR::: ",e)
+    throw new BadRequestException(e.message);
+  }
+  }
+
+  async adminUpdate(id: string, updateUserDto: UpdateUserDto):Promise<User> {
    const where = {"userID":id}
 
    try{
@@ -112,7 +151,7 @@ export class UserService {
     // async remove(id):Promise<any> {
       // return await  this.userModel.findByIdAndDelete(id);
       // return await  this.userModel.findOneAndDelete(where)
-    }
+  }
     
   formatErrors(error: any) {
     console.log("ERROR:: ",error)
@@ -137,7 +176,7 @@ export class UserService {
  
    }
 
-   async validateIsDefault(items: any[], itemType: string) {
+  async validateIsDefault(items: any[], itemType: string) {
     const defaultCount = items.filter((item) => item.isDefault).length;
   
     if (defaultCount > 1) {

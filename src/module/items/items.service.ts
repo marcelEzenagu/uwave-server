@@ -121,6 +121,7 @@ export class ItemsService {
     return await  this.itemModel.find(filter).sort(sortOption).exec();
 
   }
+
    async adminSearchItem(query,country,filterTag: string) {
     query = query.trim()
     
@@ -162,6 +163,68 @@ export class ItemsService {
       $lte: endDate, // greater than or equal to startDate
       $gte: startDate,   // less than or equal to endDate
     },
+
+    };
+    if (status){
+      filter.status = status
+    }
+
+  var sortOption :any = {}
+  const data = await  this.itemModel.find(filter)
+                                    .sort(sortOption)
+                                    .skip(skip)
+                                    .limit(limit)
+                                    .exec();
+  const total = await this.itemModel.countDocuments();
+
+
+    return{
+      data,total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit)
+    }
+
+  }
+
+  async adminListItemByVendors(vendorID: string,page, limit:number,status?:ItemStatus) {    const skip = (page - 1) * limit;
+
+    // const endDate = new Date(); // Current date
+    // const startDate = new Date();
+    // startDate.setDate(endDate.getDate() - daysDifference);
+    
+    const filter: any = { vendorID};
+    if (status){
+      filter.status = status
+    }
+
+  var sortOption :any = {}
+  const data = await  this.itemModel.find(filter)
+                                    .sort(sortOption)
+                                    .skip(skip)
+                                    .limit(limit)
+                                    .exec();
+  const total = await this.itemModel.countDocuments();
+
+
+    return{
+      data,total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit)
+    }
+
+  }
+  
+  async adminSearchItemByVendors(query,vendorID: string,page, limit:number,status?:ItemStatus) {
+    query = query.trim()
+    const skip = (page - 1) * limit;
+
+    // const endDate = new Date(); // Current date
+    // const startDate = new Date();
+    // startDate.setDate(endDate.getDate() - daysDifference);
+    
+    const filter: any = { $text: { $search: query },
+    vendorID,
+   
 
     };
     if (status){

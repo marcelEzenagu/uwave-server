@@ -22,12 +22,13 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CountryCurrencyModule } from './module/country_currency/country_currency.module';
 import { ProductCategoryModule } from './module/product-category/product-category.module';
 import { ProductSubCategoryModule } from './module/product-sub-category/product-sub-category.module';
-
 import { join } from 'path';
+
 
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { StatusController } from './app.controller';
 import { AgentModule } from './module/agent/agent.module';
+
 
 @Module({
   imports: [

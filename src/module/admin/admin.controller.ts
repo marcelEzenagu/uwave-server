@@ -12,6 +12,10 @@ import { Request } from 'express';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { Freight } from '../freight/entities/freight.entity';
 import { UserService } from '../user/user.service';
+import { User } from '../user/entities/user.entity';
+import { VendorService } from '../vendor/vendor.service';
+import { ItemsService } from '../items/items.service';
+import { ItemStatus } from '../items/entities/item.entity';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -23,7 +27,9 @@ export class AdminController {
     private readonly category: ProductCategoryService,
     private readonly subCategory: ProductSubCategoryService,
     private readonly shipmentService: FreightService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly vendorService: VendorService,
+    private readonly itemService: ItemsService,
 
   ) {}
 
@@ -48,10 +54,9 @@ export class AdminController {
   }
   }
 
-  @Patch("categories/:id")
+  @Patch('categories/:id')
   updateCategory(@Param('id') id: string,
   @Req() req: Request,
-
   @Body() updateAdminDto: UpdateAdminDto) {
    
     try {    
@@ -274,7 +279,84 @@ export class AdminController {
     throw new BadRequestException(this.errorFormat.formatErrors(e))
   }
   }
+
+  @Get('users/:id')  // Updated the route from 'wave/shipments/:id' to 'shipments/:id'
+  async adminFindUser(
+    @Req() req: Request,
+    @Param('id') id:string
+  ) {
+    try {    
+    const role = req['user'].role
+    const userType = req['user'].sub
+
+    if(role !="admin" || userType != "isAdmin"){
+      throw new BadRequestException("unaccessible");
+    }
+
+     id = id.trim()
+    return await this.userService.adminFindOne(id);
+    
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
+  }
   
+  @Patch('users/:id')  // Updated the route from 'wave/shipments/:id' to 'shipments/:id'
+    async adminUpdateUser(
+      @Req() req: Request,
+      @Param('id') id:string,
+      @Body() updateUserDto: User
+    ) {
+      try {    
+      const role = req['user'].role
+      const userType = req['user'].sub
+
+      if(role !="admin" || userType != "isAdmin"){
+        throw new BadRequestException("unaccessible");
+      }
+
+      id = id.trim()
+      return await this.userService.adminUpdate(id,updateUserDto);
+      
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+  }
+    // vendors  
+
+    
+    @Get('items/:vendorID')  // Updated the route from 'wave/shipments/:id' to 'shipments/:id'
+    async adminListItemByVendors(
+      @Req() req: Request,
+      @Param("vendorID") vendorID : string,
+      @Query('page') page: number = 1, 
+      @Query('status') status: ItemStatus, 
+      @Query('limit') limit: number = 50 
+    ) {
+      try {    
+      const role = req['user'].role
+      const userType = req['user'].sub
+      if(role !="admin" || userType != "isAdmin"){
+        throw new BadRequestException("unaccessible");
+      }
+      vendorID = vendorID.trim()
+
+      page = Number(page);
+      limit = Number(limit);
+  
+      if (page < 1) page = 1;  // Page should be at least 1
+      if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+  
+
+      return await this.itemService.adminListItemByVendors(vendorID,page,limit,status);
+      
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+    }
 
  
 }

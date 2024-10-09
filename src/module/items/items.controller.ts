@@ -65,7 +65,6 @@ export class ItemsController {
   @Query('country') country: string, 
   @Query('filter') filter: ItemFilter, 
 ) {
-   
   return await this.itemsService.searchItem(searchWord.trim(),country.trim(),filter.trim());
   }
 

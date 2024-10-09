@@ -9,6 +9,7 @@ import { AuthModule } from '../auth/auth.module';
 import { FileService } from 'src/helpers/upload';
 import { OrderModule } from '../order/order.module';
 import { ItemsModule } from '../items/items.module';
+import { AdminModule } from '../admin/admin.module';
 
 @Module({
   controllers: [VendorController],
@@ -18,6 +19,8 @@ import { ItemsModule } from '../items/items.module';
     forwardRef(() => AuthModule),
     forwardRef(() => OrderModule),
     forwardRef(() => ItemsModule),
+    forwardRef(() => AdminModule),
+
     MongooseModule.forFeature(forFeatureDb),OrderModule],
 })
 

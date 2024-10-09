@@ -108,6 +108,8 @@ export class User {
   
   @Prop({type: String})
   profilePicture?: string;
+  @Prop({type: Boolean,default:true})
+  isActive: Boolean;
   
   @Prop({
   type: [{
@@ -124,3 +126,7 @@ export class User {
 
 
 export const UserSchema = SchemaFactory.createForClass(User)
+
+UserSchema.index({ firstName: 1, lastName: 1,email:1 }, { unique: true, partialFilterExpression: { deletedAt: null } });
+
+UserSchema.index({ firstName: 'text', lastName: 'text', email: 'text' });

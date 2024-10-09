@@ -5,7 +5,13 @@ import { Type } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, Length, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+
 export type VendorDocument = Vendor & Document;
+export enum VendorStat {
+  VERIFIED= "VERIFIED",
+  PENDING= "PENDING",
+}
+
 
 @Schema({
   toJSON: {
@@ -20,6 +26,8 @@ export type VendorDocument = Vendor & Document;
   },
   timestamps: true,
 })
+
+
 export class Vendor {
   @Prop({
     type: String,
@@ -101,6 +109,9 @@ export class Vendor {
   
   @Prop({type: String})
   businessBank?: string;
+
+  @Prop({type: String,enum:VendorStat, default:VendorStat.PENDING})
+  status?: string;
   
   @Prop({type: String})
   businessBankAccount?: string;
@@ -130,5 +141,7 @@ export class Vendor {
   deletedAt: Date | null;
 }
 
+
 export const VendorSchema = SchemaFactory.createForClass(Vendor);
 VendorSchema.index({ firstName: 1, lastName: 1,email:1 }, { unique: true });
+VendorSchema.index({ firstName: 'text', lastName: 'text', email: 'text' });
