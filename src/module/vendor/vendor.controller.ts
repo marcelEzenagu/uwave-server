@@ -117,7 +117,7 @@ export class VendorController {
   
   // list all orders for a vendor use on the dasboard and orderSection
   @Get('/orders')
-  async searchOrder(
+  async searchVendorOrder(
     @Req() req: Request, 
     @Query('daysDifference') daysDifference: number)
   {
@@ -126,6 +126,18 @@ export class VendorController {
   const role = req['user'].role
 
   return await this.orderService.findOrdersByVendorID(vendorID,daysDifference);
+  }
+  // list all orders for a vendor use on the dasboard and orderSection
+  @Get('/open-orders')
+  async searchOpenOrder(
+    @Req() req: Request, 
+    @Query('daysDifference') daysDifference: number)
+  {
+   
+  const vendorID = req['user'].sub
+  const role = req['user'].role
+
+  return await this.orderService.findOpenOrdersForVendors(daysDifference);
   }
 
 

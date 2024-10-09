@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { OptionType, Order, OrderDocument } from './entities/order.entity';
+import { OptionType, Order, OrderDocument, PaymentStatusType } from './entities/order.entity';
 import { Model,Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CartService } from '../cart/cart.service';
@@ -75,7 +75,7 @@ export class OrderService {
       await  Promise.all([
        await this.stripeService.confirmPaymentIntent(paymentIntentID),
         
-        await this.item.decreaseItem(updateOrderDto.items),
+        // await this.item.decreaseItem(updateOrderDto.items),
         await this.cart.removeCart(updateOrderDto.cartID,userID),
         await this.orderModel.findOneAndUpdate(where, updateOrderDto)
       ])
@@ -213,6 +213,41 @@ async findOrdersByVendorID(vendorID: string, daysAgo:number): Promise<Order[]> {
         'items.vendorID': vendorID, // Ensure this is the correct path to vendorID
         // createdAt: { $gte: estimatedDaysAgo }  // Only include orders from the last 7 days
 
+      },
+    },
+    {
+      $project: {
+        _id: 1,  // Include orderID (MongoDB _id)
+        products: 1,  // Include the matched product
+        orderCreatedAt: '$createdAt',  // Include createdAt field (renamed to orderCreatedAt)
+        status: 1,  // Include status
+      },
+    }
+  ]).exec(); 
+}
+
+async findOpenOrdersForVendors(daysAgo:number): Promise<Order[]> {
+  if(!daysAgo){
+    daysAgo= 7
+  }
+  const estimatedDaysAgo = new Date();
+  const estimatedDaysAgo1 = new Date();
+  estimatedDaysAgo.setDate(estimatedDaysAgo.getDate() - (daysAgo));
+  console.log(" estimatedDaysAgo1:: ",estimatedDaysAgo1,":: ")
+  
+  console.log(" estimatedDaysAgo:: ",estimatedDaysAgo,":: ",estimatedDaysAgo1 > estimatedDaysAgo,
+    OptionType.ACCEPTED,
+    PaymentStatusType.SUCCESS,)
+
+  return this.orderModel.aggregate([
+    {
+      $unwind: '$items',  // Unwind the products array
+    },
+    {
+      $match: {
+        // status:OptionType.ACCEPTED,
+        // paymentStatus:PaymentStatusType.SUCCESS,
+        createdAt: { $gte: estimatedDaysAgo },  // Only include orders from the last 7 days
       },
     },
     {

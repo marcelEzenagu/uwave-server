@@ -389,6 +389,30 @@ export class AuthService {
     }
   }
 
+  async loginAdmin(dto: LogInDto): Promise<any> {
+    try {
+      dto.email = dto.email.toLowerCase()
+
+      if(dto.email !=
+        process.env.USAVE_ADMIN_EMAIL || dto.password != process.env.USAVE_ADMIN_PASS){
+        throw new NotFoundException("invalid email or password");
+      }
+    
+
+      const  role = 'admin' 
+      const accessTokenData = this.generateToken("usave_admin",role);
+
+      return {
+        access_data: { access_token: accessTokenData, role },
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException(error);
+      }
+      throw error;
+    }
+  }
+
   async forgotUWaveUserPassword(dto: ForgotPasswordDto): Promise<{}> {
     try {
       dto.email = dto.email.toLowerCase()

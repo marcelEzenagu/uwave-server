@@ -25,10 +25,13 @@ export class AuthController {
   @Post("users/")
   async login(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
    
-    console.log("createAuthDto.password).oldPassword===== ","createAuthDto.password")
-    console.log("createAuthDto.password).oldPassword===== ",createAuthDto.password)
 
     return await this.authService.loginUser(createAuthDto);
+  }
+
+  @Post("admin/")
+  async adminLogin(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
+    return await this.authService.loginAdmin(createAuthDto);
   }
 
   @Post("users/register")
@@ -95,7 +98,7 @@ export class AuthController {
   async uWaveLogin(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
     return await this.authService.loginUWaveUser(createAuthDto);
   }
-  
+
   @Post("wave/admin/")
   async uWaveAdminLogin(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
     return await this.authService.loginUWaveAdmin(createAuthDto);
