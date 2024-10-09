@@ -85,7 +85,6 @@ export class ItemsService {
   }
   
   async adminFindAll(where:any) {
-    where.deletedAt =null
     try{
       return await  this.itemModel.find().where(where).exec();
     }catch(e){
@@ -105,6 +104,31 @@ export class ItemsService {
       deletedAt:null,
       status :ItemStatus.ACTIVE
 
+    };
+
+
+  var sortOption :any = {}
+  if(filterTag == ItemFilter.BEST_SELLER){
+    sortOption.salesCount = -1; // Sort bestsellers first
+  }else if(filterTag == ItemFilter.HIGH_TO_LOW){
+    sortOption.salesPrice = -1; // Sort by price high to low
+
+  }else if(filterTag == ItemFilter.LOW_TO_HIGH){
+    sortOption.salesPrice = 1; // Sort by price low to high
+
+  }
+
+    return await  this.itemModel.find(filter).sort(sortOption).exec();
+
+  }
+   async adminSearchItem(query,country,filterTag: string) {
+    query = query.trim()
+    
+  
+    
+    const filter: any = { $text: { $search: query },
+      itemSupportedCountries:
+      { $regex: new RegExp(`^${country}`, 'i')},
     };
 
 
@@ -160,7 +184,9 @@ export class ItemsService {
     }
 
   }
+
   
+
 
   async findOne(id: string):Promise<Item> {
 

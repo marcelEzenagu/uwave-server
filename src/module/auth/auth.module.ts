@@ -15,6 +15,7 @@ import { ItemsModule } from '../items/items.module';
 import { AgentModule } from '../agent/agent.module';
 import { AgentService } from '../agent/agent.service';
 import { ErrorFormat } from 'src/helpers/errorFormat';
+import { AdminModule } from '../admin/admin.module';
 
 
 @Module({
@@ -31,5 +32,6 @@ import { ErrorFormat } from 'src/helpers/errorFormat';
     forwardRef(() => VendorModule),
     forwardRef(() => OrderModule),
     forwardRef(() => ItemsModule),
+    forwardRef(() => AdminModule),
   ],})
 export class AuthModule {}

@@ -41,26 +41,26 @@ export class ItemsController {
 }
 
 @Get('search')
-@ApiQuery({
-  name: 'query',
-  required: false,
-  description: 'Search word for item search',
-  type: String,
-})
-@ApiQuery({
-  name: 'country',
-  required: false,
-  description: 'Country for filtering items',
-  type: String,
-})
-@ApiQuery({
-  name: 'filter',
-  required: false,
-  enum: ItemFilter,
-  description: 'Filter for item sorting (bestseller, priceLowToHigh, priceHighToLow)',
-})
+  @ApiQuery({
+    name: 'query',
+    required: false,
+    description: 'Search word for item search',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'country',
+    required: false,
+    description: 'Country for filtering items',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'filter',
+    required: false,
+    enum: ItemFilter,
+    description: 'Filter for item sorting (bestseller, priceLowToHigh, priceHighToLow)',
+  })
 
-async searchItem(
+  async searchItem(
   @Query('query') searchWord: string, 
   @Query('country') country: string, 
   @Query('filter') filter: ItemFilter, 

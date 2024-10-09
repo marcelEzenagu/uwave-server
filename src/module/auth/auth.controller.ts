@@ -81,6 +81,7 @@ export class AuthController {
       return await this.authService.forgotUWaveUserPassword(createAuthDto);
    
   }
+  
 
   @Post("wave/users/verify-password")
   async verifyResetUWaveUserPassword(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
@@ -93,6 +94,11 @@ export class AuthController {
   @Post("wave/users/")
   async uWaveLogin(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
     return await this.authService.loginUWaveUser(createAuthDto);
+  }
+  
+  @Post("wave/admin/")
+  async uWaveAdminLogin(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
+    return await this.authService.loginUWaveAdmin(createAuthDto);
   }
 
   @Post("wave/users/register")

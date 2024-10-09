@@ -1,4 +1,4 @@
-import { Controller, Get,Query, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get,Query, Post, Body, Patch, Param, Delete, Req, BadRequestException } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
@@ -7,14 +7,21 @@ import { ProductSubCategoryService } from '../product-sub-category/product-sub-c
 import { ProductCategory } from '../product-category/entities/product-category.entity';
 import { ProductSubCategory } from '../product-sub-category/entities/product-sub-category.entity';
 import { ApiTags } from '@nestjs/swagger';
+import { FreightService } from '../freight/freight.service';
+import { Request } from 'express';
+import { ErrorFormat } from 'src/helpers/errorFormat';
+import { Freight } from '../freight/entities/freight.entity';
 
 @ApiTags('Admin')
 @Controller('admin')
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
+    private  errorFormat: ErrorFormat,
+
     private readonly category: ProductCategoryService,
-    private readonly subCategory: ProductSubCategoryService
+    private readonly subCategory: ProductSubCategoryService,
+    private readonly shipmentService: FreightService
 
   ) {}
 
@@ -89,6 +96,15 @@ export class AdminController {
     return this.subCategory.remove(where);
   }
 
+
+
+
+  
+
+
+
+
+
   @Post()
   create(@Body() createAdminDto: CreateAdminDto) {
     return this.adminService.create(createAdminDto);
@@ -105,16 +121,65 @@ export class AdminController {
   }
   
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminService.findOne(+id);
-  }
-
+ 
  
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.adminService.remove(+id);
   }
+  
+  // freight
+  @Patch('shipments/:id')  // Updated the route from 'wave/shipments/:id' to 'shipments/:id'
+  async adminUpdateFreight(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Body() dto :Freight,
+  ) {
+    try {
+      
+    
+    const role = req['user'].role
+    const userType = req['user'].sub
+
+
+    if(role !="admin" || userType != "isAdmin"){
+      throw new BadRequestException("unaccessible");
+    }
+
+    return await this.shipmentService.adminUpdate(id,dto);
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
+  }
+  
+  @Get('shipments/')  // Updated the route from 'wave/shipments/:id' to 'shipments/:id'
+  async adminFindAll(
+    @Req() req: Request,
+  ) {
+    try {    
+    const role = req['user'].role
+    const userType = req['user'].sub
+
+    if(role !="admin" || userType != "isAdmin"){
+      throw new BadRequestException("unaccessible");
+    }
+    
+    return await this.shipmentService.adminFindAll();
+    
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
+  }
+
+
+  
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.adminService.findOne(+id);
+  }
+
 
  
 }

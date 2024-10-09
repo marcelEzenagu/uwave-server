@@ -23,4 +23,7 @@ export class AdminService {
   remove(id: number) {
     return `This action removes a #${id} admin`;
   }
+  adminUpdateFreight(id: number) {
+    return `This action removes a #${id} admin`;
+  }
 }

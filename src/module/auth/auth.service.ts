@@ -364,6 +364,30 @@ export class AuthService {
       throw error;
     }
   }
+  async loginUWaveAdmin(dto: LogInDto): Promise<any> {
+    try {
+      dto.email = dto.email.toLowerCase()
+
+      if(dto.email != "uwave_admin@wave.com" || dto.password != "a08182090541@E"){
+        throw new NotFoundException("invalid email or password");
+      }
+
+
+    
+
+      const  role = 'admin' 
+      const accessTokenData = this.generateToken("isAdmin",role);
+
+      return {
+        access_data: { access_token: accessTokenData, role },
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException(error);
+      }
+      throw error;
+    }
+  }
 
   async forgotUWaveUserPassword(dto: ForgotPasswordDto): Promise<{}> {
     try {

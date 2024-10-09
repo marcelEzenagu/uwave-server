@@ -58,7 +58,8 @@ export class FreightController {
   }
   @Get()
   findAll() {
-    return this.freightService.findAll();
+    let where = {}
+    return this.freightService.findAll(where);
   }
 
   @Get(':id')

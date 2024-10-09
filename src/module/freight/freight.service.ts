@@ -24,8 +24,13 @@ export class FreightService {
   
   }
 
-  async findAll() {
-    return await  this.freightModel.find().exec();
+  async findAll(where:any) {
+    where.deletedAt = null
+    return await  this.freightModel.find().where(where).exec();
+  }
+
+  async adminFindAll() {
+    return await this.freightModel.find().exec();
   }
 
   async findOne(userID,id: string) {
@@ -36,6 +41,20 @@ export class FreightService {
   async update(id: string, updateFreightDto: UpdateFreightDto) {
     return await  this.freightModel.findByIdAndUpdate(id, updateFreightDto, {new: true})
 
+  }
+  async adminUpdate(id: string, UpdateFreightDto: UpdateFreightDto) {
+
+    try{
+
+    console.log("paymentStatus:::: ",UpdateFreightDto,id)
+    const where = {
+      _id:id
+    }
+    return await this.freightModel.findOneAndUpdate(where,UpdateFreightDto,{new:true})
+  }catch(e){
+    console.log("ERROR:: ",e)
+    throw new Error(e)
+  }
   }
 
  
