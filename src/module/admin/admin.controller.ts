@@ -164,7 +164,7 @@ export class AdminController {
     if(role !="admin" || userType != "isAdmin"){
       throw new BadRequestException("unaccessible");
     }
-    
+
     return await this.shipmentService.adminFindAll();
     
   } catch (e) {
