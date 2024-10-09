@@ -9,10 +9,11 @@ import { ErrorFormat } from 'src/helpers/errorFormat';
 import { AccessTokenMiddleware } from '../common/middleware/auth.middleware'
 import { AuthModule } from '../auth/auth.module';
 import { FreightService } from '../freight/freight.service';
+import { UserService } from '../user/user.service';
 
 @Module({
   controllers: [AdminController],
-  providers: [AdminService,ErrorFormat,ProductCategoryService,ProductSubCategoryService,FreightService],
+  providers: [AdminService,UserService,ErrorFormat,ProductCategoryService,ProductSubCategoryService,FreightService],
   imports: [MongooseModule.forFeature(forFeatureDb),
 
     forwardRef(() => AuthModule),

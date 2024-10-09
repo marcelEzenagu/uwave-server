@@ -50,6 +50,11 @@ export class UserService {
     }
   }
   async findAll() {
+    const where ={deletedAt:null}
+    return await  this.userModel.find().where(where).exec();
+  }
+  
+  async adminFindAll() {
     return await  this.userModel.find().exec();
   }
 

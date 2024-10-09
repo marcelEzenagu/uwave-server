@@ -11,6 +11,7 @@ import { FreightService } from '../freight/freight.service';
 import { Request } from 'express';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { Freight } from '../freight/entities/freight.entity';
+import { UserService } from '../user/user.service';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -21,7 +22,8 @@ export class AdminController {
 
     private readonly category: ProductCategoryService,
     private readonly subCategory: ProductSubCategoryService,
-    private readonly shipmentService: FreightService
+    private readonly shipmentService: FreightService,
+    private readonly userService: UserService
 
   ) {}
 
@@ -29,38 +31,92 @@ export class AdminController {
  // categories
   //add, edit, delete List
   @Post("categories")
-  createCategory(@Body() createAdminDto: ProductCategory) {
+    createCategory(@Body() createAdminDto: ProductCategory,
+    @Req() req: Request,
+    ) {
+    try {    
+      const role = req['user'].role
+      const userType = req['user'].sub
+  
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
     return this.category.create(createAdminDto);
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
   }
 
   @Patch("categories/:id")
-  updateCategory(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
+  updateCategory(@Param('id') id: string,
+  @Req() req: Request,
+
+  @Body() updateAdminDto: UpdateAdminDto) {
+   
+    try {    
+      const role = req['user'].role
+      const userType = req['user'].sub
+  
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
     return this.category.update(id, updateAdminDto);
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
   }
 
   @Get("categories")
   findAllCategories() {
 
     let where :any = {}
-     where={"deletedAt":null}
+     where={}
 
     return this.category.findAll(where);
   }
 
   @Delete("categories/:id")
-  removeCategory(@Param('id') id: string) {
+  removeCategory(@Param('id') id: string,
+  @Req() req: Request,
+
+) {
+    try {    
+      const role = req['user'].role
+      const userType = req['user'].sub
+  
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
     const where ={"_id":id}
     return this.category.remove(where);
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
   }
 
 
   // updates
 
-
-
   @Patch("sub-categories/:id")
-  updateSubCategory(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
+  updateSubCategory(@Param('id') id: string,
+  @Req() req: Request,
+
+  @Body() updateAdminDto: UpdateAdminDto) {
+    try {    
+      const role = req['user'].role
+      const userType = req['user'].sub
+  
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
     return this.subCategory.update(id, updateAdminDto);
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
   }
 
 
@@ -68,32 +124,72 @@ export class AdminController {
   // Subcategories
   //add, edit, delete List
   @Post("sub-categories")
-  createSubCategory(@Body() createAdminDto: ProductSubCategory) {
+  createSubCategory(@Body() createAdminDto: ProductSubCategory,
+  @Req() req: Request,
+
+) {
+
+  try {    
+    const role = req['user'].role
+    const userType = req['user'].sub
+
+    if(role !="admin" || userType != "usave_admin"){
+      throw new BadRequestException("unaccessible");
+    }
     return this.subCategory.create(createAdminDto);
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
   }
 
   @Get("sub-categories")
   findAllSubCategory(
 
+    @Req() req: Request,
     @Query('category') category?: string
 
   ) {
-
+    try {    
+      const role = req['user'].role
+      const userType = req['user'].sub
+  
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
     let where :any = {}
     where={"deletedAt":null}
     if(category)where.productCategory = category.toLowerCase()
 
     return this.subCategory.findAll(where);
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
   }
 
  
  
 
   @Delete("sub-categories/:id")
-  removeSubCategory(@Param('id') id: string) {
+  removeSubCategory(@Param('id') id: string,
+  @Req() req: Request,
+
+) {
+  try {    
+    const role = req['user'].role
+    const userType = req['user'].sub
+
+    if(role !="admin" || userType != "usave_admin"){
+      throw new BadRequestException("unaccessible");
+    }
     const where ={"_id":id}
 
     return this.subCategory.remove(where);
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
   }
 
 
@@ -105,28 +201,11 @@ export class AdminController {
 
 
 
-  @Post()
-  create(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.create(createAdminDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.adminService.findAll();
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.update(+id, updateAdminDto);
-  }
   
 
- 
- 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adminService.remove(+id);
-  }
+  
+  
+
   
   // freight
   @Patch('shipments/:id')  // Updated the route from 'wave/shipments/:id' to 'shipments/:id'
@@ -172,14 +251,30 @@ export class AdminController {
     throw new BadRequestException(this.errorFormat.formatErrors(e))
   }
   }
-
-
   
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminService.findOne(+id);
-  }
+  
+  
+  // users
+  @Get('users/')  // Updated the route from 'wave/shipments/:id' to 'shipments/:id'
+  async adminFindUsers(
+    @Req() req: Request,
+  ) {
+    try {    
+    const role = req['user'].role
+    const userType = req['user'].sub
 
+    if(role !="admin" || userType != "isAdmin"){
+      throw new BadRequestException("unaccessible");
+    }
+
+    return await this.userService.adminFindAll();
+    
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
+  }
+  
 
  
 }
