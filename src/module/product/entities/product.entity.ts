@@ -79,3 +79,4 @@ export class Product {
 export const ProductSchema = SchemaFactory.createForClass(Product)
 
 ProductSchema.index({ productName: 1, vendorID: 1 }, { unique: true, partialFilterExpression: { deletedAt: null } });
+ProductSchema.index({ productName: "text", vendorID: "text" });

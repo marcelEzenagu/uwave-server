@@ -6,12 +6,15 @@ import { AccessTokenMiddleware } from '../common/middleware/auth.middleware'
 import forFeatureDb from 'src/db/for-feature.db';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { AuthModule } from '../auth/auth.module';
+import { AdminModule } from '../admin/admin.module';
 
 @Module({
   controllers: [AgentController],
+  exports: [AgentService],
   providers: [AgentService,ErrorFormat],
   imports: [
     forwardRef(() => AuthModule),
+    // forwardRef(() => AdminModule),
     MongooseModule.forFeature(forFeatureDb)],
 })
 

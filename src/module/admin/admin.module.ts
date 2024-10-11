@@ -16,23 +16,31 @@ import { ItemsModule } from '../items/items.module';
 import { FileService } from 'src/helpers/upload';
 import { OrderService } from '../order/order.service';
 import { VendorModule } from '../vendor/vendor.module';
+import { OrderModule } from '../order/order.module';
+import { AgentModule } from '../agent/agent.module';
+import { ProductModule } from '../product/product.module';
+import { ProductService } from '../product/product.service';
 
 @Module({
   controllers: [AdminController],
   providers: [AdminService,UserService,
-              
               ErrorFormat,
+              ProductService,
               ProductCategoryService,
               ProductSubCategoryService,
               FreightService,FileService],
+              
   imports: [MongooseModule.forFeature(forFeatureDb),
     forwardRef(() => AuthModule),
     forwardRef(() => ItemsModule),
     forwardRef(() => VendorModule),
-
+    forwardRef(() => OrderModule),
+    forwardRef(() => AgentModule),
+    // forwardRef(() => ProductModule),
   ],
 
 })
+
 export class AdminModule {
   configure(consumer:MiddlewareConsumer){
     consumer.apply(AccessTokenMiddleware)

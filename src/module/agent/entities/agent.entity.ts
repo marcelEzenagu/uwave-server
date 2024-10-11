@@ -93,8 +93,9 @@ export class Agent {
 
 export const AgentSchema = SchemaFactory.createForClass(Agent);
 AgentSchema.index({ firstName: 1, lastName: 1,email:1,servicingCountries:1 }, { unique: true });
+AgentSchema.index({ firstName: "text", lastName: "text",email:"text"});
 
 AgentSchema.virtual('agentID').get(function (this: AgentDocument) {
     return (this._id as Types.ObjectId).toHexString(); 
     // Explicitly cast _id to ObjectId and convert to string
-  });
+});

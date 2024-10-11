@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateProductCategoryDto } from './dto/create-product-category.dto';
 import { UpdateProductCategoryDto } from './dto/update-product-category.dto';
-import { ProductCategory,ProductCategoryDocument } from './entities/product-category.entity';
+import { CategoryStatus, ProductCategory,ProductCategoryDocument } from './entities/product-category.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model,Types } from 'mongoose';
 import { AuthService } from '../auth/auth.service';
@@ -70,5 +70,34 @@ export class ProductCategoryService {
 }
  
 
+
+  async adminSearchCategories(page,limit :number, status:CategoryStatus,search:string) {
+    
+    const skip = (page - 1) * limit;
+
+    
   
+    const filter: any = { } 
+  
+    if (search) {
+      filter.categoryName = { $regex: search, $options: 'i' }; // 'i' makes it case-insensitive
+    }
+    
+    if (status) {
+     filter.status =status
+    }
+
+    const data = await this.productCategoryModel.find(filter)
+                                        .skip(skip)
+                                        .limit(limit)
+                                        .exec();
+
+    const total = await this.productCategoryModel.countDocuments();
+    return {
+      data,total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit)
+    }
+  }
+
 }

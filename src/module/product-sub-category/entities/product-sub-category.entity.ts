@@ -17,18 +17,17 @@ export type ProductSubCategoryDocument = ProductSubCategory & Document
       },
     },
     timestamps: true,
-  })
-
+})
 
 export class ProductSubCategory {
     @Prop({ required:true,unique:true})
     subCategoryName:string;
     
     @Prop({ type: Types.ObjectId, ref: 'ProductCategory', required: true })
-    productCategory ?: string;
+    productCategory : string;
     
     @Prop({ required:true,enum:CategoryStatus,default:CategoryStatus.INACTIVE})
-    status:string;
+    status:CategoryStatus;
 
     @Prop({ type: Date, default: null })
     deletedAt: Date | null;
@@ -39,3 +38,6 @@ export const ProductSubCategorySchema = SchemaFactory.createForClass(ProductSubC
 ProductSubCategorySchema.virtual('subCategoryID').get(function (this: ProductSubCategoryDocument) {
   return (this._id as Types.ObjectId).toHexString(); 
 });
+
+ProductSubCategorySchema.index({ subCategoryName: 1, status: 1 }, { unique: true, partialFilterExpression: { deletedAt: null } });
+ProductSubCategorySchema.index({ subCategoryName: "text", status: "text" });

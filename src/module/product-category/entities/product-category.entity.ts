@@ -30,7 +30,7 @@ export class ProductCategory {
   categoryImage:string;
 
   @Prop({ required:true,enum:CategoryStatus,default:CategoryStatus.INACTIVE})
-  status:string;
+  status:CategoryStatus;
 
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
@@ -42,3 +42,6 @@ ProductCategorySchema.virtual('categoryID').get(function (this: ProductCategoryD
     return (this._id as Types.ObjectId).toHexString(); 
     // Explicitly cast _id to ObjectId and convert to string
   });
+
+  ProductCategorySchema.index({ categoryName: 1, status: 1 }, { unique: true, partialFilterExpression: { deletedAt: null } });
+ProductCategorySchema.index({ categoryName: "text", status: "text" });

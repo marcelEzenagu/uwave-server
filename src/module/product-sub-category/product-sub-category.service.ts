@@ -110,4 +110,40 @@ async remove(where):Promise<any> {
   }
 
 
+  async adminSearchSubCategories(page,limit :number, status:CategoryStatus,search:string) {
+    
+    const skip = (page - 1) * limit;
+
+    
+  
+    const filter: any = {}
+    
+    if (search) {
+      filter.subCategoryName = { $regex: search, $options: 'i' }; 
+      
+    }
+    
+    if (status) {
+     filter.status =status
+    }
+    // status,   
+    //   $text: { $search: search? search:null },
+    // }
+
+
+
+    const data = await this.productSubCategoryModel.find(filter)
+                                        .skip(skip)
+                                        .limit(limit)
+                                        .exec();
+
+    const total = await this.productSubCategoryModel.countDocuments();
+    return {
+      data,total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit)
+    }
+  }
+
+
 }

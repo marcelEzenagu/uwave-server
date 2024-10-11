@@ -59,8 +59,41 @@ export class AgentService {
   }
 
   async findAll():Promise<Agent[]> {
-    return await  this.agentModel.find().exec();
+    const where = {"deletedAt":null}
+    return await  this.agentModel.find().where(where).exec();
+  }
+
+  async adminFindAll(page,limit,search:string) {
+    search = search.trim()
+    const skip = (page - 1) * limit;
+    const filter: any = {}
     
+    // $text: { $search: search? search :null },   
+    // };
+
+    if(search){
+      const regex = new RegExp(search, 'i'); // 'i' for case-insensitive matching
+
+      filter.$or = [
+        { firstName: { $regex: regex } }, // Search firstName
+        { lastName: { $regex: regex } },  // Search lastName
+        { email: { $regex: regex } },      // Search email
+      ];    
+    }  
+
+    const data =  await  this.agentModel.find(filter).skip(skip)
+                                              .limit(limit)
+                                              .exec();
+
+    const total = await this.agentModel.countDocuments();
+
+    return{
+      data,
+      total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit)
+    }
+
   }
   
   async findOne(id):Promise<Agent> {

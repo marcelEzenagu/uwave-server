@@ -225,6 +225,35 @@ async findOrdersByVendorID(vendorID: string, daysAgo:number): Promise<Order[]> {
     }
   ]).exec(); 
 }
+async findOrdersByStatus(vendorID: string, daysAgo:number): Promise<Order[]> {
+  const estimatedDaysAgo = new Date();
+  if(!daysAgo){
+    daysAgo= 7
+  }
+  estimatedDaysAgo.setDate(estimatedDaysAgo.getDate() - (daysAgo));
+  
+  console.log(" estimatedDaysAgo:: ",estimatedDaysAgo)
+  return this.orderModel.aggregate([
+    {
+      $unwind: '$items',  // Unwind the products array
+    },
+    {
+      $match: {
+        'items.vendorID': vendorID, // Ensure this is the correct path to vendorID
+        // createdAt: { $gte: estimatedDaysAgo }  // Only include orders from the last 7 days
+
+      },
+    },
+    {
+      $project: {
+        _id: 1,  // Include orderID (MongoDB _id)
+        products: 1,  // Include the matched product
+        orderCreatedAt: '$createdAt',  // Include createdAt field (renamed to orderCreatedAt)
+        status: 1,  // Include status
+      },
+    }
+  ]).exec(); 
+}
 
 async findOpenOrdersForVendors(daysAgo:number): Promise<Order[]> {
   if(!daysAgo){
@@ -261,5 +290,57 @@ async findOpenOrdersForVendors(daysAgo:number): Promise<Order[]> {
   ]).exec(); 
 }
 
+  async getOrderByStatusAndRange(page,limit :number, status:OptionType,start,end,search:string) {
+   
+    const skip = (page - 1) * limit;
 
+    
+    const startDate = new Date(start);  // Start of the range
+    const endDate = new Date(end);      // End of the range
+
+    const filter: any = { }
+    
+    if(status){
+
+      filter.status = status
+    }
+      
+    if (search  && search.trim()) {
+      const regex = new RegExp(search, 'i'); // 'i' for case-insensitive matching
+      filter.$or = [
+        { 'items.name': { $regex: regex } },    // Match `product.name` with regex
+        { orderID: { $regex: regex } },                 // Match `orderID` with regex
+      ];
+
+    }
+    if (start || end) {
+
+      filter.createdAt = {};
+      if (startDate) {
+        filter.createdAt.$gte = startDate;  // Filter by start date
+      }
+      if (endDate) {
+        filter.createdAt.$lte = endDate;    // Filter by end date
+      } 
+
+    }
+
+   
+
+
+
+    const data = await this.orderModel.find(filter)
+                                        .skip(skip)
+                                        .limit(limit)
+                                        .exec();
+  
+    const total = await this.orderModel.countDocuments();
+
+    return {
+      data,total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit)
+
+    }
+  }
 }

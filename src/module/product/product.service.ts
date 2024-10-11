@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ProductDocument,Product } from './entities/product.entity';
+import { ProductDocument,Product, ProductStatus } from './entities/product.entity';
 import { InjectModel } from  '@nestjs/mongoose';
 import { Model } from  'mongoose';
 import { Console } from 'console';
@@ -25,6 +25,61 @@ export class ProductService {
      where={"deletedAt":null}
 
     return await  this.productModel.find().where(where).exec();
+  }
+
+  
+
+  async adminGetProductsByStatusAndRange(page,limit :number, status:ProductStatus,start,end,search:string) {
+   
+    const skip = (page - 1) * limit;
+
+    
+    const startDate = new Date(start);  // Start of the range
+    const endDate = new Date(end);      // End of the range
+
+      
+      const filter: any = { }
+    
+    if(status){
+
+      filter.status = status
+    }
+
+    if(search){
+      const regex = new RegExp(search, 'i'); // 'i' for case-insensitive matching
+
+      filter.$or = [
+        { productName: { $regex: regex } },    // Match `product.name` with regex
+        {vendorID: { $regex: regex } },                 // Match `orderID` with regex
+      ];
+    }  
+
+    if (start || end) {
+
+      filter.createdAt = {};
+      if (startDate) {
+        filter.createdAt.$gte = startDate;  // Filter by start date
+      }
+      if (endDate) {
+        filter.createdAt.$lte = endDate;    // Filter by end date
+      } 
+
+    }
+
+
+    const data = await this.productModel.find(filter)
+                                        .skip(skip)
+                                        .limit(limit)
+                                        .exec();
+  
+    const total = await this.productModel.countDocuments();
+
+    return {
+      data,total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit)
+
+    }
   }
 
   async findOne(id):Promise<Product> {

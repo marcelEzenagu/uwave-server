@@ -4,7 +4,7 @@ import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { ProductCategoryService } from '../product-category/product-category.service';
 import { ProductSubCategoryService } from '../product-sub-category/product-sub-category.service';
-import { ProductCategory } from '../product-category/entities/product-category.entity';
+import { CategoryStatus, ProductCategory } from '../product-category/entities/product-category.entity';
 import { ProductSubCategory } from '../product-sub-category/entities/product-sub-category.entity';
 import { ApiTags } from '@nestjs/swagger';
 import { FreightService } from '../freight/freight.service';
@@ -16,6 +16,11 @@ import { User } from '../user/entities/user.entity';
 import { VendorService } from '../vendor/vendor.service';
 import { ItemsService } from '../items/items.service';
 import { ItemStatus } from '../items/entities/item.entity';
+import { OptionType } from '../order/entities/order.entity';
+import { OrderService } from '../order/order.service';
+import { AgentService } from '../agent/agent.service';
+import { ProductService } from '../product/product.service';
+import { ProductStatus } from '../product/entities/product.entity';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -30,10 +35,11 @@ export class AdminController {
     private readonly userService: UserService,
     private readonly vendorService: VendorService,
     private readonly itemService: ItemsService,
+    private readonly orderService: OrderService,
+    private readonly agentService: AgentService,
+    private readonly productService: ProductService,
 
   ) {}
-
-
  // categories
   //add, edit, delete List
   @Post("categories")
@@ -82,6 +88,35 @@ export class AdminController {
     return this.category.findAll(where);
   }
 
+  @Get('categories-search/')  
+  async adminGetCategories(
+    @Req() req: Request,
+    @Query('page') page: number = 1, 
+    @Query('limit') limit: number = 50,
+    @Query('status') status: CategoryStatus, 
+    @Query('search') search: string ,
+  ) {
+    try {    
+      page = Number(page);
+    limit = Number(limit);
+
+    if (page < 1) page = 1;  // Page should be at least 1
+    if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+
+
+    const role = req['user'].role
+    const userType = req['user'].sub
+    console.log("userType:: ",userType)
+    if(role !="admin" || userType != "usave_admin"){
+      throw new BadRequestException("unaccessible");
+    }
+    return await this.category.adminSearchCategories(page,limit,status,search);
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
+  }
+
   @Delete("categories/:id")
   removeCategory(@Param('id') id: string,
   @Req() req: Request,
@@ -103,8 +138,7 @@ export class AdminController {
   }
 
 
-  // updates
-
+// subcategory
   @Patch("sub-categories/:id")
   updateSubCategory(@Param('id') id: string,
   @Req() req: Request,
@@ -123,33 +157,31 @@ export class AdminController {
     throw new BadRequestException(this.errorFormat.formatErrors(e))
   }
   }
-
-
   
   // Subcategories
   //add, edit, delete List
   @Post("sub-categories")
-  createSubCategory(@Body() createAdminDto: ProductSubCategory,
+  async createSubCategory(@Body() createAdminDto: ProductSubCategory,
   @Req() req: Request,
 
 ) {
 
-  try {    
+    try {    
     const role = req['user'].role
     const userType = req['user'].sub
 
     if(role !="admin" || userType != "usave_admin"){
       throw new BadRequestException("unaccessible");
     }
-    return this.subCategory.create(createAdminDto);
-  } catch (e) {
-    console.log("eRROR @controlelr",e)
-    throw new BadRequestException(this.errorFormat.formatErrors(e))
-  }
+    return await this.subCategory.create(createAdminDto);
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
   }
 
   @Get("sub-categories")
-  findAllSubCategory(
+  async findAllSubCategory(
 
     @Req() req: Request,
     @Query('category') category?: string
@@ -166,7 +198,35 @@ export class AdminController {
     where={"deletedAt":null}
     if(category)where.productCategory = category.toLowerCase()
 
-    return this.subCategory.findAll(where);
+    return await this.subCategory.findAll(where);
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
+  }
+
+  @Get('sub-categories-search/')  
+  async adminGetSubCategories(
+    @Req() req: Request,
+    @Query('page') page: number = 1, 
+    @Query('limit') limit: number = 50,
+    @Query('status') status: CategoryStatus, 
+    @Query('search') search: string ,
+  ) {
+    try {    
+      page = Number(page);
+    limit = Number(limit);
+
+    if (page < 1) page = 1;  // Page should be at least 1
+    if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+
+
+    const role = req['user'].role
+    const userType = req['user'].sub
+    if(role !="admin" || userType != "usave_admin"){
+      throw new BadRequestException("unaccessible");
+    }
+    return await this.subCategory.adminSearchSubCategories(page,limit,status,search);
   } catch (e) {
     console.log("eRROR @controlelr",e)
     throw new BadRequestException(this.errorFormat.formatErrors(e))
@@ -174,10 +234,9 @@ export class AdminController {
   }
 
  
- 
 
   @Delete("sub-categories/:id")
-  removeSubCategory(@Param('id') id: string,
+  async removeSubCategory(@Param('id') id: string,
   @Req() req: Request,
 
 ) {
@@ -190,7 +249,7 @@ export class AdminController {
     }
     const where ={"_id":id}
 
-    return this.subCategory.remove(where);
+    return await this.subCategory.remove(where);
   } catch (e) {
     console.log("eRROR @controlelr",e)
     throw new BadRequestException(this.errorFormat.formatErrors(e))
@@ -226,7 +285,7 @@ export class AdminController {
     const userType = req['user'].sub
 
 
-    if(role !="admin" || userType != "isAdmin"){
+    if(role !="admin" || userType != "usave_admin"){
       throw new BadRequestException("unaccessible");
     }
 
@@ -245,7 +304,7 @@ export class AdminController {
     const role = req['user'].role
     const userType = req['user'].sub
 
-    if(role !="admin" || userType != "isAdmin"){
+    if(role !="admin" || userType != "usave_admin"){
       throw new BadRequestException("unaccessible");
     }
 
@@ -268,7 +327,7 @@ export class AdminController {
     const role = req['user'].role
     const userType = req['user'].sub
 
-    if(role !="admin" || userType != "isAdmin"){
+    if(role !="admin" || userType != "usave_admin"){
       throw new BadRequestException("unaccessible");
     }
 
@@ -289,7 +348,7 @@ export class AdminController {
     const role = req['user'].role
     const userType = req['user'].sub
 
-    if(role !="admin" || userType != "isAdmin"){
+    if(role !="admin" || userType != "usave_admin"){
       throw new BadRequestException("unaccessible");
     }
 
@@ -312,7 +371,7 @@ export class AdminController {
       const role = req['user'].role
       const userType = req['user'].sub
 
-      if(role !="admin" || userType != "isAdmin"){
+      if(role !="admin" || userType != "usave_admin"){
         throw new BadRequestException("unaccessible");
       }
 
@@ -326,9 +385,9 @@ export class AdminController {
   }
     // vendors  
 
-    
-    @Get('items/:vendorID')  // Updated the route from 'wave/shipments/:id' to 'shipments/:id'
-    async adminListItemByVendors(
+    // items 
+    @Get('items/:vendorID')  
+    async adminListItemsByVendors(
       @Req() req: Request,
       @Param("vendorID") vendorID : string,
       @Query('page') page: number = 1, 
@@ -338,7 +397,7 @@ export class AdminController {
       try {    
       const role = req['user'].role
       const userType = req['user'].sub
-      if(role !="admin" || userType != "isAdmin"){
+      if(role !="admin" || userType != "usave_admin"){
         throw new BadRequestException("unaccessible");
       }
       vendorID = vendorID.trim()
@@ -358,5 +417,129 @@ export class AdminController {
     }
     }
 
- 
+    @Delete('items/:vendorID/')  
+    async adminDeleteItemByVendors(
+      @Req() req: Request,
+      @Param("vendorID") vendorID : string,
+      @Query("itemID") itemID : string,
+    ) {
+      try {    
+      const role = req['user'].role
+      const userType = req['user'].sub
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
+      vendorID = vendorID.trim()
+      itemID = itemID.trim()
+
+      return await this.itemService.delete(vendorID,itemID);
+      
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+    }
+    
+    
+    // orders
+    @Get('orders/')  
+    async adminGetOrderByStatusAndRange(
+      @Req() req: Request,
+
+      @Query('page') page: number = 1, 
+      @Query('limit') limit: number = 50,
+      @Query('startDate') startDate: string ,
+      @Query('endDate') endDate: string ,
+      @Query('status') status: OptionType, 
+      @Query('search') search: string ,
+    ) {
+      try {    
+        page = Number(page);
+      limit = Number(limit);
+  
+      if (page < 1) page = 1;  // Page should be at least 1
+      if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+  
+
+      const role = req['user'].role
+      const userType = req['user'].sub
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
+
+
+      return await this.orderService.getOrderByStatusAndRange(page,limit,status,startDate,endDate,search);
+
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+    }
+    
+    // getOrderStats totalOrderCost,totalProcessedOrder,totalshipped,totalDelivered
+    
+    
+    // agents
+    
+    @Get('agents/')  
+    async adminGetAgents(
+      @Req() req: Request,
+
+      @Query('page') page: number = 1, 
+      @Query('limit') limit: number = 50,
+      @Query('search') search: string ,
+    ) {
+      try {    
+        page = Number(page);
+      limit = Number(limit);
+  
+      if (page < 1) page = 1;  // Page should be at least 1
+      if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+  
+
+      const role = req['user'].role
+      const userType = req['user'].sub
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
+
+
+      return await this.agentService.adminFindAll(page,limit,search);
+
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+    }
+
+    // products
+    @Get('products/')  
+    async adminGetProductsByStatusAndRange(
+      @Req() req: Request,
+      @Query('page') page: number = 1, 
+      @Query('limit') limit: number = 50,
+      @Query('startDate') startDate: string ,
+      @Query('endDate') endDate: string ,
+      @Query('status') status: ProductStatus, 
+      @Query('search') search: string ,
+    ) {
+      try {    
+        page = Number(page);
+      limit = Number(limit);
+  
+      if (page < 1) page = 1;  // Page should be at least 1
+      if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+  
+
+      const role = req['user'].role
+      const userType = req['user'].sub
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
+      return await this.productService.adminGetProductsByStatusAndRange(page,limit,status,startDate,endDate,search);
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+  }
 }

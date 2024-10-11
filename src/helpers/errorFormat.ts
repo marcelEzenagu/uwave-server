@@ -5,7 +5,8 @@ export class ErrorFormat  {
   formatErrors(error: any) {
     console.log("error.name:: ",error.name)
 
-    if(error.name === 'MongoServerError'){
+    if(error.name == 'MongoServerError'){
+      console.log("here::")
     const field = Object.keys(error.keyPattern)[0];
       return `a document with same ${field} already exists`;
 

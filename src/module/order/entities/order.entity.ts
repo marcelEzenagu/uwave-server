@@ -8,8 +8,11 @@ import { Item } from "src/module/items/entities/item.entity";
 
 export enum OptionType {
   ACCEPTED= "ACCEPTED",
-  CANCELLED="CANCELLED",
-  REJECTED="REJECTED",
+  CANCELLED= "CANCELLED",
+  PROCESSING= "PROCESSING",
+  SHIPPED= "SHIPPED",
+  RETURNED="RETURNED",
+  DELIVERED="DELIVERED"
 }
 
 export enum PaymentStatusType {
@@ -102,4 +105,9 @@ export const OrderSchema = SchemaFactory.createForClass(Order)
 OrderSchema.virtual('orderID').get(function (this: OrderDocument) {
     return (this._id as Types.ObjectId).toHexString(); 
     // Explicitly cast _id to ObjectId and convert to string
+  });
+
+  OrderSchema.index({
+    'items.product.name': 'text',  // Ensure the text index covers the product's name
+    'orderID': 'text',             // Make the orderID searchable
   });
