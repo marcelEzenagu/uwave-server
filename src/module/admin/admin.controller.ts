@@ -285,7 +285,7 @@ export class AdminController {
     const userType = req['user'].sub
 
 
-    if(role !="admin" || userType != "usave_admin"){
+    if(role !="admin" || userType != "isAdmin"){
       throw new BadRequestException("unaccessible");
     }
 
@@ -304,7 +304,7 @@ export class AdminController {
     const role = req['user'].role
     const userType = req['user'].sub
 
-    if(role !="admin" || userType != "usave_admin"){
+    if(role !="admin" || userType != "isAdmin"){
       throw new BadRequestException("unaccessible");
     }
 
