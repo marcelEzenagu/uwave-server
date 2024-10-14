@@ -1,0 +1,8 @@
+create business-payment at orderIntentCreation with pending state;
+change to failed or success at Place order;
+
+createIntent for vendorPayment at vednor confirming shipping
+change to failed or success using cronJob at fridays;
+
+createIntent for agentPayment at vednor confirming shipping
+change to failed or success using cronJob at fridays;

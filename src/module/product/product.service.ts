@@ -34,9 +34,6 @@ export class ProductService {
     const skip = (page - 1) * limit;
 
     
-    const startDate = new Date(start);  // Start of the range
-    const endDate = new Date(end);      // End of the range
-
       
       const filter: any = { }
     
@@ -56,6 +53,9 @@ export class ProductService {
 
     if (start || end) {
 
+      const startDate = new Date(start);  // Start of the range
+      const endDate = new Date(end);      // End of the range
+  
       filter.createdAt = {};
       if (startDate) {
         filter.createdAt.$gte = startDate;  // Filter by start date
@@ -71,7 +71,7 @@ export class ProductService {
                                         .skip(skip)
                                         .limit(limit)
                                         .exec();
-  
+                                        
     const total = await this.productModel.countDocuments();
 
     return {

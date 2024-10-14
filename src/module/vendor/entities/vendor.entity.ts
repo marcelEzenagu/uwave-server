@@ -27,7 +27,6 @@ export enum VendorStat {
   timestamps: true,
 })
 
-
 export class Vendor {
   @Prop({
     type: String,
@@ -128,6 +127,9 @@ export class Vendor {
   @Prop({ type: String })
   storeName?: string;
 
+  @Prop({ type: Boolean })
+  isDisabled: Boolean;
+
   @Prop({ required: true, })
   @IsNotEmpty()
   @Length(6, 20)
@@ -140,7 +142,6 @@ export class Vendor {
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
 }
-
 
 export const VendorSchema = SchemaFactory.createForClass(Vendor);
 VendorSchema.index({ firstName: 1, lastName: 1,email:1 }, { unique: true });

@@ -13,6 +13,7 @@ import { ItemSchema,Item } from "src/module/items/entities/item.entity";
 import { ProductCategory,ProductCategorySchema } from "src/module/product-category/entities/product-category.entity";
 import { ProductSubCategory ,ProductSubCategorySchema} from "src/module/product-sub-category/entities/product-sub-category.entity";
 import { Agent, AgentSchema } from "src/module/agent/entities/agent.entity";
+import { Wallet,WalletSchema } from "src/module/wallet/entities/wallet.entity";
 
 
 export default [
@@ -30,4 +31,5 @@ export default [
   { name: ProductCategory.name, schema: ProductCategorySchema },
   { name: ProductSubCategory.name, schema: ProductSubCategorySchema },
   { name: Agent.name, schema: AgentSchema },
+  { name: Wallet.name, schema: WalletSchema },
 ];

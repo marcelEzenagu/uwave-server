@@ -112,6 +112,11 @@ export class AgentService {
   }
   
   async remove(where):Promise<any> {
+
+  return await  this.agentModel.where(where).findOneAndUpdate().exec;
+  }
+  async delete(where):Promise<any> {
+    
   return await  this.agentModel.where(where).findOneAndDelete().exec;
   }
 

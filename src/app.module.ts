@@ -28,6 +28,7 @@ import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { StatusController } from './app.controller';
 import { AgentModule } from './module/agent/agent.module';
+import { WalletModule } from './module/wallet/wallet.module';
 
 
 @Module({
@@ -61,6 +62,7 @@ import { AgentModule } from './module/agent/agent.module';
     ProductCategoryModule,
     ProductSubCategoryModule,
     AgentModule,
+    WalletModule,
   ],
   providers: [],
   controllers: [StatusController,HealthController,],

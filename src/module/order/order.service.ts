@@ -325,10 +325,6 @@ async findOpenOrdersForVendors(daysAgo:number): Promise<Order[]> {
 
     }
 
-   
-
-
-
     const data = await this.orderModel.find(filter)
                                         .skip(skip)
                                         .limit(limit)

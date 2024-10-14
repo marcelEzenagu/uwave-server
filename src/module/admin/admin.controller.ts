@@ -6,7 +6,6 @@ import { ProductCategoryService } from '../product-category/product-category.ser
 import { ProductSubCategoryService } from '../product-sub-category/product-sub-category.service';
 import { CategoryStatus, ProductCategory } from '../product-category/entities/product-category.entity';
 import { ProductSubCategory } from '../product-sub-category/entities/product-sub-category.entity';
-import { ApiTags } from '@nestjs/swagger';
 import { FreightService } from '../freight/freight.service';
 import { Request } from 'express';
 import { ErrorFormat } from 'src/helpers/errorFormat';
@@ -21,10 +20,16 @@ import { OrderService } from '../order/order.service';
 import { AgentService } from '../agent/agent.service';
 import { ProductService } from '../product/product.service';
 import { ProductStatus } from '../product/entities/product.entity';
+import { Agent } from '../agent/entities/agent.entity';
+import { Vendor } from '../vendor/entities/vendor.entity';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Admin')
 @Controller('admin')
 export class AdminController {
+
+  password :string
+
   constructor(
     private readonly adminService: AdminService,
     private  errorFormat: ErrorFormat,
@@ -37,9 +42,10 @@ export class AdminController {
     private readonly itemService: ItemsService,
     private readonly orderService: OrderService,
     private readonly agentService: AgentService,
-    private readonly productService: ProductService,
-
-  ) {}
+    private readonly productService: ProductService,    
+  ) {
+    this.password = "123@Password"
+  }
  // categories
   //add, edit, delete List
   @Post("categories")
@@ -89,12 +95,40 @@ export class AdminController {
   }
 
   @Get('categories-search/')  
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search word for category search',
+    type: String,
+    example:"protein",
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'page for paginating category search',
+    type: Number,
+    example:1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'limit for category search',
+    type: Number,
+    example:50,
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'status for category search',
+    enum: CategoryStatus,
+    example:CategoryStatus.ACTIVE,
+  })
   async adminGetCategories(
     @Req() req: Request,
+    @Query('search') search: string ,
     @Query('page') page: number = 1, 
     @Query('limit') limit: number = 50,
     @Query('status') status: CategoryStatus, 
-    @Query('search') search: string ,
   ) {
     try {    
       page = Number(page);
@@ -180,7 +214,15 @@ export class AdminController {
     }
   }
 
+
   @Get("sub-categories")
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    description: 'category for subCategory search',
+    type : String,
+    example:"protein",
+  })
   async findAllSubCategory(
 
     @Req() req: Request,
@@ -205,7 +247,36 @@ export class AdminController {
   }
   }
 
+
   @Get('sub-categories-search/')  
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search word for sub-category search',
+    type: String,
+    example:"protein",
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'page for paginating sub-category search',
+    type: Number,
+    example:1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'limit for sub-category search',
+    type: Number,
+    example:50,
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'status for sub-category search',
+    enum: CategoryStatus,
+    example:CategoryStatus.ACTIVE,
+  })
   async adminGetSubCategories(
     @Req() req: Request,
     @Query('page') page: number = 1, 
@@ -316,8 +387,8 @@ export class AdminController {
   }
   }
   
-  
-  
+
+
   // users
   @Get('users/')  // Updated the route from 'wave/shipments/:id' to 'shipments/:id'
   async adminFindUsers(
@@ -383,41 +454,207 @@ export class AdminController {
       throw new BadRequestException(this.errorFormat.formatErrors(e))
     }
   }
-    // vendors  
 
-    // items 
-    @Get('items/:vendorID')  
-    async adminListItemsByVendors(
+// vendors  
+
+    @Get('vendors/')
+    @ApiQuery({
+      name: 'query',
+      required: false,
+      description: 'query word for vendor search',
+      type: String,
+      example:"sam",
+    })
+    @ApiQuery({
+      name: 'page',
+      required: false,
+      description: 'page for paginating vendor search',
+      type: Number,
+      example:1,
+    })
+    @ApiQuery({
+      name: 'limit',
+      required: false,
+      description: 'limit for vendor search',
+      type: Number,
+      example:50,
+    })
+    @ApiQuery({
+      name: 'isDisabled',
+      required: false,
+      description: 'isDisabled for vendor search',
+      type: Boolean,
+      example:false,
+    })  
+    async adminListVendors(
       @Req() req: Request,
-      @Param("vendorID") vendorID : string,
+      @Query('query') query: string, 
+      @Query('isDisabled') isDisabled: boolean, 
       @Query('page') page: number = 1, 
-      @Query('status') status: ItemStatus, 
       @Query('limit') limit: number = 50 
     ) {
       try {    
+
+
       const role = req['user'].role
       const userType = req['user'].sub
       if(role !="admin" || userType != "usave_admin"){
         throw new BadRequestException("unaccessible");
       }
-      vendorID = vendorID.trim()
 
-      page = Number(page);
-      limit = Number(limit);
-  
-      if (page < 1) page = 1;  // Page should be at least 1
-      if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
-  
 
-      return await this.itemService.adminListItemByVendors(vendorID,page,limit,status);
-      
+      return await this.vendorService.adminFindAll(page,limit,query,isDisabled)
+
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+  }
+
+    @Post('vendors/')  
+    async adminCreateVendors(
+      @Req() req: Request,
+      @Body() dto:Vendor, 
+    ) {
+      try {    
+
+        dto.password = this.password
+
+      const role = req['user'].role
+      const userType = req['user'].sub
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
+
+
+      return await this.vendorService.create(dto);
+
     } catch (e) {
       console.log("eRROR @controlelr",e)
       throw new BadRequestException(this.errorFormat.formatErrors(e))
     }
     }
 
-    @Delete('items/:vendorID/')  
+    @Delete('vendors/:id')  
+    async adminDeleteVendors(
+      @Req() req: Request,
+      @Param("id") id:string, 
+    ) {
+      try {    
+
+
+      const role = req['user'].role
+      const userType = req['user'].sub
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
+
+      const where = {
+        "vendorID":id
+      }
+
+      return await this.vendorService.delete(where);
+
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+    }
+    @Get('vendors/:id')  
+    async adminGetVendors(
+      @Req() req: Request,
+      @Param("id") id:string, 
+    ) {
+      try {    
+
+
+      const role = req['user'].role
+      const userType = req['user'].sub
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
+
+      const where = {
+        "vendorID":id
+      }
+
+      return await this.vendorService.findWhere(where);
+
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+    }
+
+  // items 
+  @Get('items/:vendorID')  
+  @ApiQuery({
+    name: 'vendorID',
+    required: false,
+    description: 'vendorID word for item search',
+    type: String,
+    example:"aed13412313erds",
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'page for paginating item search',
+    type: Number,
+    example:1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'limit for item search',
+    type: Number,
+    example:50,
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'status for item search',
+    enum: ItemStatus,
+    example:ItemStatus.DRAFT,
+  })
+  async adminListItemsByVendors(
+    @Req() req: Request,
+    @Param("vendorID") vendorID : string,
+    @Query('page') page: number = 1, 
+    @Query('status') status: ItemStatus, 
+    @Query('limit') limit: number = 50 
+  ) {
+    try {    
+    const role = req['user'].role
+    const userType = req['user'].sub
+    if(role !="admin" || userType != "usave_admin"){
+      throw new BadRequestException("unaccessible");
+    }
+    vendorID = vendorID.trim()
+
+    page = Number(page);
+    limit = Number(limit);
+
+    if (page < 1) page = 1;  // Page should be at least 1
+    if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+
+
+    return await this.itemService.adminListItemByVendors(vendorID,page,limit,status);
+    
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
+  }
+
+    @Delete('items/:vendorID/') 
+    @ApiQuery({
+      name: 'itemID',
+      required: false,
+      description: 'itemID word for item search',
+      type: String,
+      example:"aed13412313erds",
+    })
+   
     async adminDeleteItemByVendors(
       @Req() req: Request,
       @Param("vendorID") vendorID : string,
@@ -443,6 +680,48 @@ export class AdminController {
     
     // orders
     @Get('orders/')  
+    @ApiQuery({
+      name: 'startDate',
+      required: false,
+      description: 'startDate word for order search',
+      type: Date,
+      example:"02-02-2024",
+    })
+    @ApiQuery({
+      name: 'endDate',
+      required: false,
+      description: 'endDate word for order search',
+      type: Date,
+      example:"02-04-2024",
+    })
+    @ApiQuery({
+      name: 'page',
+      required: false,
+      description: 'page for paginating order search',
+      type: Number,
+      example:1,
+    })
+    @ApiQuery({
+      name: 'limit',
+      required: false,
+      description: 'limit for order search',
+      type: Number,
+      example:50,
+    })
+    @ApiQuery({
+      name: 'status',
+      required: false,
+      description: 'status for order search',
+      enum: OptionType,
+      example:OptionType.ACCEPTED,
+    })
+    @ApiQuery({
+      name: 'search',
+      required: false,
+      description: 'search for order search',
+      type: String,
+      example:"rice",
+    })
     async adminGetOrderByStatusAndRange(
       @Req() req: Request,
 
@@ -482,6 +761,27 @@ export class AdminController {
     // agents
     
     @Get('agents/')  
+    @ApiQuery({
+      name: 'page',
+      required: false,
+      description: 'page for paginating agent search',
+      type: Number,
+      example:1,
+    })
+    @ApiQuery({
+      name: 'limit',
+      required: false,
+      description: 'limit for agent search',
+      type: Number,
+      example:50,
+    })
+    @ApiQuery({
+      name: 'search',
+      required: false,
+      description: 'search for agent search',
+      type: String,
+      example:"fred",
+    })
     async adminGetAgents(
       @Req() req: Request,
 
@@ -511,9 +811,101 @@ export class AdminController {
       throw new BadRequestException(this.errorFormat.formatErrors(e))
     }
     }
+    
+    @Post('agents/')  
+    async adminCreateAgents(
+      @Req() req: Request,
+      @Body() dto:Agent, 
+    ) {
+      try {    
+
+        dto.password = this.password
+
+      const role = req['user'].role
+      const userType = req['user'].sub
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
+
+
+      return await this.agentService.create(dto);
+
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+    }
+
+    @Delete('agents/id')  
+    async adminDeleteAgents(
+      @Req() req: Request,
+      @Param("id") id:string, 
+    ) {
+      try {    
+
+
+      const role = req['user'].role
+      const userType = req['user'].sub
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
+
+      const where = {
+        "_id":id
+      }
+
+      return await this.agentService.delete(where);
+
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+    }
 
     // products
-    @Get('products/')  
+    @Get('products/') 
+    @ApiQuery({
+      name: 'startDate',
+      required: false,
+      description: 'startDate word for product search',
+      type: Date,
+      example:"02-02-2024",
+    })
+    @ApiQuery({
+      name: 'endDate',
+      required: false,
+      description: 'endDate word for product search',
+      type: Date,
+      example:"02-04-2024",
+    })
+    @ApiQuery({
+      name: 'page',
+      required: false,
+      description: 'page for paginating product search',
+      type: Number,
+      example:1,
+    })
+    @ApiQuery({
+      name: 'limit',
+      required: false,
+      description: 'limit for product search',
+      type: Number,
+      example:50,
+    })
+    @ApiQuery({
+      name: 'status',
+      required: false,
+      description: 'status for product search',
+      enum: ProductStatus,
+      example:ProductStatus.ACTIVE,
+    })
+    @ApiQuery({
+      name: 'search',
+      required: false,
+      description: 'search for product search',
+      type: String,
+      example:"rice",
+    }) 
     async adminGetProductsByStatusAndRange(
       @Req() req: Request,
       @Query('page') page: number = 1, 
@@ -542,4 +934,11 @@ export class AdminController {
       throw new BadRequestException(this.errorFormat.formatErrors(e))
     }
   }
+
+
+
+
+  // wallet
+  // listVendor earnings
+
 }

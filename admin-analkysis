@@ -1,0 +1,21 @@
+<!-- over-view section -->
+1: make the dateQuery to be weekly,forth-nightly, monthly, quarterly,half-ayear,year
+
+best-seller: the analysis should be best for itemsQuantity and itemsPrice( best-seller by revenue and by volume)
+
+the sales and order total should be in percentage with arrow for increase or decrease . 
+
+graph should be sales vs order graph
+
+
+map for shopping-by-country
+
+
+catalogue-prodcu
+
+list-vendors that have a product and the quantities
+
+
+<!-- 
+    average of Price and totalStock for the products; 
+-->
