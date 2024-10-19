@@ -25,8 +25,6 @@ export class VendorController {
       private readonly orderService: OrderService,
       private readonly itemsService: ItemsService,
       private readonly fileService: FileService) {}
-
-
   @Get()
   findAll() {
     return this.vendorService.findAll();

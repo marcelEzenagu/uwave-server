@@ -4,7 +4,6 @@ import {
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-
 import {
   LogInDto,
   LogInUserResponseDto,
@@ -27,7 +26,7 @@ import { WaveUser, WaveUserDocument } from '../u-wave-user/entities/u-wave-user.
 import { RedisService } from '../redis/redis.service';
 import { MailerService } from '../mailer/mailer.service';
 import { MESSAGE_TEMPLATE } from '../notification/enum';
-import { ForgotPasswordDto, ResetPasswordDto, VerifyResetPasswordDto } from './dto/reset.dto';
+import { ForgotPasswordDto, ResendOTPDto, ResetPasswordDto, VerifyResetPasswordDto } from './dto/reset.dto';
 import { AgentService } from '../agent/agent.service';
 import { Agent, AgentDocument } from '../agent/entities/agent.entity';
 const jwt = require('jsonwebtoken');
@@ -67,13 +66,11 @@ export class AuthService {
   }
 
   async generateTemporaryAccessCode(
-    tokenType: 'create-account' | 'reset-password',
+    tokenType: 'create-account' | 'reset-password'|'email-verification',
     value: string,
   ): Promise<string> {
-  // ): Promise<AccessTokenDto> {
     const characters = this.generateRandomCharacters(86);
     
-    console.log("characters---> ",characters)
     const key = `${tokenType}-${characters}`;
 
     // save to redis
@@ -268,10 +265,6 @@ export class AuthService {
      return {
         message: "A Password Reset OTP has been sent to this email",
         requestID,
-        // data:{
-        //   requestID,
-        //   OTP
-        // }
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -316,23 +309,140 @@ export class AuthService {
     }
   }
 
-  async registerAgent(createUserDto: Agent): Promise<LogInUserResponseDto> {
-    createUserDto.email = createUserDto.email.toLowerCase()
+  async verifyAgentEmail(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
+    try {
+      dto.email = dto.email.toLowerCase()
 
-    createUserDto.password = await this.hashData(createUserDto.password);
-    const newAgent = new this.agentModel(createUserDto);
-
-    const returnedAgent = await newAgent.save();
+      const key = `email-verification-${dto.requestID}`
+      const foundOTP = await this.redisService.getValue(key)
     
-    const role = 'agent'
-    const token = this.generateToken(returnedAgent.agentID,role);
+      if (foundOTP !== dto.otp) {
+        throw new UnprocessableEntityException("invalid otp");
+      }
+
+      // update isEmailVerified;
+
+      const agent = await this.agentService.verifyEmail({ email: dto.email });
+      if (!agent) {
+        throw new NotFoundException("no agent with this email");
+      }
+      
+      const  role = 'agent' 
+      const accessTokenData = this.generateToken(agent.agentID,role);
+
+
+      return {
+        access_data: { access_token: accessTokenData, role },
+        user: agent,      
+      };
+    } catch (error) {
+      console.log("error: ", error)
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error);
+      }
+
+      throw error;
+    }
+  }
+
+  async resendOTP(dto: ResendOTPDto): Promise<{}> {
+    let {email,resendType,userType} = dto
+    email =email.toLowerCase().trim()
+    
+    // format is user_email-verification, agent_email-verification
+    let user:any
+    const emailWhere = {
+      email
+    }
+
+    if(userType == 'user'){
+      const result =  await this.userService.findWhere(emailWhere)
+      if (!result) {
+        throw new NotFoundException("invalid email");
+      }
+      user = result
+    }
+
+    let requestID
+
+    if(resendType == "email-verification"){
+      // send emailOTP
+      const OTP = this.generateOtp()
+     requestID =await this.generateTemporaryAccessCode("email-verification",OTP)
+  
+        await this.mailService.send(
+          {
+            subject:"email-verification",
+            to:email,
+            otp:OTP,
+            template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+          }
+         )
+    }
 
     return {
-      access_data: { token, role },
-      user: returnedAgent,
-    };
+      message:`we have sent ${resendType} OTP to your  ${email}`,
+      requestID
+    }
   
   }
+
+  async registerAgent(createUserDto: Agent): Promise<{}> {
+    createUserDto.email = createUserDto.email.toLowerCase()
+    const where = {email:createUserDto.email}
+let returnedAgent;
+  try{
+    createUserDto.password = await this.hashData(createUserDto.password);
+    
+    let agentData:Agent = {
+      firstName : createUserDto.firstName.toLowerCase(),
+      lastName : createUserDto.lastName.toLowerCase(),
+      email : createUserDto.email.toLowerCase(),
+      password : createUserDto.password,
+      isEmailVerified:false,
+      isVerified:false,
+      deletedAt:null,
+      hasAcknowledged:null
+    }
+
+    const newAgent = new this.agentModel(agentData);
+
+     returnedAgent = await newAgent.save();
+    
+    // send emailOTP
+      const OTP = this.generateOtp()
+      const requestID = await this.generateTemporaryAccessCode("email-verification",OTP)
+     const emailResponse =  await this.mailService.send(
+        {
+          subject:"email-verification",
+          to:agentData.email,
+          otp:OTP,
+          template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+        }
+       )
+
+       if(!emailResponse.message_id){
+         this.agentService.remove(where)
+         throw new Error("failed to send email")
+
+       }
+returnedAgent.password =undefined
+    return {
+      message:"register successful",
+      user: returnedAgent,
+      requestID
+    };
+
+  }catch(e){
+    if(returnedAgent){
+      this.agentService.remove(where)
+    }
+    throw new Error(e.message)
+  }
+  
+  }
+
+  
 
   async loginUWaveUser(dto: LogInDto): Promise<LogInUserResponseDto> {
     try {
@@ -364,6 +474,7 @@ export class AuthService {
       throw error;
     }
   }
+
   async loginUWaveAdmin(dto: LogInDto): Promise<any> {
     try {
       dto.email = dto.email.toLowerCase()

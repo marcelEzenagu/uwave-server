@@ -37,8 +37,7 @@ export class MailerService {
         from: dto.from || '"Kochure" <no-reply@kochure.com>',
         to: dto.to,
         subject: dto.subject,
-        // html: "html",
-        html: `<p>Your OTP for password-reset is <strong>${dto.otp}</strong></p>`,
+        html: `<p>Your OTP for ${dto.subject} is <strong>${dto.otp}</strong></p>`,
       });
       return {
         message_id: response.messageId,
@@ -46,9 +45,8 @@ export class MailerService {
       };
     } catch (error) {
 
-      console.log("error:email failed to sent",error)
       this.logger.error('email failed to sent');
-      throw error;
+      throw new Error(error)
     }
   }
 

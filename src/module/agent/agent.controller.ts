@@ -3,7 +3,6 @@ import { AgentService } from './agent.service';
 import { CreateAgentDto } from './dto/create-agent.dto';
 import { UpdateAgentDto } from './dto/update-agent.dto';
 import { Agent } from './entities/agent.entity';
-
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 
@@ -22,14 +21,20 @@ export class AgentController {
   findOne(
     @Req() req:Request) {
     const userID = req['user'].sub
-
     return this.agentService.findOne(userID);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateAgentDto: UpdateAgentDto) {
-  //   return this.agentService.update(+id, updateAgentDto);
-  // }
+  @Patch()
+  update(
+    @Req() req:Request,
+    @Body() updateAgentDto: UpdateAgentDto) {
+      const userID = req['user'].sub
+      updateAgentDto.password =undefined
+      updateAgentDto.email =undefined
+      updateAgentDto.firstName =undefined
+      updateAgentDto.lastName =undefined
+    return this.agentService.update(userID, updateAgentDto);
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {

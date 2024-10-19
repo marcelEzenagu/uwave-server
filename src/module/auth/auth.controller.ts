@@ -4,7 +4,7 @@ import { LogInDto,VendorLogInDto,LogInUserResponseDto,LogInVendorResponseDto } f
 import { User } from '../user/entities/user.entity';
 import { Vendor } from '../vendor/entities/vendor.entity';
 import { VendorService } from '../vendor/vendor.service';
-import { ForgotPasswordDto, ResetPasswordDto, VerifyResetPasswordDto } from './dto/reset.dto';
+import { ForgotPasswordDto, ResendOTPDto, ResetPasswordDto, VerifyResetPasswordDto } from './dto/reset.dto';
 import { Request } from 'express';
 
 import { ApiTags } from '@nestjs/swagger';
@@ -24,7 +24,6 @@ export class AuthController {
 
   @Post("users/")
   async login(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
-   
 
     return await this.authService.loginUser(createAuthDto);
   }
@@ -32,6 +31,12 @@ export class AuthController {
   @Post("admin/")
   async adminLogin(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
     return await this.authService.loginAdmin(createAuthDto);
+  }
+
+
+  @Post("resend-otp/")
+  async resendOTP(@Body() dto: ResendOTPDto) {
+    return await this.authService.resendOTP(dto);
   }
 
   @Post("users/register")
@@ -60,12 +65,20 @@ export class AuthController {
   }
 
   @Post("agents/register")
-  async registerAgent(@Body() createAuthDto: Agent):Promise <LogInUserResponseDto>{
+  async registerAgent(@Body() createAuthDto: Agent){
     try{
       return await this.authService.registerAgent(createAuthDto);
     } catch (e) {
       throw new BadRequestException(this.errorFormat.formatErrors(e));
+    }
+  }
 
+  @Post("agents/verify-email")
+  async verifyAgentEmail(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
+    try{
+      return await this.authService.verifyAgentEmail(dto);
+    } catch (e) {
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
     }
   }
 

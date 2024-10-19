@@ -23,8 +23,6 @@ export type AgentDocument = Agent & Document & {
 })
 
 export class Agent {
-  
-
   @Prop({type: String})
   country?: string;
 
@@ -72,14 +70,13 @@ export class Agent {
   })
   password: string;
 
-  @Prop({ type: [String], 
-
-    validate: {
-        validator: (servicingCountries: string[]) => servicingCountries.length > 0, // Ensure the array has at least one item
-        message: 'servicingCountries array must contain at least one country',
-    }
+  @Prop({ type: [String], default:[],
+    // validate: {
+    //     validator: (servicingCountries?: string[]) => servicingCountries.length > 0, 
+    //     message: 'servicingCountries array must contain at least one country',
+    // }
    })
-    servicingCountries:string[];
+    servicingCountries?:string[];
     
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
@@ -89,6 +86,8 @@ export class Agent {
 
   @Prop({ type: Boolean })
   isVerified: Boolean ;
+  @Prop({ type: Boolean })
+  isEmailVerified: Boolean ;
 }
 
 export const AgentSchema = SchemaFactory.createForClass(Agent);
@@ -97,5 +96,4 @@ AgentSchema.index({ firstName: "text", lastName: "text",email:"text"});
 
 AgentSchema.virtual('agentID').get(function (this: AgentDocument) {
     return (this._id as Types.ObjectId).toHexString(); 
-    // Explicitly cast _id to ObjectId and convert to string
 });

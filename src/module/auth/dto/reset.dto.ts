@@ -68,3 +68,15 @@ export class ForgotPasswordDto {
   @IsEmail()
   email:string;  
 }
+export class ResendOTPDto {
+
+  @Prop({ required:true})
+  @IsEmail()
+  email:string;  
+
+  @Prop({ required:true})
+  userType:"user" |"admin"|"vendor"|"agent";  
+
+  @Prop({ required:true})
+  resendType:"forgot-password" |"email-verification";  
+}

@@ -111,40 +111,31 @@ export class AgentService {
     return await  this.agentModel.findOne().where(where).exec();
   }
   
+  async verifyEmail(where):Promise<AgentDocument> {
+    const update = {
+      isEmailVerified:true
+    }
+    return await  this.agentModel.findOneAndUpdate(where,update, {new: true });
+  }
+
   async remove(where):Promise<any> {
-
-  return await  this.agentModel.where(where).findOneAndUpdate().exec;
+    return  this.agentModel.findOneAndDelete(where)
+    .then(deletedDoc => {
+      if (deletedDoc) {
+        return "Deleted document:"
+      } else {
+        console.log("No document found for delete.");
+      }
+    })
+    .catch(err => {
+      console.error("Error finding and deleting document:", err);
+      throw new Error(`Error finding and deleting document:, ${err}`);
+    });
+    
   }
+
   async delete(where):Promise<any> {
-    
-  return await  this.agentModel.where(where).findOneAndDelete().exec;
+    return await  this.agentModel.where().findOneAndDelete().exec;
   }
 
-  formatErrors(error: any) {
-   
-    // console.log("ERROR._name:: ", error)
-    // console.log("ERROR.name:: ", Object.values(error.keyValue)[0])
-    // console.log("ERROR__name:: ", Object.keys(error.keyPattern))
-    
-    // return
-    if(error.name === 'MongoServerError'){
-     const field = Object.keys(error.keyPattern)[0];
-     const value =Object.values(error.keyValue)[0];
-       return `this ${field},${value} already exists in our record` ;
- 
-     }else{
-       const formattedErrors = [];
-       for (const key in error.errors) {
-         if (error.errors.hasOwnProperty(key)) {
-           formattedErrors.push({
-             field: key,
-             message: error.errors[key].message,
-           });
-         }
-       }
-       return formattedErrors;
- 
-     }
- 
-   }
-   }
+}
