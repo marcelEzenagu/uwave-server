@@ -6,14 +6,19 @@ import { ProductCategory } from './entities/product-category.entity';
 
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('product-category')
-@Controller('product-category')
+@ApiTags('product-categories')
+@Controller('product-categories')
 export class ProductCategoryController {
   constructor(private readonly productCategoryService: ProductCategoryService) {}
 
   @Post()
   create(@Body() createProductCategoryDto: ProductCategory) {
     return this.productCategoryService.create(createProductCategoryDto);
+  }
+  @Get()
+  listAll(@Body() createProductCategoryDto: ProductCategory) {
+    
+    return this.productCategoryService.findAll();
   }
 
  

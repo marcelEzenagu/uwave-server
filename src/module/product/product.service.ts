@@ -12,19 +12,27 @@ export class ProductService {
 
 
   async create(createProductDto: Product) {
+    try{
+
+   
     createProductDto.productName = createProductDto?.productName?.toLowerCase()
     createProductDto.productCategory = createProductDto?.productCategory?.toLowerCase()
     createProductDto.productSubCategory = createProductDto?.productSubCategory?.toLowerCase()
 
      const newProduct = new this.productModel(createProductDto)
      return await newProduct.save()
-  
+    }catch(e){
+      console.log("error====",e)
+    }
   }
 
   async findAll(where:{}) {
      where={"deletedAt":null}
 
-    return await  this.productModel.find().where(where).exec();
+    return await  this.productModel.find().where(where)
+      .populate({path: 'productCategory',select: 'categoryName'})                                    
+      .populate({path: 'productSubCategory',select: 'subCategoryName'})                                    
+    .exec();
   }
 
   
@@ -100,8 +108,8 @@ export class ProductService {
 
 
 async remove(id: string) {
-  const filter = {"deletedAt":null,"productID":id}
-  const updateProductDto = {"deletedAt":new Date}
+  const filter = {"productID":id}
+  const updateProductDto = {"deletedAt":new Date,"productStatus":ProductStatus.DELETED}
   await  this.productModel.findOneAndUpdate(filter, updateProductDto, {new: true})
     return `This action removes a #${id} product`;
   }

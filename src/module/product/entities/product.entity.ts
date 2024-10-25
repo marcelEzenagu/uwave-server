@@ -2,12 +2,13 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Document } from "mongoose";
+import { Document, Types } from 'mongoose';
 import { v4 as uuid } from "uuid";
 
 export enum ProductStatus {
   ACTIVE= "ACTIVE",
   INACTIVE= "INACTIVE",
+  DELETED= "DELETED",
 }
 export type ProductDocument = Product & Document
 
@@ -46,15 +47,17 @@ export class Product {
       example: 'proteins',
       required: true
    })
-    @Prop({ required:true})
+    @Prop({ type: Types.ObjectId, ref: 'ProductCategory', required: true })
     productCategory:string;
 
     @ApiProperty({
       example: 'plant proteins',
       required: true
    })
-    @Prop({ type:String,required:true})
+    // @Prop({ type:String,required:true})
+    @Prop({ type: Types.ObjectId, ref: 'ProductSubCategory', required: true })
     productSubCategory:string;
+
 
     @ApiProperty({
       example:ProductStatus.ACTIVE,
@@ -78,5 +81,5 @@ export class Product {
 
 export const ProductSchema = SchemaFactory.createForClass(Product)
 
-ProductSchema.index({ productName: 1, vendorID: 1 }, { unique: true, partialFilterExpression: { deletedAt: null } });
-ProductSchema.index({ productName: "text", vendorID: "text" });
+ProductSchema.index({ productName: 1 }, { unique: true, partialFilterExpression: { deletedAt: null } });
+ProductSchema.index({ productName: "text"});

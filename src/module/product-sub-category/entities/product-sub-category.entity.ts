@@ -19,6 +19,7 @@ export type ProductSubCategoryDocument = ProductSubCategory & Document
     timestamps: true,
 })
 
+
 export class ProductSubCategory {
     @Prop({ required:true,unique:true})
     subCategoryName:string;

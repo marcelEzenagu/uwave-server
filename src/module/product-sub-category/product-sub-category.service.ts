@@ -32,7 +32,8 @@ async findAll(where) {
 
     // where by productCategory (ObjectId)
     if (where.productCategory) {
-      query.productCategory = where.productCategory; // Should be an ObjectId
+      query.productCategory = where.productCategory; 
+      // Should be an ObjectId
     }
 
     // where out deleted entries (optional)
@@ -144,6 +145,4 @@ async remove(where):Promise<any> {
       totalPages: Math.ceil(total / limit)
     }
   }
-
-
 }

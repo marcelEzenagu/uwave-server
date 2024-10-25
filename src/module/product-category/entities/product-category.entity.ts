@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from 'mongoose';
+import { ProductSubCategory } from "src/module/product-sub-category/entities/product-sub-category.entity";
 import { v4 as uuid } from "uuid";
 export type ProductCategoryDocument = ProductCategory & Document
 
@@ -34,6 +35,9 @@ export class ProductCategory {
 
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
+
+  // subCategories: ProductSubCategory[];
+
 }
 
 export const ProductCategorySchema = SchemaFactory.createForClass(ProductCategory)
@@ -43,5 +47,18 @@ ProductCategorySchema.virtual('categoryID').get(function (this: ProductCategoryD
     // Explicitly cast _id to ObjectId and convert to string
   });
 
-  ProductCategorySchema.index({ categoryName: 1, status: 1 }, { unique: true, partialFilterExpression: { deletedAt: null } });
+
+// //   // New virtual to populate subcategories
+ProductCategorySchema.virtual('subCategories', {
+  ref: 'ProductSubCategory', // The model to link to
+  localField: '_id',         // The field in ProductCategory
+  foreignField: 'productCategory', // The field in ProductSubCategory
+  justOne: false,            // There will be multiple subcategories
+});
+
+
+ProductCategorySchema.set('toJSON', { virtuals: true });
+ProductCategorySchema.set('toObject', { virtuals: true });
+
+ProductCategorySchema.index({ categoryName: 1, status: 1 }, { unique: true, partialFilterExpression: { deletedAt: null } });
 ProductCategorySchema.index({ categoryName: "text", status: "text" });

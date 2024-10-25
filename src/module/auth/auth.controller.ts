@@ -61,7 +61,9 @@ export class AuthController {
 
   @Post("agents/")
   async loginAgent(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
-    return await this.authService.loginAgent(createAuthDto);
+ 
+    const response = await this.authService.loginAgent(createAuthDto);
+    return response
   }
 
   @Post("agents/register")

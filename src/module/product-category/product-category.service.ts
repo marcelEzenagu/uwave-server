@@ -6,12 +6,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model,Types } from 'mongoose';
 import { AuthService } from '../auth/auth.service';
 import { ErrorFormat } from 'src/helpers/errorFormat';
+import { ProductStatus } from '../product/entities/product.entity';
+import { ProductSubCategory, ProductSubCategoryDocument } from '../product-sub-category/entities/product-sub-category.entity';
+// import { ProductSubCategoryDocument } from '../product-sub-category/entities/product-sub-category.entity';
 
 @Injectable()
 export class ProductCategoryService {
   constructor(
     @InjectModel(ProductCategory.name) 
     private productCategoryModel: Model<ProductCategoryDocument>,
+    @InjectModel(ProductSubCategory.name) private subCategoryModel: Model<ProductSubCategoryDocument>,
     private errorFormat: ErrorFormat,
 
   ){}
@@ -25,12 +29,53 @@ export class ProductCategoryService {
     }
   }
 
-  async findAll(where:{}) {
+  async adminFindAll(where:{}) {
     try{
 
 
       return await this.productCategoryModel.find().where(where).exec();
     }catch(e){
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }  }
+
+  async findAll() {
+    try{
+      const where = {"deletedAt":null,
+        // status:ProductStatus.ACTIVE
+      }
+      //  return await this.productCategoryModel.find(where)
+       const categories = await this.productCategoryModel.find(where)
+      // .populate({
+      //   path: 'subCategories',   // Ensure this matches the virtual field name in your schema
+      //   model: 'ProductSubCategory',  // Model name
+      // })
+                                            .populate('subCategories')
+                                            // .populate({path:'subCategories',select:'categoryName'}) 
+                                            .exec();
+
+          const subCategories = await this.subCategoryModel.find(where).exec();
+
+
+          const groupedCategories = categories.map(category => {
+            // Filter subcategories that belong to the current category
+            const subcat = subCategories
+              .filter(sub => sub.productCategory.toString() === category._id.toString())
+              .map(sub => ({
+                id: sub._id,  // Use subcategory ID
+                name: sub.subCategoryName,  // Use subcategory name
+              }));
+      
+            return {
+              id: category._id,  // Use category ID
+              name: category.categoryName,  // Use category name
+              image: category.categoryImage,  // Use category image
+              subcat: subcat,  // Include the grouped subcategories
+            };
+          });
+                                        
+    return groupedCategories
+    
+  }catch(e){
       throw new BadRequestException(this.errorFormat.formatErrors(e))
     }  }
 
@@ -69,8 +114,17 @@ export class ProductCategoryService {
     }
 }
  
-
-
+  async adminDelete(where):Promise<any> {
+    try{
+      // let foundCat = await this.productCategoryModel.findById(where);
+      // foundCat.deletedAt = new Date()
+       await this.productCategoryModel.findOneAndDelete(where)
+      return `This action deletes a #${where?._id} productCategory`;
+    }catch(e){
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+}
+ 
   async adminSearchCategories(page,limit :number, status:CategoryStatus,search:string) {
     
     const skip = (page - 1) * limit;
@@ -96,7 +150,7 @@ export class ProductCategoryService {
     return {
       data,total,
       currentPage: page,
-      totalPages: Math.ceil(total / limit)
+      // totalPages: Math.ceil(total / limit)
     }
   }
 

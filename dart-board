@@ -6,3 +6,33 @@
 // create;
 // login;
 // approve-vendor;
+
+A. 1
+Explanation: The channel is buffered and can hold 1 value. The first value 1 is inserted into the buffer. When the second value 2 is inserted, the program is blocked because the buffer is full, but the first value is printed before the blocking.
+
+B. To block until a value is sent or received on a channel
+Explanation: The select statement allows a program to wait on multiple channel operations.
+
+C. Goroutines are lightweight and managed by the Go runtime
+Explanation: Goroutines are managed by the Go scheduler and are more lightweight than traditional threads.
+
+B. The deferred function will be executed before the panic causes the program to exit.
+Explanation: defer ensures that the cleanup will happen even if a panic occurs.
+
+A. It listens for incoming HTTP requests and serves them using the provided handler
+Explanation: http.ListenAndServe starts an HTTP server that listens for requests and handles them.
+
+C. Returning an error value from a function and checking if it's nil
+Explanation: Go handles errors by returning them as values, which need to be explicitly checked by the caller.
+
+B. Prints "Goroutine" then "Main function"
+Explanation: The goroutine runs concurrently, but time.Sleep allows the goroutine to finish before the main function prints.
+
+C. It waits for a collection of goroutines to finish before continuing execution
+Explanation: sync.WaitGroup is used to wait for multiple goroutines to finish.
+
+A. Channels can be used to synchronize the execution of goroutines
+Explanation: Channels can be used for communication and synchronization between goroutines.
+
+C. Return an error as the last return value
+Explanation: The idiomatic way to handle errors in Go is to return them as the last return value in a function.

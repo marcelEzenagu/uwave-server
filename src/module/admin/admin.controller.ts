@@ -86,15 +86,15 @@ export class AdminController {
   }
 
   @Get("categories")
-  findAllCategories() {
+  // findAllCategories() {
 
-    let where :any = {}
-     where={}
+  //   let where :any = {}
+  //    where={}
 
-    return this.category.findAll(where);
-  }
+  //   return this.category.findAll(where);
+  // }
 
-  @Get('categories-search/')  
+  // @Get('categories-search/')  
   @ApiQuery({
     name: 'search',
     required: false,
@@ -152,9 +152,8 @@ export class AdminController {
   }
 
   @Delete("categories/:id")
-  removeCategory(@Param('id') id: string,
+  async removeCategory(@Param('id') id: string,
   @Req() req: Request,
-
 ) {
     try {    
       const role = req['user'].role
@@ -164,7 +163,7 @@ export class AdminController {
         throw new BadRequestException("unaccessible");
       }
     const where ={"_id":id}
-    return this.category.remove(where);
+    return await this.category.adminDelete(where);
   } catch (e) {
     console.log("eRROR @controlelr",e)
     throw new BadRequestException(this.errorFormat.formatErrors(e))
@@ -186,10 +185,10 @@ export class AdminController {
         throw new BadRequestException("unaccessible");
       }
     return this.subCategory.update(id, updateAdminDto);
-  } catch (e) {
-    console.log("eRROR @controlelr",e)
-    throw new BadRequestException(this.errorFormat.formatErrors(e))
-  }
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
   }
   
   // Subcategories
@@ -215,40 +214,38 @@ export class AdminController {
   }
 
 
-  @Get("sub-categories")
-  @ApiQuery({
-    name: 'category',
-    required: false,
-    description: 'category for subCategory search',
-    type : String,
-    example:"protein",
-  })
-  async findAllSubCategory(
-
-    @Req() req: Request,
-    @Query('category') category?: string
-
-  ) {
-    try {    
-      const role = req['user'].role
-      const userType = req['user'].sub
+  // @Get("sub-categories")
+  // @ApiQuery({
+  //   name: 'category',
+  //   required: false,
+  //   description: 'category for subCategory search',
+  //   type : String,
+  //   example:"protein",
+  // })
+  // async findAllSubCategory(
+  //   @Req() req: Request,
+  //   @Query('category') category?: string
+  // ) {
+  //   try {    
+  //     const role = req['user'].role
+  //     const userType = req['user'].sub
   
-      if(role !="admin" || userType != "usave_admin"){
-        throw new BadRequestException("unaccessible");
-      }
-    let where :any = {}
-    where={"deletedAt":null}
-    if(category)where.productCategory = category.toLowerCase()
+  //     if(role !="admin" || userType != "usave_admin"){
+  //       throw new BadRequestException("unaccessible");
+  //     }
+  //   let where :any = {}
+  //   where={"deletedAt":null}
+  //   if(category)where.productCategory = category.toLowerCase()
 
-    return await this.subCategory.findAll(where);
-  } catch (e) {
-    console.log("eRROR @controlelr",e)
-    throw new BadRequestException(this.errorFormat.formatErrors(e))
-  }
-  }
+  //   return await this.subCategory.findAll(where);
+  // } catch (e) {
+  //   console.log("eRROR @controlelr",e)
+  //   throw new BadRequestException(this.errorFormat.formatErrors(e))
+  // }
+  // }
 
 
-  @Get('sub-categories-search/')  
+  @Get('sub-categories/')  
   @ApiQuery({
     name: 'search',
     required: false,
@@ -560,6 +557,7 @@ export class AdminController {
       throw new BadRequestException(this.errorFormat.formatErrors(e))
     }
     }
+
     @Get('vendors/:id')  
     async adminGetVendors(
       @Req() req: Request,
@@ -941,4 +939,20 @@ export class AdminController {
   // wallet
   // listVendor earnings
 
+  // admin details
+  @Get('/details')
+  getAdminDetails(
+    @Req() req: Request
+  ){
+    const role = req['user'].role
+    const userType = req['user'].sub
+    console.log("userType:: ",userType)
+    if(role !="admin" || userType != "usave_admin"){
+      throw new BadRequestException("unaccessible");
+    }
+
+    return {firstName:"SuperAdmin",
+      lastName:"SuperAdmin",
+    }
+  }
 }

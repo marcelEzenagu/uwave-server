@@ -13,12 +13,13 @@ import { ErrorFormat } from 'src/helpers/errorFormat';
   imports: [MongooseModule.forFeature(forFeatureDb),AuthModule],
 
 })
+
 export class ProductCategoryModule {
   configure(consumer:MiddlewareConsumer){
     consumer.apply(AccessTokenMiddleware)
-    .forRoutes(
-        { path: '', method: RequestMethod.ALL },      // Matches localhost:3600/orders/
-        // { path: 'orders/*', method: RequestMethod.ALL },    // Matches localhost:3600/orders/:id
-    )
+    // .forRoutes(
+    //     { path: '', method: RequestMethod.ALL },      // Matches localhost:3600/orders/
+    //     // { path: 'orders/*', method: RequestMethod.ALL },    // Matches localhost:3600/orders/:id
+    // )
   }
 }
