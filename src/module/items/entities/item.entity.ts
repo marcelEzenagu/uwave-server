@@ -35,14 +35,6 @@ export type ItemDocument = Item & Document
   })
 
 export class Item {
-    @Prop({
-        type:String,
-        unique:true,
-        default : function genUUID(){
-            return uuid();
-        },
-    })
-    ItemID : string;
 
    
     @Prop({ default: 0 })
@@ -101,19 +93,6 @@ export class Item {
     @Prop({ required:true})
     quantity:Number;
 
-    @ApiProperty({
-      example: 300,
-      required: true
-   })
-    @Prop({ required:true})
-    salesPrice:Number;
-
-    @ApiProperty({
-      example: 873,
-      required: true
-   })
-    @Prop({ required:true})
-    originalPrice:Number;
 
     @ApiProperty({
       example: 50,
@@ -134,7 +113,12 @@ export class Item {
       required: true
    })
     @Prop({ })
-    newPrice?:Number;
+    oldPrice?:Number;
+    @ApiProperty({
+      example: 550,
+   })
+    @Prop({ })
+    price?:Number;
 
     @ApiProperty({
       example: 35,
@@ -199,6 +183,9 @@ export class Item {
 
 export const ItemSchema = SchemaFactory.createForClass(Item)
 
+ItemSchema.virtual('itemID').get(function (this: ItemDocument) {
+  return (this._id as Types.ObjectId).toHexString(); 
+});
 ItemSchema.index({ vendorID: 1, productID: 1,itemName: 1, itemCategory: 1, itemSubCategory: 1, 
   salesPrice: 1 }, { unique: true });
 

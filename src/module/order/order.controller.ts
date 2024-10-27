@@ -50,6 +50,7 @@ export class OrderController {
       if(existingOrder.paymentStatus == PaymentStatusType.SUCCESS ){
         throw new BadRequestException("order already completed.");
       }
+      
      return await this.orderService.updatePayment(paymentIntentID, userID, updateOrderDto);
     }catch(e){
       console.log("e.CastError",e.CastError)
@@ -63,7 +64,7 @@ export class OrderController {
 ) {
 
     try {
-
+console.log("GOT CALLED-intent")
       const userID = req['user'].sub;
       createOrderDto.userID = userID
       const intentRes = await this.stripeService.createSession(createOrderDto.totalCost)

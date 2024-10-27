@@ -68,7 +68,7 @@ export class Order {
     cartID ?: string;
     
     @Prop({
-        type:[{type:Item, default:[]}],
+        type:[{default:[]}],
         default: [],
       })
     items: Item[];
@@ -79,6 +79,10 @@ export class Order {
     
     @Prop({ type: Number, })
     totalCost: number;
+
+    @Prop({ type: Number, })
+    exhangeRate?: number;
+
     @Prop({ type: String, })
     paymentIntentID: string;
 
@@ -88,7 +92,7 @@ export class Order {
     @Prop({ type: String,enum:PaymentStatusType,default:PaymentStatusType.REQUIRES_PAYMENT_METHOD })
     paymentStatus: string;
     
-    @Prop({ type: String,enum:OptionType,default:OptionType.ACCEPTED})
+    @Prop({ type: String,enum:OptionType,default:OptionType.PROCESSING})
     status?: string ;
 
     @Prop({ type: Date, default: null })

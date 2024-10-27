@@ -131,13 +131,13 @@ console.log("error:: ",e)
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    const where ={"itemID":id}
+    const where ={"_id":id}
     return this.itemsService.findWhere(where);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateItemDto: UpdateItemDto) {
-    return this.itemsService.update(+id, updateItemDto);
+    return this.itemsService.update(id, updateItemDto);
   }
 
   @Delete(':id')

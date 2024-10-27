@@ -10,18 +10,19 @@ export class CartService {
   constructor(@InjectModel(Cart.name) private cartModel: Model<CartDocument>) {}
 
   async addToCart(createCartDto: Cart) {
-    
+    try{
+
     const where = {"userID":createCartDto.userID}
     const result= await  this.cartModel.findOne().where(where).exec();
-    if (result == undefined){
-      console.log("HERE addToCart")
-      
+    if (!result){
       const newUserCart = new this.cartModel(createCartDto)
-      return newUserCart.save();
+      return await newUserCart.save();
     }else{
-      console.log("HERE existing cart")
   return result
     }
+  }catch(e){
+    console.log("addToCart_error",e)
+  }
   }
 
   findAll() {
@@ -29,18 +30,27 @@ export class CartService {
   }
 
   async findOne(userID: string) {
+    try{
     const where = {userID}
     const result= await  this.cartModel.findOne().where(where).exec();
-    if (result == undefined){
-      throw new NotFoundException('cart not found for this user');
+    if (!result){
+      console.log('cart not found for this user');
+
     }else{
   return result
     }
+  }catch(e){
+    console.log("findOneCart_error",e)
+  }
   }
 
   async update(userID: string, updateCartDto: UpdateCartDto) {
+   try{
     const where = {userID}
     return await  this.cartModel.findOneAndUpdate(where,updateCartDto,{new:true}    )
+  }catch(e){
+    console.log("update-error",e)
+  }
   }
 
  async remove(userID: string) {
@@ -69,7 +79,11 @@ return "cart deleted successfully"
   }
 
   async findWhere(where:{}):Promise<Cart> {
+    try{
     return await  this.cartModel.findOne().where(where).exec();
+  }catch(e){
+    console.log("findWhere-error",e)
+  }
   }
 
   formatErrors(error: any) {

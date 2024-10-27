@@ -18,11 +18,12 @@ export class OrderService {
     private  item: ItemsService
   ) {}
 
-  create(createOrderDto: CreateOrderDto) {
+  async create(createOrderDto: CreateOrderDto) {
     
-    
+    // weightSrvRecords
+    // this.findWhere()
     const newUserOrder = new this.orderModel(createOrderDto);
-    return newUserOrder.save();
+    return await newUserOrder.save();
   }
 
   async findAll(page: number, limit: number,where :{}) {
@@ -75,11 +76,10 @@ export class OrderService {
       await  Promise.all([
        await this.stripeService.confirmPaymentIntent(paymentIntentID),
         
-        // await this.item.decreaseItem(updateOrderDto.items),
+        await this.item.decreaseItem(updateOrderDto.items),
         await this.cart.removeCart(updateOrderDto.cartID,userID),
-        await this.orderModel.findOneAndUpdate(where, updateOrderDto)
       ])
-      return "order completed successfully"
+      return await this.orderModel.findOneAndUpdate(where, updateOrderDto)
    
   
   }

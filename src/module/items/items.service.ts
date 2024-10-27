@@ -26,7 +26,6 @@ export class ItemsService {
     try {
       // const activeItem = await this.itemModel.findOne({ itemName: createItemDto.itemName, vendorID: createItemDto.vendorID, deletedAt: null });
       // if(!activeItem){
-      let newProduct = new this.itemModel(createItemDto);
       if (createItemDto.images) {
         const vPath = 'public/images/items';
         const productImages: string[] = [];
@@ -38,13 +37,15 @@ export class ItemsService {
             imagePath,
             imageName,
           );
-
-          const itemImage = `${imagePath}/${imageName}`;
+// console.log("imagePath",imagePath)
+const itemImage = `${imagePath}/${imageName}`;
           productImages.push(itemImage);
         }
 
         createItemDto.images = productImages;
       }
+
+      let newProduct = new this.itemModel(createItemDto);
       return await newProduct.save();
 
       // }else{
@@ -60,9 +61,9 @@ export class ItemsService {
     try {
       const updatedItems: Item[] = [];
 
-      for (const { productID, quantity } of items) {
+      for (const {itemName,quantity} of items) {
         const updatedItem = await this.itemModel.findOneAndUpdate(
-          { _id: productID, quantity: { $gte: quantity } }, // Ensure sufficient stock is available
+          { itemName:itemName, quantity: { $gte: quantity } }, // Ensure sufficient stock is available
           { $inc: { quantity: -quantity, salesCount: +quantity } }, // Atomically decrement the quantity
           { new: true },
         );
@@ -86,21 +87,24 @@ export class ItemsService {
       status: ItemStatus.ACTIVE,
     };
 
-    if (itemCategory) {
+    if (itemCategory != "undefined") {
       filter.itemCategory = {
         $regex: new RegExp(`^${itemCategory}`, 'i'),
       };
     }
-    if (itemSubCategory) {
+    if (itemSubCategory != "undefined") {
+      console.log("HERE::", itemSubCategory)
       filter.itemSubCategory = {
         $regex: new RegExp(`^${itemSubCategory}`, 'i'),
       };
     }
-    if (country) {
+    if (country != "undefined") {
       filter.itemSupportedCountries = {
         $regex: new RegExp(`^${country}`, 'i'),
       };
     }
+
+    console.log("FILTER::: ",filter)
 
     try {
       const data = await this.itemModel
@@ -139,13 +143,13 @@ export class ItemsService {
         status: ItemStatus.ACTIVE,
       };
 
-      if (query) {
+      if (query!= "undefined") {
         query = query.trim();
 
         filter.$text = { $search: query };
       }
 
-      if (country) {
+      if (country != "undefined") {
         filter.itemSupportedCountries = {
           $regex: new RegExp(`^${country}`, 'i'),
         };
@@ -330,7 +334,7 @@ export class ItemsService {
     }
   }
 
-  async update(id: number, updateItemDto: UpdateItemDto) {
+  async update(id: string, updateItemDto: UpdateItemDto) {
     try {
       return await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
         new: true,
@@ -342,7 +346,7 @@ export class ItemsService {
   }
 
   async remove(id: string) {
-    const filter = { deletedAt: null, itemID: id };
+    const filter = { deletedAt: null, _id: id };
     const updateProductDto = { deletedAt: new Date() };
     await this.itemModel.findOneAndUpdate(filter, updateProductDto, {
       new: true,
@@ -352,7 +356,7 @@ export class ItemsService {
   }
 
   async delete(vendorID, id: string) {
-    const filter = { vendorID: vendorID, itemID: id };
+    const filter = { vendorID: vendorID, _id: id };
     await this.itemModel.findOneAndDelete(filter).exec();
     return `This action removes a #${id} item`;
   }

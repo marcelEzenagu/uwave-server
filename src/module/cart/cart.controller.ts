@@ -14,14 +14,14 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Post()
-  create(@Req() req: Request,
+  async create(@Req() req: Request,
   @Body() createCartDto: Cart) {
     try {
       // check for possible validation b4 an add;
 
       const userID = req['user'].sub
       createCartDto.userID = userID
-      return this.cartService.addToCart(createCartDto);
+      return await this.cartService.addToCart(createCartDto);
     } catch (error) {
       console.log("error:: ",error)
     }
