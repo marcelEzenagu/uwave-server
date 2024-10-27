@@ -26,7 +26,8 @@ export class ItemsModule {
     consumer.apply(AccessTokenMiddleware)
     .exclude(
       { path: 'items/search', method: RequestMethod.GET } , // Exclude this specific route
-      { path: 'items/:id', method: RequestMethod.GET }  // Exclude this specific route
+      { path: 'items/:id', method: RequestMethod.GET },  // Exclude this specific route
+      { path: 'items', method: RequestMethod.GET }  // Exclude this specific route
     )
     .forRoutes({path:'items*',method:RequestMethod.ALL})
     

@@ -28,16 +28,48 @@ export class ItemsController {
   }
 
   @Get()
-  findAll(
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'page for paginating category search',
+    type: Number,
+    example:1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'limit for category search',
+    type: Number,
+    example:50,
+  })
+  async findAll(
     @Query('subCategory') subCategory?: string,
-    @Query('category') category?: string
+    @Query('category') category?: string,
+    @Query('country') country?: string,
+    @Query('page') page: number = 1, 
+    @Query('limit') limit: number = 50,
   ) {
+    try{
 
-    let where :any = {}
+    page = Number(page);
+    limit = Number(limit);
 
-    if (category)where.productCategory = category.toLowerCase()
-    if(subCategory)where.productSubCategory = subCategory.toLowerCase()
-    return this.itemsService.findAll(where);
+    if (page < 1) page = 1;  // Page should be at least 1
+    if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+
+
+
+    let where :any = {
+      page,
+      limit,
+    }
+    if (category)where.itemCategory = category.toLowerCase()
+    if (country)where.country = country.toLowerCase()
+    if(subCategory)where.itemSubCategory = subCategory.toLowerCase()
+    return await this.itemsService.findAll(where);
+  }catch(e){
+console.log("error:: ",e)
+  }
 }
 
 @Get('search')
@@ -59,14 +91,42 @@ export class ItemsController {
     enum: ItemFilter,
     description: 'Filter for item sorting (bestseller, priceLowToHigh, priceHighToLow)',
   })
-
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'page for paginating category search',
+    type: Number,
+    example:1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'limit for category search',
+    type: Number,
+    example:50,
+  })
   async searchItem(
   @Query('query') searchWord: string, 
   @Query('country') country: string, 
   @Query('filter') filter: ItemFilter, 
+  @Query('page') page: number = 1, 
+  @Query('limit') limit: number = 50,
 ) {
-  return await this.itemsService.searchItem(searchWord.trim(),country.trim(),filter.trim());
-  }
+  try{
+
+    page = Number(page);
+    limit = Number(limit);
+
+    if (page < 1) page = 1;  // Page should be at least 1
+    if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+
+
+  return await this.itemsService.searchItem(page,limit,searchWord?.trim(),country?.trim(),filter?.trim());
+}catch(e){
+  console.log("eror1 :::",e)
+
+}  
+}
 
 
   @Get(':id')

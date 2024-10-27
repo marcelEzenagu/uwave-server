@@ -61,15 +61,15 @@ export class ProductCategoryService {
             const subcat = subCategories
               .filter(sub => sub.productCategory.toString() === category._id.toString())
               .map(sub => ({
-                id: sub._id,  // Use subcategory ID
-                name: sub.subCategoryName,  // Use subcategory name
+                id: sub._id,  
+                name: sub.subCategoryName,  
               }));
       
             return {
-              id: category._id,  // Use category ID
-              name: category.categoryName,  // Use category name
-              image: category.categoryImage,  // Use category image
-              subcat: subcat,  // Include the grouped subcategories
+              id: category._id,  
+              name: category.categoryName, 
+              image: category.categoryImage, 
+              subcat: subcat,  
             };
           });
                                         

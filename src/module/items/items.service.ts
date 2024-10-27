@@ -79,10 +79,42 @@ export class ItemsService {
   }
 
   async findAll(where: any) {
-    where.deletedAt = null;
-    where.status = ItemStatus.ACTIVE;
+    const { page, limit,itemCategory,itemSubCategory,country } = where;
+    const skip = (page - 1) * limit;
+    const filter: any = {
+      deletedAt: null,
+      status: ItemStatus.ACTIVE,
+    };
+
+    if (itemCategory) {
+      filter.itemCategory = {
+        $regex: new RegExp(`^${itemCategory}`, 'i'),
+      };
+    }
+    if (itemSubCategory) {
+      filter.itemSubCategory = {
+        $regex: new RegExp(`^${itemSubCategory}`, 'i'),
+      };
+    }
+    if (country) {
+      filter.itemSupportedCountries = {
+        $regex: new RegExp(`^${country}`, 'i'),
+      };
+    }
+
     try {
-      return await this.itemModel.find().where(where).exec();
+      const data = await this.itemModel
+        .find(filter)
+        .skip(skip)
+        .limit(limit)
+        .exec();
+
+      const total = await this.itemModel.countDocuments();
+      return {
+        data,
+        total,
+        currentPage: page,
+      };
     } catch (e) {
       console.log('error:: ', e);
       throw new BadRequestException(this.errorFormat.formatErrors(e));
@@ -98,26 +130,53 @@ export class ItemsService {
     }
   }
 
-  async searchItem(query, country, filterTag: string) {
-    query = query.trim();
+  async searchItem(page, limit, query, country, filterTag: string) {
+    try {
+      const skip = (page - 1) * limit;
 
-    const filter: any = {
-      $text: { $search: query },
-      itemSupportedCountries: { $regex: new RegExp(`^${country}`, 'i') },
-      deletedAt: null,
-      status: ItemStatus.ACTIVE,
-    };
+      const filter: any = {
+        deletedAt: null,
+        status: ItemStatus.ACTIVE,
+      };
 
-    var sortOption: any = {};
-    if (filterTag == ItemFilter.BEST_SELLER) {
-      sortOption.salesCount = -1; // Sort bestsellers first
-    } else if (filterTag == ItemFilter.HIGH_TO_LOW) {
-      sortOption.salesPrice = -1; // Sort by price high to low
-    } else if (filterTag == ItemFilter.LOW_TO_HIGH) {
-      sortOption.salesPrice = 1; // Sort by price low to high
+      if (query) {
+        query = query.trim();
+
+        filter.$text = { $search: query };
+      }
+
+      if (country) {
+        filter.itemSupportedCountries = {
+          $regex: new RegExp(`^${country}`, 'i'),
+        };
+      }
+
+      var sortOption: any = {};
+      if (filterTag == ItemFilter.BEST_SELLER) {
+        sortOption.salesCount = -1; // Sort bestsellers first
+      } else if (filterTag == ItemFilter.HIGH_TO_LOW) {
+        sortOption.salesPrice = -1; // Sort by price high to low
+      } else if (filterTag == ItemFilter.LOW_TO_HIGH) {
+        sortOption.salesPrice = 1; // Sort by price low to high
+      }
+
+      const data = await this.itemModel
+        .find(filter)
+        .skip(skip)
+        .limit(limit)
+        .sort(sortOption)
+        .exec();
+
+      const total = await this.itemModel.countDocuments();
+      return {
+        data,
+        total,
+        currentPage: page,
+      };
+    } catch (e) {
+      console.log('Error:: ', e);
+      throw new Error(e);
     }
-
-    return await this.itemModel.find(filter).sort(sortOption).exec();
   }
 
   async adminSearchItem(query, country, filterTag: string) {
