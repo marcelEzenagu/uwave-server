@@ -21,12 +21,18 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   async setValue(key: string, value: string): Promise<void> {
-    
     await this.redisClient.set(key, value);
+  }
+  async remove(key: string): Promise<void> {
+    console.log("called DELETE")
+    await this.redisClient.del(key);
+  }
+
+  async setTimedValue(key: string, value: string,timeInSeconds:number): Promise<void> {
+    await this.redisClient.set(key, value,{"EX":timeInSeconds});
   }
 
   async getValue(key: string): Promise<string> {
-    
     return await this.redisClient.get(key);
   }
 

@@ -20,6 +20,7 @@ import { OrderModule } from '../order/order.module';
 import { AgentModule } from '../agent/agent.module';
 import { ProductModule } from '../product/product.module';
 import { ProductService } from '../product/product.service';
+import { RedisService } from '../redis/redis.service';
 
 @Module({
   controllers: [AdminController],
@@ -27,6 +28,7 @@ import { ProductService } from '../product/product.service';
               ErrorFormat,
               ProductService,
               ProductCategoryService,
+              RedisService,
               ProductSubCategoryService,
               FreightService,FileService],
               
@@ -36,7 +38,7 @@ import { ProductService } from '../product/product.service';
     forwardRef(() => VendorModule),
     forwardRef(() => OrderModule),
     forwardRef(() => AgentModule),
-    // forwardRef(() => ProductModule),
+    // forwardRef(() => ProductCategoryModule),
   ],
 
 })

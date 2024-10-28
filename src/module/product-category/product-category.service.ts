@@ -8,21 +8,29 @@ import { AuthService } from '../auth/auth.service';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { ProductStatus } from '../product/entities/product.entity';
 import { ProductSubCategory, ProductSubCategoryDocument } from '../product-sub-category/entities/product-sub-category.entity';
+import { RedisService } from '../redis/redis.service';
 // import { ProductSubCategoryDocument } from '../product-sub-category/entities/product-sub-category.entity';
 
 @Injectable()
 export class ProductCategoryService {
-  constructor(
-    @InjectModel(ProductCategory.name) 
-    private productCategoryModel: Model<ProductCategoryDocument>,
-    @InjectModel(ProductSubCategory.name) private subCategoryModel: Model<ProductSubCategoryDocument>,
-    private errorFormat: ErrorFormat,
+  static redisKey = "categories"
 
-  ){}
+  constructor(
+    private errorFormat: ErrorFormat,
+    private redisService: RedisService,
+    
+    @InjectModel(ProductCategory.name) private productCategoryModel: Model<ProductCategoryDocument>,
+    @InjectModel(ProductSubCategory.name) private subCategoryModel: Model<ProductSubCategoryDocument>,
+    
+  ){
+
+  }
 
   async create(createProductCategoryDto: ProductCategory) {
     try{
       const newCategory = new this.productCategoryModel(createProductCategoryDto);
+      
+      await this.redisService.remove(ProductCategoryService.redisKey)
       return await newCategory.save();
     }catch(e){
       throw new BadRequestException(this.errorFormat.formatErrors(e))
@@ -41,40 +49,38 @@ export class ProductCategoryService {
   async findAll() {
     try{
       const where = {"deletedAt":null,
-        // status:ProductStatus.ACTIVE
+        status:ProductStatus.ACTIVE
       }
-      //  return await this.productCategoryModel.find(where)
-       const categories = await this.productCategoryModel.find(where)
-      // .populate({
-      //   path: 'subCategories',   // Ensure this matches the virtual field name in your schema
-      //   model: 'ProductSubCategory',  // Model name
-      // })
-                                            .populate('subCategories')
-                                            // .populate({path:'subCategories',select:'categoryName'}) 
-                                            .exec();
+      const redisCategories = await this.redisService.getValue(ProductCategoryService.redisKey)     
+    if(!redisCategories){
 
-          const subCategories = await this.subCategoryModel.find(where).exec();
+    const categories = await this.productCategoryModel.find(where).exec();
+
+    const subCategories = await this.subCategoryModel.find(where).exec();
 
 
-          const groupedCategories = categories.map(category => {
-            // Filter subcategories that belong to the current category
-            const subcat = subCategories
-              .filter(sub => sub.productCategory.toString() === category._id.toString())
-              .map(sub => ({
-                id: sub._id,  
-                name: sub.subCategoryName,  
-              }));
-      
-            return {
-              id: category._id,  
-              name: category.categoryName, 
-              image: category.categoryImage, 
-              subcat: subcat,  
-            };
-          });
-                                        
-    return groupedCategories
+        const groupedCategories = categories.map(category => {
+          // Filter subcategories that belong to the current category
+          const subcat = subCategories
+            .filter(sub => sub.productCategory.toString() === category._id.toString())
+            .map(sub => ({
+              id: sub._id,  
+              name: sub.subCategoryName,  
+            }));
     
+          return {
+            id: category._id,  
+            name: category.categoryName, 
+            image: category.categoryImage, 
+            subcat: subcat,  
+          };
+        });
+        
+        await this.redisService.setTimedValue(ProductCategoryService.redisKey,JSON.stringify(groupedCategories),20)
+        return groupedCategories
+    }else{
+      return JSON.parse(redisCategories)
+    }
   }catch(e){
       throw new BadRequestException(this.errorFormat.formatErrors(e))
     }  }

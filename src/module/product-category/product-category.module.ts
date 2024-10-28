@@ -6,11 +6,12 @@ import forFeatureDb from 'src/db/for-feature.db';
 import { AccessTokenMiddleware } from '../common/middleware/auth.middleware'
 import { AuthModule } from '../auth/auth.module';
 import { ErrorFormat } from 'src/helpers/errorFormat';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   controllers: [ProductCategoryController],
   providers: [ProductCategoryService,ErrorFormat],
-  imports: [MongooseModule.forFeature(forFeatureDb),AuthModule],
+  imports: [MongooseModule.forFeature(forFeatureDb),AuthModule,RedisModule],
 
 })
 
