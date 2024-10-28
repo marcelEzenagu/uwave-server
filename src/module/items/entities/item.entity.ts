@@ -113,9 +113,16 @@ export class Item {
       required: true
    })
     @Prop({ })
-    oldPrice?:Number;
+    salesPrice?:Number;
     @ApiProperty({
       example: 550,
+   })
+    @Prop({ })
+    originalPrice?:Number;
+
+    @ApiProperty({
+      example: 35,
+      required: true
    })
     @Prop({ })
     price?:Number;
