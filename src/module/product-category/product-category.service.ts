@@ -76,7 +76,7 @@ export class ProductCategoryService {
           };
         });
         
-        await this.redisService.setTimedValue(ProductCategoryService.redisKey,JSON.stringify(groupedCategories),20)
+        await this.redisService.setTimedValue(ProductCategoryService.redisKey,JSON.stringify(groupedCategories),60*60*24)
         return groupedCategories
     }else{
       return JSON.parse(redisCategories)
