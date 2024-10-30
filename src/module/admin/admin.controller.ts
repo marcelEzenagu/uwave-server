@@ -491,15 +491,12 @@ export class AdminController {
       @Query('limit') limit: number = 50 
     ) {
       try {    
-
-
+        console.log("got called isDisabled",isDisabled)
       const role = req['user'].role
       const userType = req['user'].sub
       if(role !="admin" || userType != "usave_admin"){
         throw new BadRequestException("unaccessible");
       }
-
-
       return await this.vendorService.adminFindAll(page,limit,query,isDisabled)
 
     } catch (e) {
@@ -586,13 +583,7 @@ export class AdminController {
 
   // items 
   @Get('items/:vendorID')  
-  @ApiQuery({
-    name: 'vendorID',
-    required: false,
-    description: 'vendorID word for item search',
-    type: String,
-    example:"aed13412313erds",
-  })
+ 
   @ApiQuery({
     name: 'page',
     required: false,
@@ -614,11 +605,12 @@ export class AdminController {
     enum: ItemStatus,
     example:ItemStatus.DRAFT,
   })
+
   async adminListItemsByVendors(
     @Req() req: Request,
     @Param("vendorID") vendorID : string,
     @Query('page') page: number = 1, 
-    @Query('status') status: ItemStatus, 
+    @Query('status') status: string, 
     @Query('limit') limit: number = 50 
   ) {
     try {    
@@ -634,8 +626,9 @@ export class AdminController {
 
     if (page < 1) page = 1;  // Page should be at least 1
     if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
-
-
+    
+   
+    
     return await this.itemService.adminListItemByVendors(vendorID,page,limit,status);
     
   } catch (e) {
@@ -644,36 +637,110 @@ export class AdminController {
   }
   }
 
-    @Delete('items/:vendorID/') 
-    @ApiQuery({
-      name: 'itemID',
-      required: false,
-      description: 'itemID word for item search',
-      type: String,
-      example:"aed13412313erds",
-    })
-   
-    async adminDeleteItemByVendors(
-      @Req() req: Request,
-      @Param("vendorID") vendorID : string,
-      @Query("itemID") itemID : string,
-    ) {
-      try {    
-      const role = req['user'].role
-      const userType = req['user'].sub
-      if(role !="admin" || userType != "usave_admin"){
-        throw new BadRequestException("unaccessible");
-      }
-      vendorID = vendorID.trim()
-      itemID = itemID.trim()
+  // items 
+  @Get('new-items')  
+  
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'page for paginating item search',
+    type: Number,
+    example:1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'limit for item search',
+    type: Number,
+    example:50,
+  })
+  
+  
+  async adminListNewItemsByVendors(
+    @Req() req: Request,
+    @Query("vendorID") vendorID : string,
+    @Query('page') page: number = 1, 
+    @Query('limit') limit: number = 50 
+  ) {
+    try {    
+    const role = req['user'].role
+    const userType = req['user'].sub
+    if(role !="admin" || userType != "usave_admin"){
+      throw new BadRequestException("unaccessible");
+    }
 
-      return await this.itemService.delete(vendorID,itemID);
+    page = Number(page);
+    limit = Number(limit);
+
+    if (page < 1) page = 1;  // Page should be at least 1
+    if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+
+    if(vendorID == "undefined"){
       
+      vendorID = null
+    }else{
+      vendorID = vendorID.trim()
+      }
+
+    return await this.itemService.adminListNewItemByVendors(vendorID,page,limit);
+    
+  } catch (e) {
+    console.log("eRROR @adminListNewItemByVendors",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
+  }
+
+
+  @Delete('items/:vendorID/') 
+  @ApiQuery({
+    name: 'itemID',
+    required: false,
+    description: 'itemID word for item search',
+    type: String,
+    example:"aed13412313erds",
+  })
+  
+  async adminDeleteItemByVendors(
+    @Req() req: Request,
+    @Param("vendorID") vendorID : string,
+    @Query("itemID") itemID : string,
+  ) {
+    try {    
+    const role = req['user'].role
+    const userType = req['user'].sub
+    if(role !="admin" || userType != "usave_admin"){
+      throw new BadRequestException("unaccessible");
+    }
+    vendorID = vendorID.trim()
+    itemID = itemID.trim()
+
+    return await this.itemService.delete(vendorID,itemID);
+    
+  } catch (e) {
+    console.log("eRROR @controlelr",e)
+    throw new BadRequestException(this.errorFormat.formatErrors(e))
+  }
+  }
+
+  @Patch('items/approve/:itemID/') 
+  async adminApproveItem(
+    @Req() req: Request,
+    @Param("itemID") itemID : string,
+  ) {
+    try {    
+    const role = req['user'].role
+    const userType = req['user'].sub
+    if(role !="admin" || userType != "usave_admin"){
+      throw new BadRequestException("unaccessible");
+    }
+      itemID = itemID.trim()
+      console.log("itemID::: ",itemID)
+      return await this.itemService.approveItem(itemID);
     } catch (e) {
-      console.log("eRROR @controlelr",e)
+      console.log("eRROR @adminApproveItem",e)
       throw new BadRequestException(this.errorFormat.formatErrors(e))
     }
-    }
+  }
     
     
     // orders
@@ -946,7 +1013,7 @@ export class AdminController {
   ){
     const role = req['user'].role
     const userType = req['user'].sub
-    console.log("userType:: ",userType)
+    console.log("userType details:: ",userType)
     if(role !="admin" || userType != "usave_admin"){
       throw new BadRequestException("unaccessible");
     }

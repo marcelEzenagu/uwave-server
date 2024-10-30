@@ -36,7 +36,6 @@ export type ItemDocument = Item & Document
 
 export class Item {
 
-   
     @Prop({ default: 0 })
     salesCount?: number;
     
@@ -140,6 +139,9 @@ export class Item {
    })
     @Prop({ required:true,type: String})
     weight_unit?:string;
+   
+    @Prop({type: Boolean})
+    isApproved:boolean;
 
     @ApiProperty({
       example: ItemStatus.ACTIVE,

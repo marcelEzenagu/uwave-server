@@ -251,19 +251,55 @@ const itemImage = `${imagePath}/${imageName}`;
     vendorID: string,
     page,
     limit: number,
-    status?: ItemStatus,
+    status?: string,
   ) {
     const skip = (page - 1) * limit;
 
     const filter: any = { vendorID };
     if (status) {
-      filter.status = status;
-    }
+      filter.status = ItemStatus[status];
+    }else{
+      filter.status = {$in:[ItemStatus.ACTIVE,ItemStatus.DRAFT,ItemStatus.INACTIVE]}
 
+    }
     var sortOption: any = {};
     const data = await this.itemModel
       .find(filter)
       .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
+      .exec();
+    const total = await this.itemModel.find(filter)
+    .countDocuments();
+
+    return {
+      data,
+      total,
+      currentPage: page,
+      // totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async adminListNewItemByVendors(
+    vendorID: string,
+    page,
+    limit: number,
+  ) {
+    const skip = (page - 1) * limit;
+
+    const filter: any = {
+                          status:ItemStatus.ACTIVE,
+                          isApproved:!true
+                         };
+  
+
+                         if(vendorID){
+                            filter.vendorID= vendorID
+                         }
+
+
+    const data = await this.itemModel
+      .find(filter)
       .skip(skip)
       .limit(limit)
       .exec();
@@ -336,6 +372,19 @@ const itemImage = `${imagePath}/${imageName}`;
 
   async update(id: string, updateItemDto: UpdateItemDto) {
     try {
+      return await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
+        new: true,
+      });
+    } catch (e) {
+      console.log('error:: ', e);
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
+    }
+  }
+  async approveItem(id: string, ) {
+    try {
+      const updateItemDto: UpdateItemDto={}
+
+      updateItemDto.isApproved = true
       return await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
         new: true,
       });

@@ -63,11 +63,11 @@ export class VendorService {
   }
 
 
-  async adminFindAll(page,limit,search:string, isDisabled:boolean) {
+  async adminFindAll(page,limit: number,search:string, isDisabled:boolean) {
     // search = search.trim()
     const skip = (page - 1) * limit;
     const filter: any = {}
-    
+
     if (search  && search.trim()) {
       const regex = new RegExp(search, 'i'); // 'i' for case-insensitive matching
       filter.$or = [
@@ -77,10 +77,11 @@ export class VendorService {
       ];
     }
 
-    if(isDisabled){
+    if(isDisabled === true){
       filter.isDisabled = true
     }
 
+    console.log("FILTER",filter)
     const data =  await  this.vendorModel.find(filter)
                                           .skip(skip)
                                           .limit(limit)
