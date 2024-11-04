@@ -124,7 +124,7 @@ export class Item {
       required: true
    })
     @Prop({ })
-    price?:Number;
+    newPrice?:Number;
 
     @ApiProperty({
       example: 35,

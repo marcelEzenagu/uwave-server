@@ -34,6 +34,9 @@ export class OrderController {
   @Req() req: Request
 ) {
 
+  console.log("updateOrderDto::: ",updateOrderDto)
+  // return
+
     try {
       // change amount to cent for
       // include paymentIntentID, clientSecret and paymentStatus
@@ -49,7 +52,8 @@ export class OrderController {
      const existingOrder = await this.orderService.findWhere(paymentIntentID);
       if(existingOrder.paymentStatus == PaymentStatusType.SUCCESS ){
         throw new BadRequestException("order already completed.");
-      }
+      } 
+      updateOrderDto.totalCost = undefined
       
      return await this.orderService.updatePayment(paymentIntentID, userID, updateOrderDto);
     }catch(e){
@@ -64,7 +68,8 @@ export class OrderController {
 ) {
 
     try {
-console.log("GOT CALLED-intent")
+
+      console.log("GOT CALLED-intent")
       const userID = req['user'].sub;
       createOrderDto.userID = userID
       const intentRes = await this.stripeService.createSession(createOrderDto.totalCost)

@@ -76,13 +76,14 @@ export class OrderService {
       await  Promise.all([
        await this.stripeService.confirmPaymentIntent(paymentIntentID),
         
+
         await this.item.decreaseItem(updateOrderDto.items),
         await this.cart.removeCart(updateOrderDto.cartID,userID),
       ])
-      return await this.orderModel.findOneAndUpdate(where, updateOrderDto)
-   
-  
-  }
+      console.log("updateOrderDto::: ",updateOrderDto)
+
+      return await this.orderModel.findOneAndUpdate(where, updateOrderDto,{new:true})
+    }
   
   async update(orderID, userID: string, updateOrderDto: UpdateOrderDto) {
     const where = { userID, _id: orderID };
@@ -196,7 +197,12 @@ export class OrderService {
 return newCustomers
 }
 
-async findOrdersByVendorID(vendorID: string, daysAgo:number): Promise<Order[]> {
+async findOrdersByVendorID(vendorID: string, daysAgo,page,limit:number): Promise<{}> {
+  try{
+
+const skip = (page - 1) * limit;
+
+  
   const estimatedDaysAgo = new Date();
   if(!daysAgo){
     daysAgo= 7
@@ -204,27 +210,125 @@ async findOrdersByVendorID(vendorID: string, daysAgo:number): Promise<Order[]> {
   estimatedDaysAgo.setDate(estimatedDaysAgo.getDate() - (daysAgo));
   
   console.log(" estimatedDaysAgo:: ",estimatedDaysAgo)
-  return this.orderModel.aggregate([
-    {
-      $unwind: '$items',  // Unwind the products array
-    },
+  // const orders = await this.orderModel.aggregate([
+   
+  //   {
+  //     $match: {
+  //       'items.vendorID': vendorID  // Filter items based on the specified vendorID
+  //     }
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: 'users',             // Reference to the User collection
+  //       localField: 'userID',      // Field in Order schema referencing User
+  //       foreignField: 'userID',    // Field in User schema to join with (UUID string userID)
+  //       as: 'userDetails'          // Field to hold the joined user details
+  //     }
+  //   },
+  //   {
+  //     $unwind: { 
+  //       path: '$userDetails', 
+  //       preserveNullAndEmptyArrays: true  // Keeps the document even if no user details found
+  //     }
+  //   },
+  //   {
+  //     $project: {
+  //       _id: 1,                     // Include Order ID
+  //       paymentStatus: 1,                  // Include cartID
+  //       items: 1,                   // Include matched items
+  //       totalCost: 1,               // Include totalCost
+  //       status: 1,                  // Include order status
+  //       orderCreatedAt: '$createdAt', // Include createdAt field for order
+  //       shippingAddress : 1,
+  //       'userDetails.firstName':1,
+  //       'userDetails.lastName':1
+  //     }
+  //   },
+  //   { 
+  //     $skip: skip // Skip the number of documents based on the current page
+  //   },
+  //   { 
+  //     $limit: limit // Limit the number of documents to 'limit' per page
+  //   }
+  // ]).exec();
+  return  await this.orderModel.aggregate([
     {
       $match: {
-        'items.vendorID': vendorID, // Ensure this is the correct path to vendorID
-        // createdAt: { $gte: estimatedDaysAgo }  // Only include orders from the last 7 days
-
-      },
+        'items.vendorID': vendorID
+      }
     },
     {
-      $project: {
-        _id: 1,  // Include orderID (MongoDB _id)
-        products: 1,  // Include the matched product
-        orderCreatedAt: '$createdAt',  // Include createdAt field (renamed to orderCreatedAt)
-        status: 1,  // Include status
-      },
+      $lookup: {
+        from: 'users',
+        localField: 'userID',
+        foreignField: 'userID',
+        as: 'userDetails'
+      }
+    },
+    {
+      $unwind: {
+        path: '$userDetails',
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $facet: {
+        paginatedResults: [
+          { $skip: skip },
+          { $limit: limit },
+          {
+            $project: {
+              _id: 1,
+              paymentStatus: 1,
+              items: 1,
+              totalCost: 1,
+              status: 1,
+              orderCreatedAt: '$createdAt',
+              shippingAddress: 1,
+              'userDetails.firstName': 1,
+              'userDetails.lastName': 1
+            }
+          }
+        ],
+        statusCounts: [
+          {
+            $group: {
+              _id: "$status",
+              count: { $sum: 1 }
+            }
+          }
+        ]
+      }
     }
-  ]).exec(); 
+  ]).exec();
+  
+  
+  // const totalOrders = await this.orderModel.aggregate([
+  //   { $match: { 'items.vendorID': vendorID } },
+  //   { $count: "totalCount" }
+  // ]).exec();
+  // const totalProcessing = await this.orderModel.aggregate([
+  //   { $match: { 'items.vendorID': vendorID } },
+  //   { $count: "totalCount" }
+  // ]).exec();
+  // const totalShipped = await this.orderModel.aggregate([
+  //   { $match: { 'items.vendorID': vendorID } },
+  //   { $count: "totalCount" }
+  // ]).exec();
+
+  // const totalCount = totalOrders[0]?.totalCount || 0;
+  // return { 
+    
+  //    totalPages : Math.ceil(totalCount / limit),
+  //    total:totalCount,
+  //    data:orders,
+  //    currentPage: page,
+
+  // }
+
+}catch(e){console.log("error== ",e)}
 }
+
 async findOrdersByStatus(vendorID: string, daysAgo:number): Promise<Order[]> {
   const estimatedDaysAgo = new Date();
   if(!daysAgo){
@@ -235,24 +339,44 @@ async findOrdersByStatus(vendorID: string, daysAgo:number): Promise<Order[]> {
   console.log(" estimatedDaysAgo:: ",estimatedDaysAgo)
   return this.orderModel.aggregate([
     {
-      $unwind: '$items',  // Unwind the products array
+      $unwind: '$items', // Unwind the items array
     },
     {
       $match: {
-        'items.vendorID': vendorID, // Ensure this is the correct path to vendorID
-        // createdAt: { $gte: estimatedDaysAgo }  // Only include orders from the last 7 days
-
+        'items.vendorID': vendorID, // Match the specified vendorID in items
+        // createdAt: { $gte: estimatedDaysAgo } // Uncomment to filter by date if needed
       },
     },
     {
+      $lookup: {
+        from: 'users', // Collection name for users
+        localField: 'userID', // Field in orders that references the user
+        foreignField: '_id', // Field in users that is matched to userID in orders
+        as: 'userDetails' // Output field for user details
+      }
+    },
+    {
+      $unwind: {
+        path: '$userDetails',
+        preserveNullAndEmptyArrays: true // Keep orders without a matching user
+      }
+    },
+    {
       $project: {
-        _id: 1,  // Include orderID (MongoDB _id)
-        products: 1,  // Include the matched product
-        orderCreatedAt: '$createdAt',  // Include createdAt field (renamed to orderCreatedAt)
-        status: 1,  // Include status
-      },
+        _id: 1, // Include orderID (_id field in MongoDB)
+        items: 1, // Include the matched item
+        orderCreatedAt: '$createdAt', // Include createdAt field (renamed to orderCreatedAt)
+        status: 1, // Include status
+        userDetails: {
+          _id: 1, // Include userID
+          name: 1, // Include name from the user details if available
+          email: 1 // Include email from the user details if available
+        }
+      }
     }
-  ]).exec(); 
+  ]).exec();
+  
+  
 }
 
 async findOpenOrdersForVendors(daysAgo:number): Promise<Order[]> {

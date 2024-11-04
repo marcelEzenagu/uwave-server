@@ -31,8 +31,11 @@ export class Cart {
     @Prop({
       type: [{ 
         itemID: { type: String, required: true },
+        vendorID: { type: String, required: true },
+        productID: { type: String, required: true },
         itemName: { type: String, required: true },
-        price: { type: Number, required: true },
+        salesPrice: { type: Number },
+        newPrice: { type: Number },
         quantity: { type: Number, required: true },
         _id: false 
       }],

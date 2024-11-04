@@ -9,7 +9,7 @@ import { Type } from "class-transformer";
 export type UserDocument = User & Document
 
 
-class Address {
+export class Address {
   @Prop({ required:true})
   firstName:string;
 

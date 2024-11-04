@@ -100,8 +100,7 @@ export class UserController {
       if(updateUserDto.profilePicture){
         const imagePath = `${vPath}/profilePicture`
          await this.fileService.uploadImage(updateUserDto.profilePicture,imagePath,imageName)
-         
-        updateUserDto.profilePicture = `${imagePath}/${imageName}`
+         updateUserDto.profilePicture = `${imagePath}/${imageName}`
       }
         return await this.userService.update(
         userID,

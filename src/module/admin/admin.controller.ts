@@ -135,7 +135,7 @@ export class AdminController {
     limit = Number(limit);
 
     if (page < 1) page = 1;  // Page should be at least 1
-    if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+    if (limit < 1 || limit > 100) limit = 100;  // Limit should be between 1 and 100
 
 
     const role = req['user'].role

@@ -5,6 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { Document, Types } from 'mongoose';
 import { Item } from "src/module/items/entities/item.entity";
+import { Address } from "src/module/user/entities/user.entity";
 
 export enum OptionType {
   ACCEPTED= "ACCEPTED",
@@ -53,10 +54,6 @@ class Product {
     timestamps: true,
   })
 
-
-
- 
-
 export class Order {
   @ApiProperty({
     example: "a cartID",
@@ -68,8 +65,17 @@ export class Order {
     cartID ?: string;
     
     @Prop({
-        type:[{default:[]}],
-        default: [],
+      type: [{ 
+        itemID: { type: String, required: true },
+        itemName: { type: String, required: true },
+        vendorID: { type: String, required: true },
+        productID: { type: String, required: true },
+        salesPrice: { type: Number },
+        newPrice: { type: Number },
+        quantity: { type: Number, required: true },
+        _id: false 
+      }],
+      default: [],
       })
     items: Item[];
 
@@ -97,6 +103,9 @@ export class Order {
 
     @Prop({ type: Date, default: null })
     deletedAt: Date | null;
+
+    @Prop()
+    shippingAddress : Address
 }
 
 

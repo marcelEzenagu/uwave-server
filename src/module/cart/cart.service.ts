@@ -10,9 +10,8 @@ export class CartService {
   constructor(@InjectModel(Cart.name) private cartModel: Model<CartDocument>) {}
 
   async addToCart(createCartDto: Cart) {
-    try{
-
-    const where = {"userID":createCartDto.userID}
+    try{    
+      const where = {"userID":createCartDto.userID}
     const result= await  this.cartModel.findOne().where(where).exec();
     if (!result){
       const newUserCart = new this.cartModel(createCartDto)

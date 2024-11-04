@@ -55,8 +55,7 @@ export class VendorController {
   @Query('daysDifference') daysDifference: number,
   @Query('page') page: number = 1, 
   @Query('limit') limit: number = 50 , 
-  @Query('filter') filter?: ItemStatus )
-  {
+  @Query('filter') filter?: ItemStatus ){
    
   const vendorID = req['user'].sub
   const role = req['user'].role
@@ -117,13 +116,20 @@ export class VendorController {
   @Get('/orders')
   async searchVendorOrder(
     @Req() req: Request, 
-    @Query('daysDifference') daysDifference: number)
-  {
-   
+    @Query('daysDifference') daysDifference: number,
+    @Query('status') status: string,
+    @Query('page') page: number = 1, 
+    @Query('limit') limit: number = 50,){
+      page = Number(page);
+      limit = Number(limit);
+    
+      if (page < 1) page = 1;  // Page should be at least 1
+      if (limit < 1 || limit > 100) limit = 10;  // Limit should be between 1 and 100
+    
   const vendorID = req['user'].sub
   const role = req['user'].role
-
-  return await this.orderService.findOrdersByVendorID(vendorID,daysDifference);
+console.log("vendorID==vendorID",vendorID)
+  return await this.orderService.findOrdersByVendorID(vendorID,daysDifference,page,limit);
   }
   // list all orders for a vendor use on the dasboard and orderSection
   @Get('/open-orders')

@@ -51,8 +51,8 @@ export class ProductCategoryService {
       const where = {"deletedAt":null,
         status:ProductStatus.ACTIVE
       }
-      const redisCategories = await this.redisService.getValue(ProductCategoryService.redisKey)     
-    if(!redisCategories){
+    //   const redisCategories = await this.redisService.getValue(ProductCategoryService.redisKey)     
+    // if(!redisCategories){
 
     const categories = await this.productCategoryModel.find(where).exec();
 
@@ -78,9 +78,9 @@ export class ProductCategoryService {
         
         await this.redisService.setTimedValue(ProductCategoryService.redisKey,JSON.stringify(groupedCategories),60*60*24)
         return groupedCategories
-    }else{
-      return JSON.parse(redisCategories)
-    }
+    // }else{
+    //   return JSON.parse(redisCategories)
+    // }
   }catch(e){
       throw new BadRequestException(this.errorFormat.formatErrors(e))
     }  }
