@@ -105,7 +105,9 @@ export class Order {
     deletedAt: Date | null;
 
     @Prop()
-    shippingAddress : Address
+    shippingAddress? : Address
+    @Prop()
+    billingAddress? : Address
 }
 
 

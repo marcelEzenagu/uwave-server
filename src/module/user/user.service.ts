@@ -93,6 +93,7 @@ export class UserService {
    if(updateUserDto.billingDetails){
     await this.validateIsDefault(updateUserDto.billingDetails,"Billing Details")
   }
+  
   if(updateUserDto.cardDetails){
       await this.validateIsDefault(updateUserDto.cardDetails,"Card Details")
 

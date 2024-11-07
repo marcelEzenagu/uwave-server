@@ -9,10 +9,11 @@ import { FileService } from 'src/helpers/upload';
 import { OrderModule } from '../order/order.module';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { AdminModule } from '../admin/admin.module';
+import { UtilityService } from 'src/helpers/utils';
 
 @Module({
   controllers: [ItemsController],
-  providers: [ItemsService,FileService,ErrorFormat],
+  providers: [ItemsService,FileService,ErrorFormat,UtilityService],
   imports: [MongooseModule.forFeature(forFeatureDb),
     forwardRef(() => OrderModule),
     forwardRef(() => AuthModule),

@@ -13,6 +13,7 @@ import { FileService } from 'src/helpers/upload';
 import { AuthService } from '../auth/auth.service';
 
 import { ErrorFormat } from 'src/helpers/errorFormat';
+import { Frequency,UtilityService } from 'src/helpers/utils';
 @Injectable()
 export class ItemsService {
   constructor(
@@ -20,6 +21,7 @@ export class ItemsService {
 
     private readonly fileService: FileService,
     private errorFormat: ErrorFormat,
+    private utilityService: UtilityService,
   ) {}
 
   async create(createItemDto: Item) {
@@ -247,6 +249,41 @@ const itemImage = `${imagePath}/${imageName}`;
     };
   }
 
+  async countItemByVendors(
+    vendorID: string,
+    daysDifference,
+    page,
+    limit: number,
+    daysAgo: Frequency,
+  ) {
+    const {startDate,endDate} = this.utilityService.calculatePreviousDate(daysAgo)
+
+
+    const filter: any = {
+      vendorID,
+      createdAt: {
+        $lte: endDate, // greater than or equal to startDate
+        $gte: startDate, // less than or equal to endDate
+      },
+    };
+   
+
+    var sortOption: any = {};
+    const data = await this.itemModel
+      .find(filter)
+      .sort(sortOption)
+      .limit(limit)
+      .exec();
+    const total = await this.itemModel.countDocuments();
+
+    return {
+      data,
+      total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
   async adminListItemByVendors(
     vendorID: string,
     page,
@@ -380,6 +417,7 @@ const itemImage = `${imagePath}/${imageName}`;
       throw new BadRequestException(this.errorFormat.formatErrors(e));
     }
   }
+
   async approveItem(id: string, ) {
     try {
       const updateItemDto: UpdateItemDto={}
@@ -443,4 +481,13 @@ const itemImage = `${imagePath}/${imageName}`;
       return { totalItems: 0, totalSections: 0 };
     }
   }
+
+  async countVendorSection(vendorID:string){
+    return await this.itemModel.aggregate([
+      { $match: { vendorID} },
+      { $group: { _id: "$itemCategory" } },
+      { $count: "distinctCategoryCount" }
+    ]);
+  }
+  
 }

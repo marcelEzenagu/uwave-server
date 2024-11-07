@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
+export type Frequency = 'weekly' | 'fortnightly' | 'quarterly' | 'annually';
+
 @Injectable()
 export class UtilityService {
   
   // Method to calculate the past date based on the range
-  calculatePreviousDate(range: 'weekly' | 'fortnightly' | 'quarterly' | 'annually'):{startDate:string ,endDate:string} {
+  calculatePreviousDate(range: Frequency):{startDate:string ,endDate:string} {
     const endDate = new Date();  // Use the current date as the starting point
     const startDate = new Date();  // Use the current date as the starting point
     

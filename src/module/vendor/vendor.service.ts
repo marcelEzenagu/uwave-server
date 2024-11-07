@@ -16,6 +16,13 @@ export class VendorService {
 
 ) {}
 
+// all by dateRange
+  // dashboardStat 
+    // sales vs totalOrders 
+    // getVendorOrders
+    // getNewCustomersOf-vendor
+    // getTotalSections for a vendor
+    // getTotalVendorProduct;
 
 
   // change import to b e the from auth
