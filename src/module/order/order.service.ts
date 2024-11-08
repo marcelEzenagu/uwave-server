@@ -279,9 +279,6 @@ const {startDate,endDate} = this.utilityService.calculatePreviousDate(daysAgo)
   } else {
     return { totalOrders: 0 };
   }
-  
-  
-
 }catch(e){
   console.log("error== ",e)}
 }
