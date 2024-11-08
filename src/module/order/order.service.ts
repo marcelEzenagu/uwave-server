@@ -167,33 +167,52 @@ export class OrderService {
     ]);
   }
   
-  async getNewCustomers(vendorID, start, end :string) {
-    const startDate = new Date(start)
-    const endDate = new Date(end)
+  async getNewCustomers(vendorID:string,daysAgo:Frequency, start?, end? :string) {
+    let {startDate,endDate} = this.utilityService.calculatePreviousDate(daysAgo)
+    let starting = new Date(startDate),
+    ending= new Date(endDate) 
+console.log("starting:: ",starting,"ending:: ",ending)
+
+
     const newCustomers = await this.orderModel.aggregate([
       {
         // Step 1: Match orders from the specific vendor within the date range
         $match: {
-          "products.vendorID": vendorID,
-          createdAt: { $gte: startDate, $lte: endDate }
-        }
+          'items.vendorID': vendorID,
+          // createdAt: { $gte: starting,
+          //              $lte: endDate
+          //             }       
+         }
       },
       {
         // Step 2: Group by customerID, and calculate the firstOrderDate
         $group: {
           _id: '$userID',  // Group orders by customerID
-          firstOrderDate: { $min: '$createdAt' }  // Get the earliest order date per customer
+          firstOrderDate: { $min: '$createdAt' },  // Get the earliest order date per customer
+          totalNewCustomers: { $sum: 1 }, // Count total items
+
         }
       },
       {
         // Step 3: Filter customers whose first order falls within the date range
         $match: {
-          firstOrderDate: { $gte: startDate, $lte: endDate }
+          firstOrderDate: { $gte: starting, $lte: ending }
         }
       },
-      // Optionally: Lookup or project customer details
+      {
+        $project: {
+          _id: 0, // Exclude _id
+          totalNewCustomers: 1, // Keep totalItems
+        },
+      },
     ]);
-return newCustomers
+
+    console.log("newCustomers::: ",newCustomers)
+    if (newCustomers.length > 0) {
+      return newCustomers[0];
+    } else {
+      return { totalNewCustomers: 0 };
+    }
 }
   
 // vendor dashBoard
@@ -227,86 +246,44 @@ return newCustomers
 return newCustomers
 }
 
-async countOrdersByVendorID(vendorID: string, daysAgo:Frequency): Promise<{}> {
+async countOrdersByVendorID(vendorID: string, daysAgo:Frequency,start?, end? :string): Promise<{}> {
   try{
 
 const {startDate,endDate} = this.utilityService.calculatePreviousDate(daysAgo)
-   
-  
-    
-  //   {
-  //     $match: {
-  //       'items.vendorID': vendorID  // Filter items based on the specified vendorID
-  //     }
-  //   },
-  //   {
-  //     $lookup: {
-  //       from: 'users',             // Reference to the User collection
-  //       localField: 'userID',      // Field in Order schema referencing User
-  //       foreignField: 'userID',    // Field in User schema to join with (UUID string userID)
-  //       as: 'userDetails'          // Field to hold the joined user details
-  //     }
-  //   },
-  //   {
-  //     $unwind: { 
-  //       path: '$userDetails', 
-  //       preserveNullAndEmptyArrays: true  // Keeps the document even if no user details found
-  //     }
-  //   },
-  //   {
-  //     $project: {
-  //       _id: 1,                     // Include Order ID
-  //       paymentStatus: 1,                  // Include cartID
-  //       items: 1,                   // Include matched items
-  //       totalCost: 1,               // Include totalCost
-  //       status: 1,                  // Include order status
-  //       orderCreatedAt: '$createdAt', // Include createdAt field for order
-  //       shippingAddress : 1,
-  //       'userDetails.firstName':1,
-  //       'userDetails.lastName':1
-  //     }
-  //   },
-  //   { 
-  //     $skip: skip // Skip the number of documents based on the current page
-  //   },
-  //   { 
-  //     $limit: limit // Limit the number of documents to 'limit' per page
-  //   }
-  // ]).exec();
-  return  await this.orderModel.aggregate([
+
+  const totalOrders =  await this.orderModel.aggregate([
     {
       $match: {
-        'items.vendorID': vendorID
+        'items.vendorID': vendorID,
+        createdAt: { $gte: new Date(startDate),
+          $lte: new Date(endDate) 
+        }
       }
+    },
+    { $group: {
+      _id: '$items.vendorID',  // Group orders by customerID
+      totalOrders: { $sum: 1 }, // Count total items
+
+    }},
+    {
+      $project: {
+        _id: 0, // Exclude _id
+        totalOrders: 1, // Keep totalItems
+      },
     },
   
   ]).exec();
+
+  if (totalOrders.length > 0) {
+    return totalOrders[0];
+  } else {
+    return { totalOrders: 0 };
+  }
   
   
-  // const totalOrders = await this.orderModel.aggregate([
-  //   { $match: { 'items.vendorID': vendorID } },
-  //   { $count: "totalCount" }
-  // ]).exec();
-  // const totalProcessing = await this.orderModel.aggregate([
-  //   { $match: { 'items.vendorID': vendorID } },
-  //   { $count: "totalCount" }
-  // ]).exec();
-  // const totalShipped = await this.orderModel.aggregate([
-  //   { $match: { 'items.vendorID': vendorID } },
-  //   { $count: "totalCount" }
-  // ]).exec();
 
-  // const totalCount = totalOrders[0]?.totalCount || 0;
-  // return { 
-    
-  //    totalPages : Math.ceil(totalCount / limit),
-  //    total:totalCount,
-  //    data:orders,
-  //    currentPage: page,
-
-  // }
-
-}catch(e){console.log("error== ",e)}
+}catch(e){
+  console.log("error== ",e)}
 }
 // end vendor dashBoard
 
@@ -577,8 +554,8 @@ async getOrderByStatusAndRange(page,limit :number, status:OptionType,start,end,s
   }
 }
 
-async remove(where): Promise<any> {
-  await this.orderModel.findOneAndDelete(where);
-  return `This action removes a #${where?._id} order`;
-}
+  async remove(where): Promise<any> {
+    await this.orderModel.findOneAndDelete(where);
+    return `This action removes a #${where?._id} order`;
+  }
 }

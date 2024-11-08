@@ -15,6 +15,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ItemFilter, ItemStatus } from '../items/entities/item.entity';
 import { ItemsService } from '../items/items.service';
 import { OptionType } from '../order/entities/order.entity';
+import { Frequency } from 'src/helpers/utils';
 
 @ApiTags('vendors')
 @Controller('vendors')
@@ -76,41 +77,41 @@ export class VendorController {
           );
   }
 
-  @Get('dashboard/customers')
-  async findNewCustomers(
-    @Req() req: Request,
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
-  ) {
-    try {
+  // @Get('dashboard/customers')
+  // async findNewCustomers(
+  //   @Req() req: Request,
+  //   @Query('startDate') startDate?: string,
+  //   @Query('endDate') endDate?: string,
+  // ) {
+  //   try {
 
 
-    const vendorID = req['user'].sub
-    const role = req['user'].role
+  //   const vendorID = req['user'].sub
+  //   const role = req['user'].role
 
-    if(role !="vendor"){
-      throw new BadRequestException("unaccessible to non-vendors");
-    }
+  //   if(role !="vendor"){
+  //     throw new BadRequestException("unaccessible to non-vendors");
+  //   }
 
-    const resp = await this.orderService.getNewCustomers(vendorID,startDate,endDate);
-    console.log("resp::::::> ",resp)
-    return resp
-  } catch (e) {
-    throw new BadRequestException(e);
-  }
-  }
+  //   const resp = await this.orderService.getNewCustomers(vendorID,startDate,endDate);
+  //   console.log("resp::::::> ",resp)
+  //   return resp
+  // } catch (e) {
+  //   throw new BadRequestException(e);
+  // }
+  // }
 
-  @Get('/item-stats')
-  async getItemStats(
-    @Req() req: Request, 
-  )
-  {
+  // @Get('/item-stats')
+  // async getItemStats(
+  //   @Req() req: Request, 
+  // )
+  // {
    
-  const vendorID = req['user'].sub
-  const role = req['user'].role
+  // const vendorID = req['user'].sub
+  // const role = req['user'].role
 
-  return await this.itemsService.countItemsAndCategories(vendorID);
-  }
+  // return await this.itemsService.countItemsAndCategories(vendorID);
+  // }
   
   // list all orders for a vendor use on the dasboard and orderSection
   @Get('/orders')
@@ -229,5 +230,27 @@ console.log("vendorID==vendorID",vendorID)
       );
     
   }
+
+  @Get('/dashboard')
+  async getStatsOrder(
+    @Req() req: Request, 
+    @Query('daysDifference') daysDifference: Frequency)
+  {
+   try {
+    
+   
+  const vendorID = req['user'].sub
+  const role = req['user'].role
+return  await  Promise.all([
+   await this.itemsService.countItemsAndCategories(vendorID,daysDifference),
+   await this.orderService.getNewCustomers(vendorID,daysDifference),
+   await this.orderService.countOrdersByVendorID(vendorID,daysDifference)
+
+])
+} catch (e) {
+  console.log("Error:: ",e)
+ }  
+}
+
 
 }

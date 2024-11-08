@@ -449,11 +449,23 @@ const itemImage = `${imagePath}/${imageName}`;
   }
 
   async countItemsAndCategories(
-    vendorID: string,
+    vendorID: string,daysAgo:Frequency
   ): Promise<{ totalItems: number; totalSections: number }> {
+ 
+    const {startDate,endDate} = this.utilityService.calculatePreviousDate(daysAgo)
+  
+    
+
+ 
     const result = await this.itemModel.aggregate([
-      // Match items with the given vendorID
-      { $match: { vendorID } },
+      { $match: { vendorID ,
+        status:ItemStatus.ACTIVE,
+        createdAt: { $gte: new Date(startDate),
+          $lte: new Date(endDate) 
+        }
+      }
+
+       },
 
       // Group to get distinct itemCategories and count total items
       {
@@ -482,11 +494,15 @@ const itemImage = `${imagePath}/${imageName}`;
     }
   }
 
-  async countVendorSection(vendorID:string){
+  async countVendorSection(vendorID:string,daysAgo:Frequency){
+    const {startDate,endDate} = this.utilityService.calculatePreviousDate(daysAgo)
     return await this.itemModel.aggregate([
-      { $match: { vendorID} },
+      { $match: { vendorID,
+      createdAt: { $gte: new Date(startDate) },  // Only include orders from the last 7 days
+      }
+    },
       { $group: { _id: "$itemCategory" } },
-      { $count: "distinctCategoryCount" }
+      { $count: "vendorSectionCount" }
     ]);
   }
   
