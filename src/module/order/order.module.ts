@@ -7,23 +7,24 @@ import { AccessTokenMiddleware } from '../common/middleware/auth.middleware'
 import { AuthModule } from '../auth/auth.module';
 import { CartService } from '../cart/cart.service';
 import { StripePayment } from 'src/helpers/stripePayment';
-import { ItemsService } from '../items/items.service';
 import { VendorModule } from '../vendor/vendor.module';
 import { ItemsModule } from '../items/items.module';
 
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { UtilityService } from 'src/helpers/utils';
+import { ShipmentService } from '../shipment/shipment.service';
+import { AppModule } from 'src/app.module';
 
 @Module({
   controllers: [OrderController],
   // exports:[forwardRef(() =>VendorModule)],
   exports:[OrderService],
-  providers: [OrderService,CartService,StripePayment,ErrorFormat,UtilityService],
+  providers: [OrderService,ShipmentService,CartService,StripePayment,ErrorFormat,UtilityService],
   imports: [MongooseModule.forFeature(forFeatureDb),
     forwardRef(() => AuthModule),
     forwardRef(() => VendorModule),
     forwardRef(() => ItemsModule),
-
+    forwardRef(() => AppModule),
     ],
 })
 

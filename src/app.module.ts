@@ -29,6 +29,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { StatusController } from './app.controller';
 import { AgentModule } from './module/agent/agent.module';
 import { WalletModule } from './module/wallet/wallet.module';
+import { ShipmentModule } from './module/shipment/shipment.module';
+import { AppGateway } from './app.gateway';
 
 
 @Module({
@@ -63,8 +65,12 @@ import { WalletModule } from './module/wallet/wallet.module';
     ProductSubCategoryModule,
     AgentModule,
     WalletModule,
+    ShipmentModule,
   ],
-  providers: [],
+  exports:[
+    AppGateway
+  ],
+  providers: [AppGateway],
   controllers: [StatusController,HealthController,],
 })
 export class AppModule  {}

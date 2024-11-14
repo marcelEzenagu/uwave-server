@@ -8,22 +8,33 @@ import { CartService } from '../cart/cart.service';
 import { ItemsService } from '../items/items.service';
 import { StripePayment } from 'src/helpers/stripePayment';
 import { Frequency, UtilityService } from 'src/helpers/utils';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { ShipmentService } from '../shipment/shipment.service';
+import { Shipment } from '../shipment/entities/shipment.entity';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     private readonly stripeService: StripePayment,
+    private shipmentService:ShipmentService,
     private  utilityService: UtilityService,
 
     private  cart: CartService,
     private  item: ItemsService
   ) {}
 
+  // @Cron(CronExpression.EVERY_10_MINUTES)
+  //moveAllAcceptedOrdersToProcessingIfNotCancelled
+  async moveAcceptedOrdersToProcessing(){
+    console.log("calling moveAcceptedOrdersToProcessing")
+    await this.moveOrdersToProcessing()
+    console.log("calling moveOrderToShipped")
+    await this.moveOrderToShipped()
+  }
+
   async create(createOrderDto: CreateOrderDto) {
    
-    // weightSrvRecords
-    // this.findWhere()
     const newUserOrder = new this.orderModel(createOrderDto);
     return await newUserOrder.save();
   }
@@ -46,8 +57,9 @@ export class OrderService {
       };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findOne(orderID: string) {
+    const where = {"_id":orderID}
+    return await this.orderModel.findOne().where(where).exec();
   }
 
   async findWhere(where: {}): Promise<Order> {
@@ -82,7 +94,6 @@ export class OrderService {
         await this.item.decreaseItem(updateOrderDto.items),
         await this.cart.removeCart(updateOrderDto.cartID,userID),
       ])
-      console.log("updateOrderDto::: ",updateOrderDto)
 
       return await this.orderModel.findOneAndUpdate(where, updateOrderDto,{new:true})
     }
@@ -93,7 +104,24 @@ export class OrderService {
       new: true,
     });
   }
-  
+
+  async moveOrdersToProcessing() {
+
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000); 
+
+    const result = await this.orderModel.updateMany(
+      {
+        status: OptionType.ACCEPTED,
+        createdAt: { $lte: twentyFourHoursAgo }, // Orders created 24+ hours ago
+      },
+      {
+        $set: { status: OptionType.PROCESSING },
+      }
+    );
+
+    return result; // Returns the number of documents modified
+  }
+
   async updateStatus(orderID, userID: string, updateOrderDto: UpdateOrderDto) {
     const where = { userID, _id: orderID };
 
@@ -555,4 +583,199 @@ async getOrderByStatusAndRange(page,limit :number, status:OptionType,start,end,s
     await this.orderModel.findOneAndDelete(where);
     return `This action removes a #${where?._id} order`;
   }
+
+  async listVendorOrders(vendorID: string,
+    daysRange:Frequency,
+    page,
+    limit: number ,
+    status?: OptionType,
+  ) {
+    try{
+
+   
+        const skip = (page - 1) * limit;
+    const {startDate,endDate} =this.utilityService.calculatePreviousDate(daysRange)
+    
+    const createdAtGte = new Date(startDate)
+    const createdAtLte = new Date(endDate)
+    
+    const matchCriteria: any = {
+          items: { $elemMatch: { vendorID: vendorID } },
+          createdAt: {
+            $gte: createdAtGte,
+            $lte: createdAtLte,
+          }
+        };
+    
+        // Add status to the match criteria if provided
+        if (status) {
+          matchCriteria.status = status;
+        }
+    
+        const orders = await this.orderModel.aggregate([
+          // Match orders based on vendorID, status, and createdAt range
+          { $match: matchCriteria },
+          
+          // Filter items within each order by vendorID
+          {
+            $project: {
+              cartID: 1,
+              userID: 1,
+              totalCost: 1,
+              paymentIntentID: 1,
+              clientSecret: 1,
+              paymentStatus: 1,
+              status: 1,
+              createdAt: 1,
+              deletedAt: 1,
+              shippingAddress: 1,
+              billingAddress: 1,
+              items: {
+                $filter: {
+                  input: "$items",
+                  as: "item",
+                  cond: { $eq: ["$$item.vendorID", vendorID] }
+                }
+              }
+            }
+          },
+          // Exclude orders with empty items arrays after filtering
+          {
+            $match: {
+              items: { $ne: [] }
+            }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'userID',
+              foreignField: 'userID',
+              as: 'userDetails'
+            }
+          },
+          {
+            $unwind: {
+              path: '$userDetails',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          // Implement pagination
+          { $skip: skip },
+          { $limit: limit }
+        ]);
+    
+        // Count total results for pagination metadata
+        const totalOrders = await this.orderModel.countDocuments(matchCriteria);
+    
+        return {
+          data: orders,
+          total: totalOrders,
+          page,
+          limit,
+          // totalPages: Math.ceil(totalOrders / limit)
+        };
+        
+        }catch(e){
+          console.log("ERROR===",e)
+        }
+      }
+    
+    async completeProcessing(vendorID,orderID:string,itemIDs:string[]){
+      
+      
+      try{
+
+       
+        // await this.orderModel.updateOne(
+        //   { _id: orderID },
+        //   {
+        //     $set: {
+        //       "items.$[elem].status": OptionType.SHIPPED,
+        //     },
+        //   },
+        //   {
+           
+        //       arrayFilters: [
+        //         { "elem.vendorID": vendorID, "elem.itemID": { $in: itemIDs } }
+        //       ],
+        //   },
+        // );
+     
+        // After updating the order status, check if there was a change and generate shipment
+      // const found = await this.orderModel.findOne({ _id:orderID  });
+    
+      const order = await this.orderModel.findById(orderID).exec();
+      // .lean<OrderDocument>()
+
+      
+  
+      // Filter items to include only those with itemID present in itemIDs array
+      const matchingItems = order.items.filter(item => itemIDs.includes(item.itemID));
+  
+      // return matchingItems;
+      // for (const itemID of itemIDs) {
+
+        const shipmentData:Shipment = {
+          destination:order?.shippingAddress.country.toLowerCase(),
+                    items:matchingItems,
+                    vendorID:matchingItems[0].vendorID,
+                    itemsCost:matchingItems.reduce((a,b)=> a.newPrice?(a.newPrice*a.quantity):(a.salesPrice*a.quantity) +b.newPrice?(b.newPrice*b.quantity):(b.salesPrice*b.quantity) ,0),
+                    exhangeRate:order.exhangeRate,
+                    orderID:order.id,
+                  }
+
+        await this.shipmentService.generateShipmentForOrder(shipmentData);
+  
+      return "order completed by vendor"
+      }catch(e){
+        console.log("error at completeProcessing:",e)
+      }
+    }
+    async moveOrderToShipped(){
+      try{
+
+       
+      
+     
+     
+    
+   const result = await this.orderModel.updateMany(
+      { 
+        status: OptionType.PROCESSING  // Only target orders that are in "processing" status
+      },  
+      [
+        {
+          $set: {
+            status: {
+              $cond: {
+                if: {
+                  $eq: [
+                    {
+                      $size: {
+                        $filter: {
+                          input: "$items",
+                          as: "item",
+                          cond: { $ne: ["$$item.status", OptionType.SHIPPED] }
+                        }
+                      }
+                    },
+                    0 // If no item has a status other than "shipped", set size to 0
+                  ]
+                },
+                then: OptionType.SHIPPED, // Set orderStatus to "shipped" if all items are shipped
+                else: "$status" // Otherwise, keep the current orderStatus
+              }
+            }
+          }
+        }
+      ]
+    );
+
+    
+    return result;
+  }catch(e){
+    console.log("error at moveOrderToShipped:",e)
+  }
+  }
+
 }

@@ -239,7 +239,7 @@ const itemImage = `${imagePath}/${imageName}`;
       .skip(skip)
       .limit(limit)
       .exec();
-    const total = await this.itemModel.countDocuments();
+    const total = await this.itemModel.countDocuments(filter);
 
     return {
       data,

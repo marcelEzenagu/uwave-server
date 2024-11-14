@@ -11,6 +11,7 @@ export enum OptionType {
   ACCEPTED= "ACCEPTED",
   CANCELLED= "CANCELLED",
   PROCESSING= "PROCESSING",
+  IN_TRANSIT= "IN_TRANSIT",
   SHIPPED= "SHIPPED",
   RETURNED="RETURNED",
   DELIVERED="DELIVERED"
@@ -73,11 +74,12 @@ export class Order {
         salesPrice: { type: Number },
         newPrice: { type: Number },
         quantity: { type: Number, required: true },
+        status:{ type: String,enum:OptionType,default:OptionType.ACCEPTED},
         _id: false 
       }],
       default: [],
       })
-    items: Item[];
+    items: any[];
 
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     userID: Types.ObjectId;
@@ -98,7 +100,7 @@ export class Order {
     @Prop({ type: String,enum:PaymentStatusType,default:PaymentStatusType.REQUIRES_PAYMENT_METHOD })
     paymentStatus: string;
     
-    @Prop({ type: String,enum:OptionType,default:OptionType.PROCESSING})
+    @Prop({ type: String,enum:OptionType,default:OptionType.ACCEPTED})
     status?: string ;
 
     @Prop({ type: Date, default: null })
@@ -113,7 +115,8 @@ export class Order {
 
 
 
-export type OrderDocument = Order & Document
+export type OrderDocument = Order & Document 
+
 export const OrderSchema = SchemaFactory.createForClass(Order)
 
 // Create a virtual field `orderID` that points to the `_id` field
@@ -123,6 +126,6 @@ OrderSchema.virtual('orderID').get(function (this: OrderDocument) {
   });
 
   OrderSchema.index({
-    'items.product.name': 'text',  // Ensure the text index covers the product's name
+    'items.itemName': 'text',  // Ensure the text index covers the product's name
     'orderID': 'text',             // Make the orderID searchable
   });

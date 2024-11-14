@@ -17,7 +17,7 @@ import { Request } from 'express';
 import { StripePayment } from 'src/helpers/stripePayment';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthService } from '../auth/auth.service';
+
 
 @ApiTags('orders')
 @Controller('orders')
@@ -54,6 +54,7 @@ export class OrderController {
         throw new BadRequestException("order already completed.");
       } 
       updateOrderDto.totalCost = undefined
+      updateOrderDto.status = undefined
       
      return await this.orderService.updatePayment(paymentIntentID, userID, updateOrderDto);
     }catch(e){

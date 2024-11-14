@@ -7,14 +7,16 @@ import forFeatureDb from 'src/db/for-feature.db';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { AuthModule } from '../auth/auth.module';
 import { AdminModule } from '../admin/admin.module';
+import { ShipmentService } from '../shipment/shipment.service';
+import { AppModule } from 'src/app.module';
 
 @Module({
   controllers: [AgentController],
   exports: [AgentService],
-  providers: [AgentService,ErrorFormat],
+  providers: [AgentService,ErrorFormat,ShipmentService],
   imports: [
     forwardRef(() => AuthModule),
-    // forwardRef(() => AdminModule),
+    forwardRef(() => AppModule),
     MongooseModule.forFeature(forFeatureDb)],
 })
 

@@ -16,6 +16,7 @@ import { ItemFilter, ItemStatus } from '../items/entities/item.entity';
 import { ItemsService } from '../items/items.service';
 import { OptionType } from '../order/entities/order.entity';
 import { Frequency } from 'src/helpers/utils';
+import { UpdateOrderDto } from '../order/dto/update-order.dto';
 
 @ApiTags('vendors')
 @Controller('vendors')
@@ -132,19 +133,66 @@ export class VendorController {
 console.log("vendorID==vendorID",vendorID)
   return await this.orderService.findOrdersByVendorID(vendorID,daysDifference,page,limit);
   }
-  // list all orders for a vendor use on the dasboard and orderSection
-  @Get('/open-orders')
-  async searchOpenOrder(
-    @Req() req: Request, 
-    @Query('daysDifference') daysDifference: number)
-  {
-   
-  const vendorID = req['user'].sub
-  const role = req['user'].role
 
-  return await this.orderService.findOpenOrdersForVendors(daysDifference);
+  @Get('/vendor-orders')
+async listVendorOrders(
+  @Req() req: Request, 
+  @Query('daysDifference') daysDifference: Frequency,
+  @Query('status') status: string,
+  @Query('page') page: number = 1, 
+  @Query('limit') limit: number = 50,
+){
+  page = Number(page);
+  limit = Number(limit);
+
+  if (page < 1) page = 1;  // Page should be at least 1
+  if (limit < 1 || limit > 100) limit = 50;  
+
+const vendorID = req['user'].sub
+const role = req['user'].role
+console.log("vendorID==vendorID",vendorID)
+
+return await this.orderService.listVendorOrders(vendorID,daysDifference,page,limit,OptionType[status]);
+
+}
+
+// list all orders for a vendor use on the dasboard and orderSection
+@Get('/open-orders')
+async searchOpenOrder(
+  @Req() req: Request, 
+  @Query('daysDifference') daysDifference: number)
+{
+  
+const vendorID = req['user'].sub
+const role = req['user'].role
+
+return await this.orderService.findOpenOrdersForVendors(daysDifference);
+}
+
+// completedOrder
+@Patch('/complete-order')
+async completeProcessing(
+  @Req() req: any, 
+  @Body()dto:{itemIDs: string[]},
+  @Query('orderID') orderID: string)
+{
+  try{
+
+  
+  
+const vendorID = req['user'].sub
+const role = req['user'].role
+
+  if(role != "vendor"){
+    throw new BadRequestException("unaccessible to non-vendors");
   }
+  return await this.orderService.completeProcessing(vendorID,orderID.trim(),dto.itemIDs);
+  }catch(e){
+    console.log("Error::: ",e)
+  }
+}
 
+  // 
 
   @Patch("")
   async update(@Req() req: Request,

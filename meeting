@@ -26,3 +26,10 @@
 
 
 //VENDOR 
+
+// 11-11
+// agent
+// agent sees listing of new shipments based on orders;
+//     -accept/reject;
+
+// when order arrives (uses orderID to see the full orderDetails to see if the order-items are complete or not)
