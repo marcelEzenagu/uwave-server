@@ -78,13 +78,9 @@ export class AgentController {
     @Body() data :any
   ){
     try {
-      
-    
-    console.log("got called","shipmentID",data.shipmentID)
     const agentID = req['user'].sub
-    console.log("got called","agentID",agentID)
     const role = req['user'].role
-    return await this.shipmentService.acceptShipment(data.shipmentID,agentID)
+    return await this.shipmentService.acceptShipment(data.shipmentID,agentID,data.status)
   } catch (e) {
     throw new BadRequestException(this.errorFormat.formatErrors(e));
 

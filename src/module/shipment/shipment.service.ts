@@ -76,11 +76,21 @@ try{
     return `This action updates a #${id} shipment`;
   }
 
-  acceptShipment(shipmentID,agentID: string) {
+  acceptShipment(shipmentID,agentID,status?: string) {
    
-    return this.shipmentModel.findOneAndUpdate({_id: shipmentID},{agentID,status:OptionType.ACCEPTED},{new:true})
+    const presentStatus = OptionType[status]
+   const newUpdate = presentStatus === OptionType.PROCESSING ?
+                      {agentID,status: OptionType.ACCEPTED}
+                    : 
+                     presentStatus === OptionType.IN_TRANSIT ? 
+                      {status: OptionType.WAREHOUSED}
+                    : 
+                     presentStatus === OptionType.WAREHOUSED ?
+                      {status: OptionType.SHIPPED}
+                     :null 
+
+    return this.shipmentModel.findOneAndUpdate({_id: shipmentID},newUpdate,{new:true})
                               .exec();
-    // return {message:`This action accepts  #${shipmentID} shipment by ${agentID}`};
   }
 
   remove(id: number) {
