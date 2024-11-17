@@ -177,8 +177,6 @@ async completeProcessing(
   @Query('orderID') orderID: string)
 {
   try{
-
-  
   
 const vendorID = req['user'].sub
 const role = req['user'].role

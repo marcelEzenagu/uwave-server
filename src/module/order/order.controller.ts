@@ -73,7 +73,11 @@ export class OrderController {
       console.log("GOT CALLED-intent")
       const userID = req['user'].sub;
       createOrderDto.userID = userID
+      console.log("createOrderDto:::",createOrderDto)
+
       const intentRes = await this.stripeService.createSession(createOrderDto.totalCost)
+      console.log("GOT intentRes",intentRes)
+
       createOrderDto.paymentIntentID =intentRes.paymentIntentID
       createOrderDto.clientSecret =intentRes.clientSecret
       intentRes.paymentIntentID =undefined

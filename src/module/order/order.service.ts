@@ -716,7 +716,7 @@ async getOrderByStatusAndRange(page,limit :number, status:OptionType,start,end,s
       // for (const itemID of itemIDs) {
 
         const shipmentData:Shipment = {
-          destination:order?.shippingAddress.country.toLowerCase(),
+          destination:order?.shippingAddress?.country.toLowerCase(),
                     items:matchingItems,
                     vendorID:matchingItems[0].vendorID,
                     itemsCost:matchingItems.reduce((a,b)=> a.newPrice?(a.newPrice*a.quantity):(a.salesPrice*a.quantity) +b.newPrice?(b.newPrice*b.quantity):(b.salesPrice*b.quantity) ,0),

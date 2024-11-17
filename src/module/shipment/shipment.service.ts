@@ -4,7 +4,7 @@ import { Shipment, ShipmentDocument } from './entities/shipment.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AppGateway } from 'src/app.gateway';
-import { OptionType } from '../order/entities/order.entity';
+import { OptionType, ShipmentOptionType } from '../order/entities/order.entity';
 
 @Injectable()
 export class ShipmentService {
@@ -46,7 +46,7 @@ try{
   async findShipmentsForAgent(countries: string[],
     page,
     limit: number,    
-    status: OptionType,
+    status: ShipmentOptionType,
   ) {
       const skip = (page - 1) * limit;
       const filter =  {
@@ -78,17 +78,32 @@ try{
 
   acceptShipment(shipmentID,agentID,status?: string) {
    
-    const presentStatus = OptionType[status]
-   const newUpdate = presentStatus === OptionType.PROCESSING ?
-                      {agentID,status: OptionType.ACCEPTED}
+    const presentStatus = ShipmentOptionType[status]
+   const newUpdate = presentStatus === ShipmentOptionType.PROCESSING ?
+                      {agentID,status: ShipmentOptionType.ACCEPTED}
                     : 
-                     presentStatus === OptionType.IN_TRANSIT ? 
-                      {status: OptionType.WAREHOUSED}
+                     presentStatus === ShipmentOptionType.IN_TRANSIT ? 
+                      {status: ShipmentOptionType.WAREHOUSED}
                     : 
-                     presentStatus === OptionType.WAREHOUSED ?
-                      {status: OptionType.SHIPPED}
+                     presentStatus === ShipmentOptionType.WAREHOUSED ?
+                      {status: ShipmentOptionType.FOR_SHIPPING}
+                     :null 
+                     presentStatus === ShipmentOptionType.FOR_SHIPPING ?
+                      {status: ShipmentOptionType.SHIPPED}
                      :null 
 
+    return this.shipmentModel.findOneAndUpdate({_id: shipmentID},newUpdate,{new:true})
+                              .exec();
+  }
+
+  rejectShipment(shipmentID,agentID,reason?: string) {
+   
+   const newUpdate = 
+                      {agentID,
+                      status: ShipmentOptionType.REJECTED,
+                      rejectReason:reason
+                      }
+                    
     return this.shipmentModel.findOneAndUpdate({_id: shipmentID},newUpdate,{new:true})
                               .exec();
   }

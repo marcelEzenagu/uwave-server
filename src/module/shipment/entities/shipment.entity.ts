@@ -7,7 +7,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Document, Types } from 'mongoose';
 import { Item } from "src/module/items/entities/item.entity";
 import { Address } from "src/module/user/entities/user.entity";
-import { OptionType } from "src/module/order/entities/order.entity";
+import { OptionType, ShipmentOptionType } from "src/module/order/entities/order.entity";
 
 
 
@@ -65,9 +65,11 @@ export class Shipment {
     @Prop({ type: Number, })
     exhangeRate?: number;
 
-    @Prop({ type: String,enum:OptionType,default:OptionType.PROCESSING})
+    @Prop({ type: String,enum:ShipmentOptionType,default:ShipmentOptionType.PROCESSING})
     status?: string ;
 
+    @Prop()
+    rejectReason? : string
     @Prop()
     destination : string
     @Prop({ type: Date, default: null })

@@ -10,15 +10,18 @@ export class CartService {
   constructor(@InjectModel(Cart.name) private cartModel: Model<CartDocument>) {}
 
   async addToCart(createCartDto: Cart) {
+    // console.log("CART:: ",createCartDto)
+    console.log("CART-called:: ",)
+    // process.exit()
     try{    
-      const where = {"userID":createCartDto.userID}
-    const result= await  this.cartModel.findOne().where(where).exec();
-    if (!result){
+    //   const where = {"userID":createCartDto.userID}
+    // const result= await  this.cartModel.findOne().where(where).exec();
+    // if (!result.products.length){
       const newUserCart = new this.cartModel(createCartDto)
       return await newUserCart.save();
-    }else{
-  return result
-    }
+  //   }else{
+  // return result
+  //   }
   }catch(e){
     console.log("addToCart_error",e)
   }

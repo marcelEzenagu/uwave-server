@@ -8,22 +8,27 @@ const stripe = require('stripe')(process.env.STRIPE_KEY)
 @Injectable()
 export class StripePayment {
   async createSession(amount){
+console.log("samount:::",amount)
+    try{
+      const paymentIntent = await stripe.paymentIntents.create({
+            amount: amount*100,
+            currency: process.env.CURRENCY_TYPE,
+            automatic_payment_methods: {
+              enabled: true,
+            },
+      });
+      
+      
+          return {
+            dpmCheckerLink:`https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=${paymentIntent.id}`,
+            paymentIntentID:paymentIntent.id,
+            clientSecret:paymentIntent.client_secret}
 
+    }catch(e){
+      console.log("error:::",e)
+
+    }
     
-    
-const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount*100,
-      currency: process.env.CURRENCY_TYPE,
-      automatic_payment_methods: {
-        enabled: true,
-      },
-});
-
-
-    return {
-      dpmCheckerLink:`https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=${paymentIntent.id}`,
-      paymentIntentID:paymentIntent.id,
-      clientSecret:paymentIntent.client_secret}
   }
 
   async confirmPaymentIntent(paymentIntentId){

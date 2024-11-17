@@ -6,7 +6,7 @@ import { Agent } from './entities/agent.entity';
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { ShipmentService } from '../shipment/shipment.service';
-import { OptionType } from '../order/entities/order.entity';
+import { OptionType, ShipmentOptionType } from '../order/entities/order.entity';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 
 @ApiTags('agents')
@@ -55,7 +55,7 @@ export class AgentController {
     @Query('daysDiff') daysDifference: string,
     @Query('page') page: number = 1, 
     @Query('limit') limit: number = 50 , 
-    @Query('status') status: OptionType ,
+    @Query('status') status: ShipmentOptionType ,
     @Query("countries") countries:string[],
 
   ) {
@@ -73,18 +73,23 @@ export class AgentController {
   }
 
   @Patch("warehouse")
- async accept(
+  async accept(
     @Req() req: Request,
     @Body() data :any
   ){
     try {
-    const agentID = req['user'].sub
-    const role = req['user'].role
-    return await this.shipmentService.acceptShipment(data.shipmentID,agentID,data.status)
-  } catch (e) {
-    throw new BadRequestException(this.errorFormat.formatErrors(e));
-
-  }
+      const agentID = req['user'].sub
+      const role = req['user'].role
+      
+      if(data.rejectMessage != undefined){
+        console.log("AT REJECT")
+        return await this.shipmentService.rejectShipment (data.shipmentID,agentID,data.rejectMessage) 
+      }
+      console.log("NOT_AT REJECT")
+      return await this.shipmentService.acceptShipment(data.shipmentID,agentID,data.status)
+    } catch (e) {
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
+    }
   }
 
 }
