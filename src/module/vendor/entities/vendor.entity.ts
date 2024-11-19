@@ -1,12 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document,Types } from 'mongoose';
 import { v4 as uuid } from 'uuid';
 import { Type } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, Length, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 
-export type VendorDocument = Vendor & Document;
+export type VendorDocument = Vendor & Document & {
+  vendorID: string;  
+}
+
 export enum VendorStat {
   VERIFIED= "VERIFIED",
   PENDING= "PENDING",
@@ -28,14 +31,7 @@ export enum VendorStat {
 })
 
 export class Vendor {
-  @Prop({
-    type: String,
-    unique: true,
-    default: function genUUID() {
-      return uuid();
-    },
-  })
-  vendorID: string;
+  
 
   @ApiProperty({
     example: 'ghana',
@@ -50,6 +46,13 @@ export class Vendor {
  })
   @Prop({ type: String })
   phoneNumber?: string;
+  
+  @ApiProperty({
+    example: '2348183940563',
+    required: true
+ })
+  @Prop({ type: String })
+  businessPhoneNumber?: string;
   
   @ApiProperty({
     example: 'km 10 benin-asaba, expressway',
@@ -109,11 +112,15 @@ export class Vendor {
   @Prop({type: String})
   businessBank?: string;
 
+
+  @Prop({type: String})
+  businessBankAccount?: string;
+  @Prop({type: String})
+  businessBankAccountName?: string;
+
   @Prop({type: String,enum:VendorStat, default:VendorStat.PENDING})
   status?: string;
   
-  @Prop({type: String})
-  businessBankAccount?: string;
 
   @Prop({ type: String })
   @IsOptional()
@@ -141,8 +148,21 @@ export class Vendor {
 
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
+
+
+  @Prop({ type: Boolean })
+  isVerified: Boolean ;
+  @Prop({ type: Boolean })
+  isEmailVerified: Boolean ;
+  @Prop({ type: Boolean })
+  hasAcknowleged: Boolean ;
 }
+
 
 export const VendorSchema = SchemaFactory.createForClass(Vendor);
 VendorSchema.index({ firstName: 1, lastName: 1,email:1 }, { unique: true });
 VendorSchema.index({ firstName: 'text', lastName: 'text', email: 'text' });
+
+VendorSchema.virtual('vendorID').get(function (this: VendorDocument) {
+  return (this._id as Types.ObjectId).toHexString(); 
+});

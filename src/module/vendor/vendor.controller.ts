@@ -193,8 +193,10 @@ const role = req['user'].role
   // 
 
   @Patch("")
-  async update(@Req() req: Request,
-   @Body() updateVendorDto: UpdateVendorDto) {
+  async update(
+    @Body() updateVendorDto: UpdateVendorDto,
+    @Req() req: Request,
+  ) {
     const role = req['user'].role
     if(role !="vendor"){
       throw new BadRequestException("unaccessible to non-vendors");
@@ -204,7 +206,10 @@ const role = req['user'].role
 
    
     const vendorID = req['user'].sub
+    console.log("req['user']",req['user'])
     const vPath = "public/images/vendors"
+
+    console.log("vendorID",vendorID)
     const imageName =`${vendorID}.png`
     if(updateVendorDto.profilePicture){
       const imagePath = `${vPath}/profilePicture`
@@ -215,28 +220,34 @@ const role = req['user'].role
 
     if(updateVendorDto.businessPicture){
       const imagePath = `${vPath}/business`
-      const success =  await this.fileService.uploadImage(updateVendorDto.profilePicture,imagePath,imageName)
+      const success =  await this.fileService.uploadImage(updateVendorDto.businessPicture,imagePath,imageName)
       updateVendorDto.businessPicture = `${imagePath}/${imageName}`
     }
     if(updateVendorDto.permitDocument){
       const imagePath = `${vPath}/vendorPermit`
-      const success =  await this.fileService.uploadImage(updateVendorDto.profilePicture,imagePath,imageName)
+      const success =  await this.fileService.uploadImage(updateVendorDto.permitDocument,imagePath,imageName)
       updateVendorDto.permitDocument = `${imagePath}/${imageName}`
     }
     if(updateVendorDto.foodLicenseDocument){
       const imagePath = `${vPath}/foodLicense`
-      const success =  await this.fileService.uploadImage(updateVendorDto.profilePicture,imagePath,imageName)
+      const success =  await this.fileService.uploadImage(updateVendorDto.foodLicenseDocument,imagePath,imageName)
       updateVendorDto.foodLicenseDocument = `${imagePath}/${imageName}`
     }
     if(updateVendorDto.cacDocument){
       const imagePath = `${vPath}/CAC`
-      const success =  await this.fileService.uploadImage(updateVendorDto.profilePicture,imagePath,imageName)
+      const success =  await this.fileService.uploadImage(updateVendorDto.cacDocument,imagePath,imageName)
       updateVendorDto.cacDocument = `${imagePath}/${imageName}`
     }
+    if(updateVendorDto.idDocument){
+      const imagePath = `${vPath}/ID`
+      const success =  await this.fileService.uploadImage(updateVendorDto.idDocument,imagePath,imageName)
+      updateVendorDto.idDocument = `${imagePath}/${imageName}`
+    }
 
+    console.log("updateVendorDt==== ",updateVendorDto)
 
     try{
-      return this.vendorService.update(vendorID,updateVendorDto);
+      return await this.vendorService.update(vendorID,updateVendorDto);
     }catch(e){
       throw new BadRequestException(e)
     }

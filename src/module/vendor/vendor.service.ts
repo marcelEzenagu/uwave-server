@@ -38,7 +38,7 @@ export class VendorService {
         
       }
       const vendorID = dto.vendorID 
-      const user = await this.findWhere({ vendorID});
+      const user = await this.findWhere({ "_id":vendorID});
 
       if (!user) {
         throw new NotFoundException("no vendor with this email");
@@ -66,7 +66,6 @@ export class VendorService {
 
   async findAll():Promise<Vendor[]> {
     return await  this.vendorModel.find().exec();
-    
   }
 
 
@@ -106,31 +105,51 @@ const total = await this.vendorModel.countDocuments();
   }
   
   async findOne(id):Promise<Vendor> {
-    const where = {"vendorID":id}
+    const where = {"_id":id}
     console.log("where: ",where)
-    return await  this.vendorModel.findOne().where(where).exec();
+    return await  this.vendorModel.findOne(where).exec();
   
-    // return await  this.vendorModel.findById(id).exec();
   }
   
   async update(id: string, updateVendorDto: UpdateVendorDto):Promise<Vendor> {
-   
-    const where= {"vendorID":id}
+    const where= {"_id":id}
     return await  this.vendorModel.findOneAndUpdate(where,updateVendorDto, {new: true })
   }
 
-  async findWhere(where:{}):Promise<Vendor> {
-    return await  this.vendorModel.findOne().where(where).exec();
+  async findWhere(where:{}):Promise<VendorDocument> {
+    return await  this.vendorModel.findOne(where).exec();
   }
   
-  async remove(where):Promise<any> {
+  async delete(where):Promise<any> {
     const params = {"_id":where.vendorID}
     where.deletedAt = new Date()
   return await  this.vendorModel.findOneAndUpdate(params,where,{new:true}).exec;
   }
 
-  async delete(where):Promise<any> {
-  return await  this.vendorModel.where(where).findOneAndDelete().exec;
+  async remove(where):Promise<any> {
+    console.log("DELETEING", where)
+    return  await  this.vendorModel.findOneAndDelete(where)
+    .then(deletedDoc => {
+      if (deletedDoc) {
+        return "Deleted document:"
+      } else {
+        console.log("No document found for delete.");
+      }
+    })
+    .catch(err => {
+      console.error("Error finding and deleting document:", err);
+      throw new Error(`Error finding and deleting document:, ${err}`);
+    });
+
   }
+
+  async verifyEmail(where):Promise<VendorDocument> {
+   
+    const update = {
+      isEmailVerified:true
+    }
+    return await  this.vendorModel.findOneAndUpdate(where,update, {new: true });
+  }
+
 
 }

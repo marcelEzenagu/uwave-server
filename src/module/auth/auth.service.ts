@@ -47,7 +47,6 @@ export class AuthService {
     @InjectModel(WaveUser.name) private uWaveUserModel: Model<WaveUserDocument>,
   ) {}
 
-
   private generateRandomCharacters(length: number) {
     const characters = randomBytes(Math.ceil(length / 2))
       .toString('hex')
@@ -66,32 +65,33 @@ export class AuthService {
   }
 
   async generateTemporaryAccessCode(
-    tokenType: 'create-account' | 'reset-password'|'email-verification',
+    tokenType: 'create-account' | 'reset-password' | 'email-verification',
     value: string,
   ): Promise<string> {
     const characters = this.generateRandomCharacters(86);
-    
+
     const key = `${tokenType}-${characters}`;
 
     // save to redis
-    await this.redisService.setValue(key, value)
-   
-    return characters;
+    await this.redisService.setValue(key, value);
 
+    return characters;
   }
 
   private hashData(data: string) {
     return bcrypt.hash(data, 10);
   }
-  
+
   async loginUser(dto: LogInDto): Promise<LogInUserResponseDto> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
-      const user = await this.userService.findWhere({ email: dto.email.toLowerCase() });
+      const user = await this.userService.findWhere({
+        email: dto.email.toLowerCase(),
+      });
 
       if (!user) {
-        throw new NotFoundException("invalid email");
+        throw new NotFoundException('invalid email');
       }
 
       const passwordMatch = await bcrypt.compare(dto.password, user.password);
@@ -100,8 +100,8 @@ export class AuthService {
         throw new UnauthorizedException('Invalid password');
       }
 
-      const  role = 'user' 
-      const accessTokenData = this.generateToken(user.userID,role);
+      const role = 'user';
+      const accessTokenData = this.generateToken(user.userID, role);
 
       return {
         access_data: { access_token: accessTokenData, role },
@@ -115,33 +115,31 @@ export class AuthService {
     }
   }
 
- 
-
   async forgotUserPassword(dto: ForgotPasswordDto): Promise<{}> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
       const user = await this.userService.findWhere({ email: dto.email });
 
       if (!user) {
-        throw new NotFoundException("no user with this email");
+        throw new NotFoundException('no user with this email');
       }
 
-      const OTP = this.generateOtp()
-      const requestID = await this.generateTemporaryAccessCode("reset-password",OTP)
+      const OTP = this.generateOtp();
+      const requestID = await this.generateTemporaryAccessCode(
+        'reset-password',
+        OTP,
+      );
 
-      await this.mailService.send(
-        {
-          subject:"reset-password",
-          to:dto.email,
-          otp:OTP,
-          template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
-        }
-       )
+      await this.mailService.send({
+        subject: 'reset-password',
+        to: dto.email,
+        otp: OTP,
+        template: MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+      });
 
-
-     return {
-        message: "A Password Reset OTP has been sent to this email",
+      return {
+        message: 'A Password Reset OTP has been sent to this email',
         requestID,
         // data:{
         //   requestID,
@@ -156,33 +154,35 @@ export class AuthService {
     }
   }
 
-  async verifyResetUserPassword(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
+  async verifyResetUserPassword(
+    dto: VerifyResetPasswordDto,
+  ): Promise<LogInUserResponseDto> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
-      const key = `reset-password-${dto.requestID}`
+      const key = `reset-password-${dto.requestID}`;
 
-      const foundOTP = await this.redisService.getValue(key)
-    
+      const foundOTP = await this.redisService.getValue(key);
+
       if (foundOTP !== dto.otp) {
-        throw new UnprocessableEntityException("invalid otp");
+        throw new UnprocessableEntityException('invalid otp');
       }
 
-       const user = await this.userService.findWhere({ email: dto.email });
+      const user = await this.userService.findWhere({ email: dto.email });
 
       if (!user) {
-        throw new NotFoundException("no user with this email");
+        throw new NotFoundException('no user with this email');
       }
-      
-      const  role = 'user' 
-      const accessTokenData = this.generateToken(user.userID,role);
 
+      const role = 'user';
+      const accessTokenData = this.generateToken(user.userID, role);
 
       return {
- access_data: { access_token: accessTokenData, role },
-        user: user,      };
+        access_data: { access_token: accessTokenData, role },
+        user: user,
+      };
     } catch (error) {
-      console.log("error: ", error)
+      console.log('error: ', error);
       if (error instanceof NotFoundException) {
         throw new NotFoundException(error);
       }
@@ -193,30 +193,31 @@ export class AuthService {
 
   async registerUser(createUserDto: User): Promise<LogInUserResponseDto> {
     // try {
-      createUserDto.email = createUserDto.email.toLowerCase()
+    createUserDto.email = createUserDto.email.toLowerCase();
 
-      createUserDto.password = await this.hashData(createUserDto.password);
-      const newUser = new this.userModel(createUserDto);
-      
-      const returnedUser = await newUser.save();
-      const role = 'user'
+    createUserDto.password = await this.hashData(createUserDto.password);
+    const newUser = new this.userModel(createUserDto);
 
-      const token = this.generateToken(newUser.userID,role);
+    const returnedUser = await newUser.save();
+    const role = 'user';
 
-      return {
-        access_data: { token, role },
-        user: returnedUser,
-      };
-    
+    const token = this.generateToken(newUser.userID, role);
+
+    return {
+      access_data: { token, role },
+      user: returnedUser,
+    };
   }
 
   async loginAgent(dto: LogInDto): Promise<LogInUserResponseDto> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
-      const agent = await this.agentService.findWhere({ email: dto.email.toLowerCase() });
+      const agent = await this.agentService.findWhere({
+        email: dto.email.toLowerCase(),
+      });
       if (!agent) {
-        throw new NotFoundException("invalid email");
+        throw new NotFoundException('invalid email');
       }
 
       const passwordMatch = await bcrypt.compare(dto.password, agent.password);
@@ -224,8 +225,8 @@ export class AuthService {
         throw new UnauthorizedException('Invalid password');
       }
 
-      const  role = 'agent' 
-      const accessTokenData = this.generateToken(agent.agentID,role);
+      const role = 'agent';
+      const accessTokenData = this.generateToken(agent.agentID, role);
 
       return {
         access_data: { access_token: accessTokenData, role },
@@ -241,29 +242,29 @@ export class AuthService {
 
   async forgotAgentPassword(dto: ForgotPasswordDto): Promise<{}> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
       const user = await this.agentService.findWhere({ email: dto.email });
 
       if (!user) {
-        throw new NotFoundException("no user with this email");
+        throw new NotFoundException('no user with this email');
       }
 
-      const OTP = this.generateOtp()
-      const requestID = await this.generateTemporaryAccessCode("reset-password",OTP)
+      const OTP = this.generateOtp();
+      const requestID = await this.generateTemporaryAccessCode(
+        'reset-password',
+        OTP,
+      );
 
-      await this.mailService.send(
-        {
-          subject:"reset-password",
-          to:dto.email,
-          otp:OTP,
-          template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
-        }
-       )
+      await this.mailService.send({
+        subject: 'reset-password',
+        to: dto.email,
+        otp: OTP,
+        template: MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+      });
 
-
-     return {
-        message: "A Password Reset OTP has been sent to this email",
+      return {
+        message: 'A Password Reset OTP has been sent to this email',
         requestID,
       };
     } catch (error) {
@@ -274,33 +275,34 @@ export class AuthService {
     }
   }
 
-  async verifyResetAgentPassword(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
+  async verifyResetAgentPassword(
+    dto: VerifyResetPasswordDto,
+  ): Promise<LogInUserResponseDto> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
-      const key = `reset-password-${dto.requestID}`
+      const key = `reset-password-${dto.requestID}`;
 
-      const foundOTP = await this.redisService.getValue(key)
-    
+      const foundOTP = await this.redisService.getValue(key);
+
       if (foundOTP !== dto.otp) {
-        throw new UnprocessableEntityException("invalid otp");
+        throw new UnprocessableEntityException('invalid otp');
       }
 
       const agent = await this.agentService.findWhere({ email: dto.email });
       if (!agent) {
-        throw new NotFoundException("no agent with this email");
+        throw new NotFoundException('no agent with this email');
       }
-      
-      const  role = 'agent' 
-      const accessTokenData = this.generateToken(agent.agentID,role);
 
+      const role = 'agent';
+      const accessTokenData = this.generateToken(agent.agentID, role);
 
       return {
         access_data: { access_token: accessTokenData, role },
-        user: agent,      
+        user: agent,
       };
     } catch (error) {
-      console.log("error: ", error)
+      console.log('error: ', error);
       if (error instanceof NotFoundException) {
         throw new NotFoundException(error);
       }
@@ -309,34 +311,71 @@ export class AuthService {
     }
   }
 
-  async verifyAgentEmail(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
+  async verifyAgentEmail(
+    dto: VerifyResetPasswordDto,
+  ): Promise<LogInUserResponseDto> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
-      const key = `email-verification-${dto.requestID}`
-      const foundOTP = await this.redisService.getValue(key)
-    
+      const key = `email-verification-${dto.requestID}`;
+      const foundOTP = await this.redisService.getValue(key);
+
       if (foundOTP !== dto.otp) {
-        throw new UnprocessableEntityException("invalid otp");
+        throw new UnprocessableEntityException('invalid otp');
       }
 
       // update isEmailVerified;
 
       const agent = await this.agentService.verifyEmail({ email: dto.email });
       if (!agent) {
-        throw new NotFoundException("no agent with this email");
+        throw new NotFoundException('no agent with this email');
       }
-      
-      const  role = 'agent' 
-      const accessTokenData = this.generateToken(agent.agentID,role);
 
+      const role = 'agent';
+      const accessTokenData = this.generateToken(agent.agentID, role);
 
       return {
         access_data: { access_token: accessTokenData, role },
-        user: agent,      
+        user: agent,
       };
     } catch (error) {
-      console.log("error: ", error)
+      console.log('error: ', error);
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error);
+      }
+
+      throw error;
+    }
+  }
+
+  async verifyVendorEmail(
+    dto: VerifyResetPasswordDto,
+  ): Promise<LogInUserResponseDto> {
+    try {
+      dto.email = dto.email.toLowerCase();
+
+      const key = `email-verification-${dto.requestID}`;
+      const foundOTP = await this.redisService.getValue(key);
+
+      if (foundOTP !== dto.otp) {
+        throw new UnprocessableEntityException('invalid otp');
+      }
+
+      // update isEmailVerified;
+      const vendor = await this.vendorService.verifyEmail({ email: dto.email });
+      if (!vendor) {
+        throw new NotFoundException('no vendor with this email');
+      }
+
+      const role = 'vendor';
+      const accessTokenData = this.generateToken(vendor.vendorID, role);
+
+      return {
+        access_data: { access_token: accessTokenData, role },
+        user: vendor,
+      };
+    } catch (error) {
+      console.log('error: ', error);
       if (error instanceof NotFoundException) {
         throw new NotFoundException(error);
       }
@@ -346,112 +385,109 @@ export class AuthService {
   }
 
   async resendOTP(dto: ResendOTPDto): Promise<{}> {
-    let {email,resendType,userType} = dto
-    email =email.toLowerCase().trim()
-    
+    let { email, resendType, userType } = dto;
+    email = email.toLowerCase().trim();
+
     // format is user_email-verification, agent_email-verification
-    let user:any
+    let user: any;
     const emailWhere = {
-      email
-    }
+      email,
+    };
 
-    if(userType == 'user'){
-      const result =  await this.userService.findWhere(emailWhere)
+    if (userType == 'user') {
+      const result = await this.userService.findWhere(emailWhere);
       if (!result) {
-        throw new NotFoundException("invalid email");
+        throw new NotFoundException('invalid email');
       }
-      user = result
+      user = result;
     }
 
-    let requestID
+    let requestID;
 
-    if(resendType == "email-verification"){
+    if (resendType == 'email-verification') {
       // send emailOTP
-      const OTP = this.generateOtp()
-     requestID =await this.generateTemporaryAccessCode("email-verification",OTP)
-  
-        await this.mailService.send(
-          {
-            subject:"email-verification",
-            to:email,
-            otp:OTP,
-            template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
-          }
-         )
+      const OTP = this.generateOtp();
+      requestID = await this.generateTemporaryAccessCode(
+        'email-verification',
+        OTP,
+      );
+
+      await this.mailService.send({
+        subject: 'email-verification',
+        to: email,
+        otp: OTP,
+        template: MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+      });
     }
 
     return {
-      message:`we have sent ${resendType} OTP to your  ${email}`,
-      requestID
-    }
-  
+      message: `we have sent ${resendType} OTP to your  ${email}`,
+      requestID,
+    };
   }
 
   async registerAgent(createUserDto: Agent): Promise<{}> {
-    createUserDto.email = createUserDto.email.toLowerCase()
-    const where = {email:createUserDto.email}
-let returnedAgent;
-  try{
-    createUserDto.password = await this.hashData(createUserDto.password);
-    
-    let agentData:Agent = {
-      firstName : createUserDto.firstName.toLowerCase(),
-      lastName : createUserDto.lastName.toLowerCase(),
-      email : createUserDto.email.toLowerCase(),
-      password : createUserDto.password,
-      isEmailVerified:false,
-      isVerified:false,
-      deletedAt:null,
-      hasAcknowledged:null
+    createUserDto.email = createUserDto.email.toLowerCase();
+    const where = { email: createUserDto.email };
+    let returnedAgent;
+    try {
+      createUserDto.password = await this.hashData(createUserDto.password);
+
+      let agentData: Agent = {
+        firstName: createUserDto.firstName.toLowerCase(),
+        lastName: createUserDto.lastName.toLowerCase(),
+        email: createUserDto.email.toLowerCase(),
+        password: createUserDto.password,
+        isEmailVerified: false,
+        isVerified: false,
+        deletedAt: null,
+        hasAcknowledged: null,
+      };
+
+      const newAgent = new this.agentModel(agentData);
+
+      returnedAgent = await newAgent.save();
+
+      // send emailOTP
+      const OTP = this.generateOtp();
+      const requestID = await this.generateTemporaryAccessCode(
+        'email-verification',
+        OTP,
+      );
+      
+      const emailResponse = await this.mailService.send({
+        subject: 'email-verification',
+        to: agentData.email,
+        otp: OTP,
+        template: MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+      });
+
+      if (!emailResponse.message_id) {
+        this.agentService.remove(where);
+        throw new Error('failed to send email');
+      }
+      returnedAgent.password = undefined;
+      return {
+        message: 'register successful',
+        user: returnedAgent,
+        requestID,
+      };
+    } catch (e) {
+      // if (returnedAgent) {
+       await  this.agentService.remove(where);
+      // }
+      throw new Error(e.message);
     }
-
-    const newAgent = new this.agentModel(agentData);
-
-     returnedAgent = await newAgent.save();
-    
-    // send emailOTP
-      const OTP = this.generateOtp()
-      const requestID = await this.generateTemporaryAccessCode("email-verification",OTP)
-     const emailResponse =  await this.mailService.send(
-        {
-          subject:"email-verification",
-          to:agentData.email,
-          otp:OTP,
-          template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
-        }
-       )
-
-       if(!emailResponse.message_id){
-         this.agentService.remove(where)
-         throw new Error("failed to send email")
-
-       }
-returnedAgent.password =undefined
-    return {
-      message:"register successful",
-      user: returnedAgent,
-      requestID
-    };
-
-  }catch(e){
-    if(returnedAgent){
-      this.agentService.remove(where)
-    }
-    throw new Error(e.message)
   }
-  
-  }
-
-  
 
   async loginUWaveUser(dto: LogInDto): Promise<LogInUserResponseDto> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
       const user = await this.waveUserService.findWhere({ email: dto.email });
 
       if (!user) {
-        throw new NotFoundException("invalid email");
+        throw new NotFoundException('invalid email');
       }
 
       const passwordMatch = await bcrypt.compare(dto.password, user.password);
@@ -460,8 +496,8 @@ returnedAgent.password =undefined
         throw new UnauthorizedException('Invalid  password');
       }
 
-      const  role = 'user' 
-      const accessTokenData = this.generateToken(user.userID,role);
+      const role = 'user';
+      const accessTokenData = this.generateToken(user.userID, role);
 
       return {
         access_data: { access_token: accessTokenData, role },
@@ -477,17 +513,17 @@ returnedAgent.password =undefined
 
   async loginUWaveAdmin(dto: LogInDto): Promise<any> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
-      if(dto.email != "uwave_admin@wave.com" || dto.password != "a08182090541@E"){
-        throw new NotFoundException("invalid email or password");
+      if (
+        dto.email != 'uwave_admin@wave.com' ||
+        dto.password != 'a08182090541@E'
+      ) {
+        throw new NotFoundException('invalid email or password');
       }
 
-
-    
-
-      const  role = 'admin' 
-      const accessTokenData = this.generateToken("isAdmin",role);
+      const role = 'admin';
+      const accessTokenData = this.generateToken('isAdmin', role);
 
       return {
         access_data: { access_token: accessTokenData, role },
@@ -502,16 +538,17 @@ returnedAgent.password =undefined
 
   async loginAdmin(dto: LogInDto): Promise<any> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
-      if(dto.email !=
-        process.env.USAVE_ADMIN_EMAIL || dto.password != process.env.USAVE_ADMIN_PASS){
-        throw new NotFoundException("invalid email or password");
+      if (
+        dto.email != process.env.USAVE_ADMIN_EMAIL ||
+        dto.password != process.env.USAVE_ADMIN_PASS
+      ) {
+        throw new NotFoundException('invalid email or password');
       }
-    
 
-      const  role = 'admin' 
-      const accessTokenData = this.generateToken("usave_admin",role);
+      const role = 'admin';
+      const accessTokenData = this.generateToken('usave_admin', role);
 
       return {
         access_data: { access_token: accessTokenData, role },
@@ -526,37 +563,35 @@ returnedAgent.password =undefined
 
   async forgotUWaveUserPassword(dto: ForgotPasswordDto): Promise<{}> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
       const user = await this.waveUserService.findWhere({ email: dto.email });
 
       if (!user) {
-        throw new NotFoundException("no user with this email");
+        throw new NotFoundException('no user with this email');
       }
 
-      const OTP = this.generateOtp()
-      const requestID = await this.generateTemporaryAccessCode("reset-password",OTP)
+      const OTP = this.generateOtp();
+      const requestID = await this.generateTemporaryAccessCode(
+        'reset-password',
+        OTP,
+      );
 
-      await this.mailService.send(
-        {
-          subject:"reset-password",
-          to:dto.email,
-          otp:OTP,
-          template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
-        }
-       )
+      await this.mailService.send({
+        subject: 'reset-password',
+        to: dto.email,
+        otp: OTP,
+        template: MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+      });
 
-
-       
       return {
-        message: "A Password Reset OTP has been sent to this email",
+        message: 'A Password Reset OTP has been sent to this email',
         requestID,
         // data:{
         //   requestID,
         //   OTP
         // }
       };
-
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new UnauthorizedException(error);
@@ -565,32 +600,34 @@ returnedAgent.password =undefined
     }
   }
 
-  async verifyUWaveUserPassword(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
+  async verifyUWaveUserPassword(
+    dto: VerifyResetPasswordDto,
+  ): Promise<LogInUserResponseDto> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
-      const key = `reset-password-${dto.requestID}`
+      const key = `reset-password-${dto.requestID}`;
 
-      const foundOTP = await this.redisService.getValue(key)
+      const foundOTP = await this.redisService.getValue(key);
       // ({ email: dto.email });
 
       if (foundOTP !== dto.otp) {
         throw new UnprocessableEntityException();
       }
 
-       const user = await this.waveUserService.findWhere({ email: dto.email });
+      const user = await this.waveUserService.findWhere({ email: dto.email });
 
       if (!user) {
-        throw new NotFoundException("no user with this email");
+        throw new NotFoundException('no user with this email');
       }
-      
-      const  role = 'user' 
-      const accessTokenData = this.generateToken(user.userID,role);
 
+      const role = 'user';
+      const accessTokenData = this.generateToken(user.userID, role);
 
       return {
         access_data: { access_token: accessTokenData, role },
-        user: user,      };
+        user: user,
+      };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new UnauthorizedException(error);
@@ -601,13 +638,13 @@ returnedAgent.password =undefined
 
   async resetUWaveUserPassword(dto: ResetPasswordDto): Promise<{}> {
     try {
-
-      if(dto.password != dto.confirmPassword){
-        throw new UnauthorizedException("password and confirmPassword don't match");
-        
+      if (dto.password != dto.confirmPassword) {
+        throw new UnauthorizedException(
+          "password and confirmPassword don't match",
+        );
       }
-      const userID = dto.userID 
-      const user = await this.waveUserService.findWhere({ userID});
+      const userID = dto.userID;
+      const user = await this.waveUserService.findWhere({ userID });
 
       if (!user) {
         throw new NotFoundException();
@@ -615,10 +652,10 @@ returnedAgent.password =undefined
 
       user.password = await this.hashData(dto.password);
 
-      this.waveUserService.update(userID,user)
+      this.waveUserService.update(userID, user);
 
       return {
-        message: "Password Reset successful",
+        message: 'Password Reset successful',
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -628,34 +665,34 @@ returnedAgent.password =undefined
     }
   }
 
-
-  async registerUWaveUser(createUserDto: WaveUser): Promise<LogInUserResponseDto> {
+  async registerUWaveUser(
+    createUserDto: WaveUser,
+  ): Promise<LogInUserResponseDto> {
     // try {
-      createUserDto.email = createUserDto.email.toLowerCase()
+    createUserDto.email = createUserDto.email.toLowerCase();
 
-      createUserDto.password = await this.hashData(createUserDto.password);
-      const newUser = new this.uWaveUserModel(createUserDto);
-      
-      const returnedUser = await newUser.save();
-      const role = 'user'
+    createUserDto.password = await this.hashData(createUserDto.password);
+    const newUser = new this.uWaveUserModel(createUserDto);
 
-      const token = this.generateToken(newUser.userID,role);
+    const returnedUser = await newUser.save();
+    const role = 'user';
 
-      return {
-        access_data: { token, role },
-        user: returnedUser,
-      };
-    
+    const token = this.generateToken(newUser.userID, role);
+
+    return {
+      access_data: { token, role },
+      user: returnedUser,
+    };
   }
 
   async loginVendor(dto: VendorLogInDto): Promise<LogInVendorResponseDto> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
       const vendor = await this.vendorService.findWhere({ email: dto.email });
-      
+
       if (!vendor) {
-        throw new NotFoundException("Invalid email");
+        throw new NotFoundException('Invalid email');
       }
 
       const passwordMatch = await bcrypt.compare(dto.password, vendor.password);
@@ -663,15 +700,15 @@ returnedAgent.password =undefined
       if (!passwordMatch) {
         throw new UnauthorizedException('Invalid password');
       }
-      const role = 'vendor'
-      const accessTokenData = this.generateToken(vendor.vendorID,role);
+      const role = 'vendor';
+      const accessTokenData = this.generateToken(vendor.vendorID, role);
 
       return {
         access_data: { access_token: accessTokenData, role },
         vendor,
       };
     } catch (e) {
-      console.log("e:: ",e)
+      console.log('e:: ', e);
       if (e instanceof NotFoundException) {
         throw new UnauthorizedException(e);
       }
@@ -681,35 +718,33 @@ returnedAgent.password =undefined
 
   async forgotVendorPassword(dto: ForgotPasswordDto): Promise<{}> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
       const vendor = await this.vendorService.findWhere({ email: dto.email });
 
       if (!vendor) {
-        throw new NotFoundException("no vendor with this email");
+        throw new NotFoundException('no vendor with this email');
       }
-      const OTP = this.generateOtp()
-      const requestID = await this.generateTemporaryAccessCode("reset-password",OTP)
+      const OTP = this.generateOtp();
+      const requestID = await this.generateTemporaryAccessCode(
+        'reset-password',
+        OTP,
+      );
 
-      await this.mailService.send(
-        {
-          subject:"reset-password",
-          to:dto.email,
-          otp:OTP,
-          template:MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
-        }
-       )
+      await this.mailService.send({
+        subject: 'reset-password',
+        to: dto.email,
+        otp: OTP,
+        template: MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+      });
 
-       
       return {
-        message: "A Password Reset OTP has been sent to this email",
+        message: 'A Password Reset OTP has been sent to this email',
         requestID,
         // data:{
         //   requestID,
         //   OTP
         // }
       };
-
-
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new UnauthorizedException('Invalid email');
@@ -718,33 +753,34 @@ returnedAgent.password =undefined
     }
   }
 
-  async verifyResetVendorPassword(dto: VerifyResetPasswordDto): Promise<LogInUserResponseDto> {
+  async verifyResetVendorPassword(
+    dto: VerifyResetPasswordDto,
+  ): Promise<LogInUserResponseDto> {
     try {
-      dto.email = dto.email.toLowerCase()
+      dto.email = dto.email.toLowerCase();
 
-      const key = `reset-password-${dto.requestID}`
+      const key = `reset-password-${dto.requestID}`;
 
-      const foundOTP = await this.redisService.getValue(key)
+      const foundOTP = await this.redisService.getValue(key);
       // ({ email: dto.email });
 
       if (foundOTP !== dto.otp) {
         throw new UnprocessableEntityException();
       }
 
-       const user = await this.vendorService.findWhere({ email: dto.email });
+      const user = await this.vendorService.findWhere({ email: dto.email });
 
       if (!user) {
-        throw new NotFoundException("no user with this email");
+        throw new NotFoundException('no user with this email');
       }
-      
-      const  role = 'vendor' 
-      const accessTokenData = this.generateToken(user.vendorID,role);
 
+      const role = 'vendor';
+      const accessTokenData = this.generateToken(user.vendorID, role);
 
       return {
         access_data: { access_token: accessTokenData, role },
-        user: user, 
-           };
+        user: user,
+      };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new UnauthorizedException(error);
@@ -753,46 +789,79 @@ returnedAgent.password =undefined
     }
   }
 
-  
-
-  async registerVendor(
-
-    createVendorDto: Vendor,
-  ): Promise<LogInVendorResponseDto> {
-    console.log("registerVendor:: ")
+  async registerVendor(createVendorDto: Vendor): Promise<{}> {
+    console.log('registerVendor:: ');
+    let returnedVendorUser;
+    createVendorDto.email = createVendorDto.email.toLowerCase();
+    const where = { email: createVendorDto.email };
+    try {
 
       createVendorDto.password = await this.hashData(createVendorDto.password);
-      createVendorDto.email = createVendorDto.email.toLowerCase()
-      const newVendor = new this.vendorModel(createVendorDto);
+
+      let vendorData: Vendor = {
+        firstName: createVendorDto.firstName.toLowerCase(),
+        lastName: createVendorDto.lastName.toLowerCase(),
+        email: createVendorDto.email.toLowerCase(),
+        password: createVendorDto.password,
+        isEmailVerified: false,
+        isDisabled: false,
+        isVerified: false,
+        hasAcknowleged: false,
+        deletedAt: null,
+      };
+
+      const newVendor = new this.vendorModel(vendorData);
 
       const returnedVendorUser = await newVendor.save();
-      const role = 'vendor'
+      const role = 'vendor';
 
-      const token = this.generateToken(returnedVendorUser.vendorID,role);
+      // send emailOTP
+      const OTP = this.generateOtp();
+      const requestID = await this.generateTemporaryAccessCode(
+        'email-verification',
+        OTP,
+      );
+
+      const emailResponse = await this.mailService.send({
+        subject: 'email-verification',
+        to: returnedVendorUser.email,
+        otp: OTP,
+        template: MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
+      });
+
+      if (!emailResponse.message_id) {
+        this.vendorService.remove(where);
+        throw new Error('failed to send email');
+      }
+      returnedVendorUser.password = undefined;
 
       return {
-        vendor: returnedVendorUser,
-        access_data: {
-          token,
-          role
-        },
+        message: 'register successful',
+        user: returnedVendorUser,
+        requestID,
       };
-  
+    } catch (e) {
+      console.log('registerVendor error:: ',e);
+      console.log('registerVendor error:: ',    returnedVendorUser);
+
+      // if (returnedVendorUser) {
+        await this.vendorService.remove(where);
+      // }
+      throw new Error(e.message);
+    }
   }
 
-  generateToken(userID: string, role:string) {
-  
-    const payload = { sub:userID, role: role };
-   
+  generateToken(userID: string, role: string) {
+    const payload = { sub: userID, role: role };
+
     return jwt.sign(payload, 'process.env.JWT_SECRET', { expiresIn: '3600m' });
   }
 
   async verifyAccessToken(token: string): Promise<any> {
     try {
-      return jwt.verify(token,'process.env.JWT_SECRET');
+      return jwt.verify(token, 'process.env.JWT_SECRET');
     } catch (err) {
       throw new UnauthorizedException('Invalid access token');
     }
   }
-
 }

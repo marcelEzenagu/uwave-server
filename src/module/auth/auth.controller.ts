@@ -150,11 +150,9 @@ export class AuthController {
   }
 
   @Post("vendors/register")
-  async registerVendor(@Body() createAuthDto: Vendor):Promise <LogInVendorResponseDto> {
-    console.log("createAuthDto:: ")
+  async registerVendor(@Body() createAuthDto: Vendor):Promise <{}> {
     try {
     
-    console.log("createAuthDto:: ",createAuthDto)
       return await this.authService.registerVendor(createAuthDto);
     } catch (e) {
       throw new BadRequestException(this.errorFormat.formatErrors(e));
@@ -162,6 +160,15 @@ export class AuthController {
     }
   }
 
+  @Post("vendors/verify-email")
+  async verifyVendorEmail(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
+    try{
+
+      return await this.authService.verifyVendorEmail(dto);
+    } catch (e) {
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
+    }
+  }
   
  
 
