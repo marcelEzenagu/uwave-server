@@ -228,20 +228,25 @@ const role = req['user'].role
       const success =  await this.fileService.uploadImage(updateVendorDto.permitDocument,imagePath,imageName)
       updateVendorDto.permitDocument = `${imagePath}/${imageName}`
     }
-    if(updateVendorDto.foodLicenseDocument){
-      const imagePath = `${vPath}/foodLicense`
-      const success =  await this.fileService.uploadImage(updateVendorDto.foodLicenseDocument,imagePath,imageName)
-      updateVendorDto.foodLicenseDocument = `${imagePath}/${imageName}`
+    if(updateVendorDto.nafdacRegistration){
+      const imagePath = `${vPath}/nafdacRegistration`
+      const success =  await this.fileService.uploadImage(updateVendorDto.nafdacRegistration,imagePath,imageName)
+      updateVendorDto.nafdacRegistration = `${imagePath}/${imageName}`
     }
     if(updateVendorDto.cacDocument){
       const imagePath = `${vPath}/CAC`
       const success =  await this.fileService.uploadImage(updateVendorDto.cacDocument,imagePath,imageName)
       updateVendorDto.cacDocument = `${imagePath}/${imageName}`
     }
-    if(updateVendorDto.idDocument){
+    if(updateVendorDto.idDocumentFront){
       const imagePath = `${vPath}/ID`
-      const success =  await this.fileService.uploadImage(updateVendorDto.idDocument,imagePath,imageName)
-      updateVendorDto.idDocument = `${imagePath}/${imageName}`
+      const success =  await this.fileService.uploadImage(updateVendorDto.idDocumentFront,imagePath,imageName)
+      updateVendorDto.idDocumentFront = `${imagePath}/${imageName}`
+    }
+    if(updateVendorDto.idDocumentBack){
+      const imagePath = `${vPath}/ID`
+      const success =  await this.fileService.uploadImage(updateVendorDto.idDocumentBack,imagePath,imageName)
+      updateVendorDto.idDocumentBack = `${imagePath}/${imageName}`
     }
 
     console.log("updateVendorDt==== ",updateVendorDto)

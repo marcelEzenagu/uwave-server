@@ -64,9 +64,10 @@ export class Vendor {
   @Prop({type: String})
   idDocumentType?: string;
   
-  
   @Prop({type: String})
-  idDocument?: string;
+  idDocumentFront?: string;
+  @Prop({type: String})
+  idDocumentBack?: string;
 
   @Prop({type: String})
   permitDocument?: string;
@@ -75,7 +76,7 @@ export class Vendor {
   tax_number?: string;
 
   @Prop({type: String})
-  foodLicenseDocument?: string;
+  nafdacRegistration?: string;
 
   @ApiProperty({
     example: 'expressway Home',
