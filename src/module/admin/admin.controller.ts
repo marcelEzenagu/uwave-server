@@ -23,6 +23,8 @@ import { ProductStatus } from '../product/entities/product.entity';
 import { Agent } from '../agent/entities/agent.entity';
 import { Vendor } from '../vendor/entities/vendor.entity';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { UpdateVendorDto } from '../vendor/dto/update-vendor.dto';
+import { MailerService } from '../mailer/mailer.service';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -42,7 +44,9 @@ export class AdminController {
     private readonly itemService: ItemsService,
     private readonly orderService: OrderService,
     private readonly agentService: AgentService,
-    private readonly productService: ProductService,    
+    private readonly productService: ProductService, 
+    private emailService: MailerService,
+   
   ) {
     this.password = "123@Password"
   }
@@ -556,7 +560,7 @@ export class AdminController {
     }
 
     @Get('vendors/:id')  
-    async adminGetVendors(
+    async adminGetVendor(
       @Req() req: Request,
       @Param("id") id:string, 
     ) {
@@ -574,6 +578,47 @@ export class AdminController {
       }
 
       return await this.vendorService.findWhere(where);
+
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+    }
+
+    @Patch('vendors/:id')  
+    async scheduleVendorMeeting(
+      @Body() dto:any,
+      @Param("id") id:string, 
+      @Req() req: Request,
+    ) {
+      try {    
+
+
+      const role = req['user'].role
+      const userType = req['user'].sub
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
+
+      const where = {
+        "_id":id
+      }
+
+      const vendor = await this.vendorService.findWhere(where);
+
+      const emailBody = {
+        subject: 'verification-interview',
+        to: vendor.email,
+        date:`${dto.date} ${dto.startTime}-${dto.endTime}`,
+        link:dto.link,
+        from:"Verification Team"
+      }
+      console.log("LINK===emailBody ",emailBody)
+      // await this
+
+      await this.emailService.scheduleMeeting(emailBody);
+      dto.interviewDate = emailBody.date
+      return await this.vendorService.update(id,dto);
 
     } catch (e) {
       console.log("eRROR @controlelr",e)

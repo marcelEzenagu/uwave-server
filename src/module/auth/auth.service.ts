@@ -457,6 +457,7 @@ export class AuthService {
       
       const emailResponse = await this.mailService.send({
         subject: 'email-verification',
+        
         to: agentData.email,
         otp: OTP,
         template: MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,

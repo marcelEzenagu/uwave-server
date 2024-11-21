@@ -49,6 +49,32 @@ export class MailerService {
       throw new Error(error)
     }
   }
+  async scheduleMeeting(dto: any): Promise<SendEmailResDto> {
+    
+   
+    try {
+     const response = await this.transporter.sendMail({
+        from: '"Kochure" <no-reply@kochure.com>',
+        to: dto.to,
+        subject: dto.subject,
+        html: `<p>
+                Your verification interview is scheduled as follow:
+                <br/>
+                Date : ${dto.date}
+                <br/>
+                MeetingLink : <a href="_blank" >${dto.link}</a>
+                `,
+      });
+      return {
+        message_id: response.messageId,
+        provider: this.provider,
+      };
+    } catch (error) {
+
+      this.logger.error('email failed to sent');
+      throw new Error(error)
+    }
+  }
 
   // async send(dto: SendEmailDto): Promise<SendEmailResDto> {
   //   try {

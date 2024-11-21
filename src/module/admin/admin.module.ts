@@ -21,6 +21,7 @@ import { AgentModule } from '../agent/agent.module';
 import { ProductModule } from '../product/product.module';
 import { ProductService } from '../product/product.service';
 import { RedisService } from '../redis/redis.service';
+import { MailerService } from '../mailer/mailer.service';
 
 @Module({
   controllers: [AdminController],
@@ -29,6 +30,7 @@ import { RedisService } from '../redis/redis.service';
               ProductService,
               ProductCategoryService,
               RedisService,
+              MailerService,
               ProductSubCategoryService,
               FreightService,FileService],
               
