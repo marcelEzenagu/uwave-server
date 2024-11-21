@@ -63,9 +63,11 @@ export class Vendor {
  
   @Prop({type: String})
   idDocumentType?: string;
-  
+
   @Prop({type: String})
   interviewDate?: string;
+  @Prop({type: String})
+  interviewLink?: string;
   
   @Prop({type: String})
   idDocumentFront?: string;

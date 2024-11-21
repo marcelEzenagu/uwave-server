@@ -615,10 +615,12 @@ export class AdminController {
       }
       console.log("LINK===emailBody ",emailBody)
       // await this
-
-      await this.emailService.scheduleMeeting(emailBody);
+      
       dto.interviewDate = emailBody.date
-      return await this.vendorService.update(id,dto);
+      dto.interviewLink = emailBody.link
+      const res = await this.vendorService.update(id,dto);
+      await this.emailService.scheduleMeeting(emailBody);
+      return res
 
     } catch (e) {
       console.log("eRROR @controlelr",e)
