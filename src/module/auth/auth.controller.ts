@@ -33,7 +33,6 @@ export class AuthController {
     return await this.authService.loginAdmin(createAuthDto);
   }
 
-
   @Post("resend-otp/")
   async resendOTP(@Body() dto: ResendOTPDto) {
     return await this.authService.resendOTP(dto);

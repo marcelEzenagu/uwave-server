@@ -114,6 +114,8 @@ export class Vendor {
   
   @Prop({type: String})
   businessPicture?: string;
+  @Prop({type: String})
+  videoVerification?: string;
   
   @Prop({type: String})
   businessBank?: string;

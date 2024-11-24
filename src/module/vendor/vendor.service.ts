@@ -112,8 +112,14 @@ const total = await this.vendorModel.countDocuments();
   }
   
   async update(id: string, updateVendorDto: UpdateVendorDto):Promise<Vendor> {
-    const where= {"_id":id}
-    return await  this.vendorModel.findOneAndUpdate(where,updateVendorDto, {new: true })
+    try{
+
+      const where= {"_id":id}
+      return await  this.vendorModel.findOneAndUpdate(where,updateVendorDto, {new: true })
+    }catch(e){
+      console.log("ERROR==",e)
+
+    }
   }
 
   async findWhere(where:{}):Promise<VendorDocument> {

@@ -204,10 +204,11 @@ const role = req['user'].role
     updateVendorDto.email=undefined
     updateVendorDto.password=undefined
 
+    console.log("updateVendorDt==== ",updateVendorDto)
    
     const vendorID = req['user'].sub
-    console.log("req['user']",req['user'])
     const vPath = "public/images/vendors"
+    const vidPath = "public/video/vendors"
 
     console.log("vendorID",vendorID)
     const imageName =`${vendorID}.png`
@@ -248,12 +249,19 @@ const role = req['user'].role
       const success =  await this.fileService.uploadImage(updateVendorDto.idDocumentBack,imagePath,imageName)
       updateVendorDto.idDocumentBack = `${imagePath}/${imageName}`
     }
+    if(updateVendorDto.videoVerification){
+      const videoName =`${vendorID}.mp4`
 
-    console.log("updateVendorDt==== ",updateVendorDto)
+      const imagePath = `${vidPath}/videoVerification`
+      const success =  await this.fileService.uploadVideo(updateVendorDto.videoVerification,imagePath,videoName)
+      updateVendorDto.videoVerification = `${imagePath}/${videoName}`
+    }
+
 
     try{
       return await this.vendorService.update(vendorID,updateVendorDto);
     }catch(e){
+      console.log("ERROR==",e)
       throw new BadRequestException(e)
     }
   }

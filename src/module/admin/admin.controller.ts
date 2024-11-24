@@ -613,9 +613,8 @@ export class AdminController {
         link:dto.link,
         from:"Verification Team"
       }
-      console.log("LINK===emailBody ",emailBody)
-      // await this
       
+      // await this      
       dto.interviewDate = emailBody.date
       dto.interviewLink = emailBody.link
       const res = await this.vendorService.update(id,dto);

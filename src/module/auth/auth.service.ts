@@ -66,11 +66,13 @@ export class AuthService {
 
   async generateTemporaryAccessCode(
     tokenType: 'create-account' | 'reset-password' | 'email-verification',
-    value: string,
+    value,
+    email
+    : string,
   ): Promise<string> {
     const characters = this.generateRandomCharacters(86);
 
-    const key = `${tokenType}-${characters}`;
+    const key = `${tokenType}-${characters}-${email}`;
 
     // save to redis
     await this.redisService.setValue(key, value);
@@ -129,6 +131,7 @@ export class AuthService {
       const requestID = await this.generateTemporaryAccessCode(
         'reset-password',
         OTP,
+        dto.email
       );
 
       await this.mailService.send({
@@ -160,7 +163,7 @@ export class AuthService {
     try {
       dto.email = dto.email.toLowerCase();
 
-      const key = `reset-password-${dto.requestID}`;
+      const key = `reset-password-${dto.requestID}-${dto.email}`;
 
       const foundOTP = await this.redisService.getValue(key);
 
@@ -254,6 +257,7 @@ export class AuthService {
       const requestID = await this.generateTemporaryAccessCode(
         'reset-password',
         OTP,
+        dto.email,
       );
 
       await this.mailService.send({
@@ -281,7 +285,7 @@ export class AuthService {
     try {
       dto.email = dto.email.toLowerCase();
 
-      const key = `reset-password-${dto.requestID}`;
+      const key = `reset-password-${dto.requestID}-${dto.email}`;
 
       const foundOTP = await this.redisService.getValue(key);
 
@@ -317,7 +321,7 @@ export class AuthService {
     try {
       dto.email = dto.email.toLowerCase();
 
-      const key = `email-verification-${dto.requestID}`;
+      const key = `email-verification-${dto.requestID}-${dto.email}`;
       const foundOTP = await this.redisService.getValue(key);
 
       if (foundOTP !== dto.otp) {
@@ -354,7 +358,7 @@ export class AuthService {
     try {
       dto.email = dto.email.toLowerCase();
 
-      const key = `email-verification-${dto.requestID}`;
+      const key = `email-verification-${dto.requestID}-${dto.email}`;
       const foundOTP = await this.redisService.getValue(key);
 
       if (foundOTP !== dto.otp) {
@@ -400,6 +404,20 @@ export class AuthService {
         throw new NotFoundException('invalid email');
       }
       user = result;
+    }else if(userType == 'vendor'){
+      const result = await this.vendorService.findWhere(emailWhere);
+      if (!result) {
+        throw new NotFoundException('invalid email');
+      }
+      user = result;
+
+    }else if(userType == 'agent'){
+      const result = await this.agentService.findWhere(emailWhere);
+      if (!result) {
+        throw new NotFoundException('invalid email');
+      }
+      user = result;
+
     }
 
     let requestID;
@@ -410,6 +428,7 @@ export class AuthService {
       requestID = await this.generateTemporaryAccessCode(
         'email-verification',
         OTP,
+        email
       );
 
       await this.mailService.send({
@@ -453,6 +472,7 @@ export class AuthService {
       const requestID = await this.generateTemporaryAccessCode(
         'email-verification',
         OTP,
+        agentData.email,
       );
       
       const emailResponse = await this.mailService.send({
@@ -537,6 +557,7 @@ export class AuthService {
     }
   }
 
+
   async loginAdmin(dto: LogInDto): Promise<any> {
     try {
       dto.email = dto.email.toLowerCase();
@@ -576,6 +597,7 @@ export class AuthService {
       const requestID = await this.generateTemporaryAccessCode(
         'reset-password',
         OTP,
+        dto.email
       );
 
       await this.mailService.send({
@@ -607,7 +629,7 @@ export class AuthService {
     try {
       dto.email = dto.email.toLowerCase();
 
-      const key = `reset-password-${dto.requestID}`;
+      const key = `reset-password-${dto.requestID}-${dto.email}`;
 
       const foundOTP = await this.redisService.getValue(key);
       // ({ email: dto.email });
@@ -729,6 +751,7 @@ export class AuthService {
       const requestID = await this.generateTemporaryAccessCode(
         'reset-password',
         OTP,
+        dto.email
       );
 
       await this.mailService.send({
@@ -760,7 +783,7 @@ export class AuthService {
     try {
       dto.email = dto.email.toLowerCase();
 
-      const key = `reset-password-${dto.requestID}`;
+      const key = `reset-password-${dto.requestID}-${dto.email}`;
 
       const foundOTP = await this.redisService.getValue(key);
       // ({ email: dto.email });
@@ -791,7 +814,6 @@ export class AuthService {
   }
 
   async registerVendor(createVendorDto: Vendor): Promise<{}> {
-    console.log('registerVendor:: ');
     let returnedVendorUser;
     createVendorDto.email = createVendorDto.email.toLowerCase();
     const where = { email: createVendorDto.email };
@@ -821,6 +843,7 @@ export class AuthService {
       const requestID = await this.generateTemporaryAccessCode(
         'email-verification',
         OTP,
+        returnedVendorUser.email,
       );
 
       const emailResponse = await this.mailService.send({
