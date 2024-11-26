@@ -615,10 +615,10 @@ export class AdminController {
       }
       
       // await this      
-      dto.interviewDate = emailBody.date
-      dto.interviewLink = emailBody.link
+      // dto.interviewDate = emailBody.date
+      dto.isVerified = true
       const res = await this.vendorService.update(id,dto);
-      await this.emailService.scheduleMeeting(emailBody);
+      // await this.emailService.scheduleMeeting(emailBody);
       return res
 
     } catch (e) {

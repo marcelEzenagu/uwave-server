@@ -210,7 +210,6 @@ const role = req['user'].role
     const vPath = "public/images/vendors"
     const vidPath = "public/video/vendors"
 
-    console.log("vendorID",vendorID)
     const imageName =`${vendorID}.png`
     if(updateVendorDto.profilePicture){
       const imagePath = `${vPath}/profilePicture`
@@ -249,12 +248,12 @@ const role = req['user'].role
       const success =  await this.fileService.uploadImage(updateVendorDto.idDocumentBack,imagePath,imageName)
       updateVendorDto.idDocumentBack = `${imagePath}/${imageName}`
     }
-    if(updateVendorDto.videoVerification){
+    if(updateVendorDto.processVideo){
       const videoName =`${vendorID}.mp4`
 
-      const imagePath = `${vidPath}/videoVerification`
-      const success =  await this.fileService.uploadVideo(updateVendorDto.videoVerification,imagePath,videoName)
-      updateVendorDto.videoVerification = `${imagePath}/${videoName}`
+      const videoPath = `${vidPath}/processVideo`
+      const success =  await this.fileService.uploadVideo(updateVendorDto.processVideo,videoPath,videoName)
+      updateVendorDto.processVideo = `${videoPath}/${videoName}`
     }
 
 

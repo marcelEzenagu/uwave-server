@@ -39,6 +39,7 @@ export class MailerService {
         subject: dto.subject,
         html: `<p>Your OTP for ${dto.subject} is <strong>${dto.otp}</strong></p>`,
       });
+      
       return {
         message_id: response.messageId,
         provider: this.provider,
