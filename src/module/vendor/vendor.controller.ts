@@ -208,7 +208,7 @@ const role = req['user'].role
    
     const vendorID = req['user'].sub
     const vPath = "public/images/vendors"
-    const vidPath = "public/video/vendors"
+    const vidPath = "public/videos/vendors"
 
     const imageName =`${vendorID}.png`
     if(updateVendorDto.profilePicture){
@@ -239,11 +239,15 @@ const role = req['user'].role
       updateVendorDto.cacDocument = `${imagePath}/${imageName}`
     }
     if(updateVendorDto.idDocumentFront){
+      const imageName =`${vendorID}_front.png`
+
       const imagePath = `${vPath}/ID`
       const success =  await this.fileService.uploadImage(updateVendorDto.idDocumentFront,imagePath,imageName)
       updateVendorDto.idDocumentFront = `${imagePath}/${imageName}`
     }
     if(updateVendorDto.idDocumentBack){
+      const imageName =`${vendorID}_back.png`
+
       const imagePath = `${vPath}/ID`
       const success =  await this.fileService.uploadImage(updateVendorDto.idDocumentBack,imagePath,imageName)
       updateVendorDto.idDocumentBack = `${imagePath}/${imageName}`
