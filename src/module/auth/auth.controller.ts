@@ -77,6 +77,7 @@ export class AuthController {
   @Post("agents/verify-email")
   async verifyAgentEmail(@Body() dto: VerifyResetPasswordDto):Promise <LogInUserResponseDto>{
     try{
+      console.log("DTO==",dto)
       return await this.authService.verifyAgentEmail(dto);
     } catch (e) {
       throw new BadRequestException(this.errorFormat.formatErrors(e));

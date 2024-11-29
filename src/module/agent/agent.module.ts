@@ -9,11 +9,12 @@ import { AuthModule } from '../auth/auth.module';
 import { AdminModule } from '../admin/admin.module';
 import { ShipmentService } from '../shipment/shipment.service';
 import { AppModule } from 'src/app.module';
+import { FileService } from 'src/helpers/upload';
 
 @Module({
   controllers: [AgentController],
   exports: [AgentService],
-  providers: [AgentService,ErrorFormat,ShipmentService],
+  providers: [AgentService,FileService,ErrorFormat,ShipmentService],
   imports: [
     forwardRef(() => AuthModule),
     forwardRef(() => AppModule),

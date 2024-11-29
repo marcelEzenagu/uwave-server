@@ -214,7 +214,6 @@ const role = req['user'].role
     if(updateVendorDto.profilePicture){
       const imagePath = `${vPath}/profilePicture`
       const success =  await this.fileService.uploadImage(updateVendorDto.profilePicture,imagePath,imageName)
-       
       updateVendorDto.profilePicture = `${imagePath}/${imageName}`
     }
 
@@ -223,6 +222,7 @@ const role = req['user'].role
       const success =  await this.fileService.uploadImage(updateVendorDto.businessPicture,imagePath,imageName)
       updateVendorDto.businessPicture = `${imagePath}/${imageName}`
     }
+    
     if(updateVendorDto.permitDocument){
       const imagePath = `${vPath}/vendorPermit`
       const success =  await this.fileService.uploadImage(updateVendorDto.permitDocument,imagePath,imageName)

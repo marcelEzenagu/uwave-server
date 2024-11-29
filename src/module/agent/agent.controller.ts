@@ -8,6 +8,7 @@ import { Request } from 'express';
 import { ShipmentService } from '../shipment/shipment.service';
 import { OptionType, ShipmentOptionType } from '../order/entities/order.entity';
 import { ErrorFormat } from 'src/helpers/errorFormat';
+import { FileService } from 'src/helpers/upload';
 
 @ApiTags('agents')
 @Controller('agents')
@@ -17,7 +18,7 @@ export class AgentController {
     private readonly errorFormat: ErrorFormat,
 
     private readonly shipmentService: ShipmentService,
-  ) {}
+    private readonly fileService: FileService) {}
 
  
  
@@ -30,7 +31,7 @@ export class AgentController {
   }
 
   @Patch()
-  update(
+  async update(
     @Req() req:Request,
     @Body() updateAgentDto: UpdateAgentDto) {
       const agentID = req['user'].sub
@@ -38,6 +39,25 @@ export class AgentController {
       updateAgentDto.email =undefined
       updateAgentDto.firstName =undefined
       updateAgentDto.lastName =undefined
+
+      const vPath = "public/images/vendors"
+      const vidPath = "public/videos/vendors"
+  
+      const imageName =`${agentID}.png`
+      if(updateAgentDto.idDocumentFront){
+        const imageName =`${agentID}_front.png`
+  
+        const imagePath = `${vPath}/ID`
+        const success =  await this.fileService.uploadImage(updateAgentDto.idDocumentFront,imagePath,imageName)
+        updateAgentDto.idDocumentFront = `${imagePath}/${imageName}`
+      }
+      if(updateAgentDto.idDocumentBack){
+        const imageName =`${agentID}_back.png`
+  
+        const imagePath = `${vPath}/ID`
+        const success =  await this.fileService.uploadImage(updateAgentDto.idDocumentBack,imagePath,imageName)
+        updateAgentDto.idDocumentBack = `${imagePath}/${imageName}`
+      }
     return this.agentService.update(agentID, updateAgentDto);
   }
 

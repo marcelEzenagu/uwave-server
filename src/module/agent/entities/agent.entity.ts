@@ -36,7 +36,12 @@ export class Agent {
   idDocumentType?: string;
   
   @Prop({type: String})
-  idDocument?: string;
+  idDocumentNumber?: string;
+  @Prop({type: String})
+  idDocumentBack?: string;
+  
+  @Prop({type: String})
+  idDocumentFront?: string;
 
   @Prop({ required: true })
   firstName: string;

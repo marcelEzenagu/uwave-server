@@ -328,8 +328,8 @@ export class AuthService {
         throw new UnprocessableEntityException('invalid otp');
       }
 
+      console.log("EMAIL:::", dto.email)
       // update isEmailVerified;
-
       const agent = await this.agentService.verifyEmail({ email: dto.email });
       if (!agent) {
         throw new NotFoundException('no agent with this email');
@@ -421,15 +421,16 @@ export class AuthService {
     }
 
     let requestID;
+    const OTP = this.generateOtp();
 
     if (resendType == 'email-verification') {
       // send emailOTP
-      const OTP = this.generateOtp();
       requestID = await this.generateTemporaryAccessCode(
         'email-verification',
         OTP,
         email
       );
+      console.log("OTP:: ",OTP,"email",email)
 
       await this.mailService.send({
         subject: 'email-verification',

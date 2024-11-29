@@ -112,6 +112,7 @@ export class AgentService {
   }
   
   async verifyEmail(where):Promise<AgentDocument> {
+    console.log("WHERE:::",where)
     const update = {
       isEmailVerified:true
     }

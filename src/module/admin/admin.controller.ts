@@ -898,7 +898,7 @@ export class AdminController {
 
       @Query('page') page: number = 1, 
       @Query('limit') limit: number = 50,
-      @Query('search') search: string ,
+      @Query('query') query: string ,
     ) {
       try {    
         page = Number(page);
@@ -915,7 +915,7 @@ export class AdminController {
       }
 
 
-      return await this.agentService.adminFindAll(page,limit,search);
+      return await this.agentService.adminFindAll(page,limit,query);
 
     } catch (e) {
       console.log("eRROR @controlelr",e)
