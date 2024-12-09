@@ -586,7 +586,7 @@ export class AdminController {
     }
 
     @Patch('vendors/:id')  
-    async scheduleVendorMeeting(
+    async updateVendor(
       @Body() dto:any,
       @Param("id") id:string, 
       @Req() req: Request,
@@ -966,6 +966,37 @@ export class AdminController {
       }
 
       return await this.agentService.delete(where);
+
+    } catch (e) {
+      console.log("eRROR @controlelr",e)
+      throw new BadRequestException(this.errorFormat.formatErrors(e))
+    }
+    }
+    @Patch('agents/:id')  
+    async updateAgent(
+      @Body() dto:any,
+      @Param("id") id:string, 
+      @Req() req: Request,
+    ) {
+      try {    
+
+
+      const role = req['user'].role
+      const userType = req['user'].sub
+      if(role !="admin" || userType != "usave_admin"){
+        throw new BadRequestException("unaccessible");
+      }
+
+      const where = {
+        "_id":id
+      }
+
+      const agent = await this.agentService.findWhere(where);
+
+     
+      dto.isVerified = true
+      const res = await this.agentService.update(id,dto);
+      return res
 
     } catch (e) {
       console.log("eRROR @controlelr",e)
