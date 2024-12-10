@@ -39,8 +39,8 @@ process.env.EXCHANGE_URL    );
     console.log('Cron job running every EVERY_DAY_AT_MIDNIGHT');
   }
 
-  // @Cron(CronExpression.EVERY_DAY_AT_1AM)
-    @Cron(CronExpression.EVERY_10_SECONDS)    
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+    // @Cron(CronExpression.EVERY_10_SECONDS)    
   async loadCountryCron() {
    
    
@@ -51698,8 +51698,6 @@ process.env.EXCHANGE_URL    );
     let modifiedCountryList:ApiResponse[] = Object.values(resp.data)
     // console.log("countries_dataresp.data",resp.data);
     // console.log(modifiedCountryList,"countries_data");
-    // console.log(modifiedCountryList[1],"countries_data",typeof modifiedCountryList);
-  //  for(const item of modifiedCountryList ){
     let modified : TransformedData[] = modifiedCountryList.map(country => {
 
       return{
