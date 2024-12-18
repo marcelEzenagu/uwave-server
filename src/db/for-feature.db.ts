@@ -16,7 +16,7 @@ import { Agent, AgentSchema } from "src/module/agent/entities/agent.entity";
 import { Wallet,WalletSchema } from "src/module/wallet/entities/wallet.entity";
 import { Shipment,ShipmentSchema } from "src/module/shipment/entities/shipment.entity";
 import { FreightReceiptSchema ,FreightReceipt} from "src/module/freight_receipt/entities/freight_receipt.entity";
-import { Donation, DonationSchema ,DonationSchema} from "src/module/donation/entities/donation.entity";
+import { Donation, DonationSchema } from "src/module/donation/entities/donation.entity";
 
 
 export default [
