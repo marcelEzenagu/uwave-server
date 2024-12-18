@@ -513,7 +513,6 @@ export class AuthService {
       }
 
       const passwordMatch = await bcrypt.compare(dto.password, user.password);
-
       if (!passwordMatch) {
         throw new UnauthorizedException('Invalid  password');
       }

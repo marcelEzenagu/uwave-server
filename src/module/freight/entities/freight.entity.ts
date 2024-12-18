@@ -21,11 +21,10 @@ import { PaymentStatusType } from "src/module/order/entities/order.entity";
 
 
 export class Freight {
-
     @Prop({ type: Types.ObjectId, ref: 'WaveUser', required: true })
     userID: Types.ObjectId;
 
-    @Prop({type:String,required:true})
+    @Prop({type:String,required:true,default:"sea"})
     freightType:string
 
     @Prop({type:Boolean,required:true})
@@ -61,8 +60,6 @@ export class Freight {
     
     @Prop({ type: Date, default: null })
     deletedAt: Date | null;
-
-
 }
 
 export type FreightDocument = Freight & Document

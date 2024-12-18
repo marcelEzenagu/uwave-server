@@ -31,6 +31,7 @@ import { AgentModule } from './module/agent/agent.module';
 import { WalletModule } from './module/wallet/wallet.module';
 import { ShipmentModule } from './module/shipment/shipment.module';
 import { AppGateway } from './app.gateway';
+import { FreightReceiptModule } from './module/freight_receipt/freight_receipt.module';
 
 
 @Module({
@@ -66,6 +67,7 @@ import { AppGateway } from './app.gateway';
     AgentModule,
     WalletModule,
     ShipmentModule,
+    FreightReceiptModule,
   ],
   exports:[
     AppGateway

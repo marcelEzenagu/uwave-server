@@ -15,6 +15,7 @@ import { ProductSubCategory ,ProductSubCategorySchema} from "src/module/product-
 import { Agent, AgentSchema } from "src/module/agent/entities/agent.entity";
 import { Wallet,WalletSchema } from "src/module/wallet/entities/wallet.entity";
 import { Shipment,ShipmentSchema } from "src/module/shipment/entities/shipment.entity";
+import { FreightReceiptSchema ,FreightReceipt} from "src/module/freight_receipt/entities/freight_receipt.entity";
 
 
 export default [
@@ -33,5 +34,6 @@ export default [
   { name: ProductSubCategory.name, schema: ProductSubCategorySchema },
   { name: Agent.name, schema: AgentSchema },
   { name: Wallet.name, schema: WalletSchema },
+  { name: FreightReceipt.name, schema: FreightReceiptSchema },
   { name: Shipment.name, schema: ShipmentSchema },
 ];

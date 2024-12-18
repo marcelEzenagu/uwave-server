@@ -18,8 +18,8 @@ constructor(
   private hashData(data: string) {
     return bcrypt.hash(data, 10);
   }
-  create(createWaveUserDto: CreateWaveUserDto) {
-    return 'This action adds a new uWaveUser';
+  async create(createWaveUserDto: CreateWaveUserDto) {
+    return await  new this.wUserModel(createWaveUserDto).save();
   }
 
   findAll() {

@@ -113,6 +113,7 @@ export class AuthController {
   async uWaveLogin(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
     return await this.authService.loginUWaveUser(createAuthDto);
   }
+  
 
   @Post("wave/admin/")
   async uWaveAdminLogin(@Body() createAuthDto: LogInDto):Promise <LogInUserResponseDto> {
