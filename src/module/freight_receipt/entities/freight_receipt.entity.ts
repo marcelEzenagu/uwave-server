@@ -16,7 +16,6 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
   })
 
 export class FreightReceipt {
-
     @Prop({type:String})
     provider:string
 
@@ -27,7 +26,16 @@ export class FreightReceipt {
     dateDropped:string
 
     @Prop({type:String,required:true})
-    parcelWeight:string
+    eta:string
+
+    @Prop({type:Number,required:true})
+    parcelWeight:Number
+
+    @Prop({type:Number,required:true})
+    noOfPackages:Number
+
+    @Prop({type:String,required:true})
+    origin:string
 
     @Prop({type:String,required:true})
     customerName:string

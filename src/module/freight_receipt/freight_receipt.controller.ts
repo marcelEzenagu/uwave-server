@@ -20,6 +20,7 @@ export class FreightReceiptController {
         throw new BadRequestException("unaccessible");
       }
       
+      console.log("body",adminCreateFreightDto)
        const pdfFilePath = await this.freightReceiptService.adminCreate(adminCreateFreightDto);
        const pdf = path.resolve(__dirname,pdfFilePath)
 

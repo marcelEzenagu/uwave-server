@@ -127,10 +127,45 @@ export class FreightReceiptService {
       *{
         color:"#15141f"
       }
+    .grid-2-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* Two equal columns */
+      width: 80%; /* Adjust the width of the grid */
+      margin: 20px auto; /* Center the grid */
+      border: 0.3px solid black; /* Optional: Outer border for the grid */
+    }
+    .grid-3-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr; /* Two equal columns */
+      width: 80%; /* Adjust the width of the grid */
+      margin: 20px auto; /* Center the grid */
+      border: 0.3px solid black; /* Optional: Outer border for the grid */
+    }
+    .grid-small-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr; /* Two equal columns */
+      width: 25%; /* Adjust the width of the grid */
+      margin: 20px auto; /* Center the grid */
+      border: 0.3px solid black; /* Optional: Outer border for the grid */
+    }
+
+    /* Grid item styling */
+    .grid-item {
+      border: 0.3px solid black; /* Border for each grid cell */
+      padding: 10px; /* Add spacing inside the cell */
+      text-align: center; /* Center text */
+    }
         
+        .boldFont{
+          font-size:14;
+          font-weight:500;
+        background-color: lightgray;
+
+        }
         #smallFont{
           font-size:14;
-          font-weight:500
+          font-weight:500;
+
         }
         
         #headerRight {
@@ -173,12 +208,11 @@ export class FreightReceiptService {
           margin-bottom:10px
         }
       .centered-div {
-      width: 50%; 
-      margin: 0 auto;
-      color: gray;
-      padding: 20px;
-      text-align: center;
-    }
+        width: 50%; 
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center;
+      }
       </style>
     </head>
     <body style="" >
@@ -222,6 +256,71 @@ export class FreightReceiptService {
         </div>
             
     </section>
+
+    <section>
+      <div class="grid-2-container">
+        <div class="grid-item boldFont">SUPPLIER</div>
+        <div class="grid-item boldFont">IMPORTER</div>
+        <div class="grid-item">${data.customerName}</div>
+        <div class="grid-item">UWAVE CORPORATE LTD</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="grid-3-container">
+        <div class="grid-item boldFont">DROPPED DATE</div>
+        <div class="grid-item boldFont">WEIGHT</div>
+        <div class="grid-item boldFont">PACKAGE</div>
+        <div class="grid-item">${data.dateDropped}</div>
+        <div class="grid-item">${data.parcelWeight}</div>
+        <div class="grid-item">${data.noOfPackages}</div>
+      </div>
+    </section>
+    <section>
+      <div class="grid-3-container">
+        <div class="grid-item boldFont">ORIGIN</div>
+        <div class="grid-item boldFont">DESTINATION</div>
+        <div class="grid-item boldFont">ETA</div>
+        <div class="grid-item">${data.origin}</div>
+        <div class="grid-item">AUCKLAND, NEWZEALAND</div>
+        <div class="grid-item">${data.eta}</div>
+      </div>
+    </section>
+
+      <div class="grid-3-container">
+        <div class="grid-item boldFont">DESCRIPTION</div>
+        <div class="grid-item boldFont">GST</div>
+        <div class="grid-item boldFont">CHARGES</div>
+      </div>
+      <div class="grid-small-container">
+        <div class="grid-item boldFont">SUBTOTAL</div>
+        <div class="grid-item boldFont">1000</div>
+        <div class="grid-item boldFont">ADD GST</div>
+        <div class="grid-item boldFont">234</div>
+        <div class="grid-item boldFont">TOTAL NZD</div>
+        <div class="grid-item boldFont">1234</div>
+      </div>
+
+    <section style="margin:20px 0px 0px 0px;font-size:10px;">
+      <hr/>
+      <div style="font-weight:bold" >
+        Eft payments to:
+        Bank   ASB BANK LIMITED
+        Account   01-0286-0975830-00
+        UWAVE CORPORATE LTD
+        PAY Ref: ${data.customerName}  ${data.id}
+      </div >
+      <hr/>
+      <div >
+        This invoice & any orders or business entered in to is subject to UWAVE CORPORATE Ltd 'Standard Trading Conditions / Conditions of Contract'. 
+        Insurance is not arranged unless requested by written application prior to shipment. 
+        Please contact us within 7 days should there be any discrepancies.
+      </div>
+      <hr/>
+
+
+    </section>
+
     </body>
   </html>`;
     
