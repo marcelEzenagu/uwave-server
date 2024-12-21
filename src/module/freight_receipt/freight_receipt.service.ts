@@ -127,40 +127,71 @@ export class FreightReceiptService {
       *{
         color:"#15141f"
       }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* Two equal columns */
+      width: 80%; /* Adjust the width of the grid */
+      margin: 0px auto; /* Center the grid */
+    }
     .grid-2-container {
       display: grid;
       grid-template-columns: 1fr 1fr; /* Two equal columns */
       width: 80%; /* Adjust the width of the grid */
-      margin: 20px auto; /* Center the grid */
-      border: 0.3px solid black; /* Optional: Outer border for the grid */
+      margin: 10px auto 0px auto; /* Center the grid */
+      border: 0.1px solid black; /* Optional: Outer border for the grid */
     }
     .grid-3-container {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr; /* Two equal columns */
       width: 80%; /* Adjust the width of the grid */
-      margin: 20px auto; /* Center the grid */
-      border: 0.3px solid black; /* Optional: Outer border for the grid */
+      margin: 10px auto 0px auto; /* Center the grid */
+      border: 0.1px solid black; /* Optional: Outer border for the grid */
     }
-    .grid-small-container {
+    .grid-3mod-container {
+      display: grid;
+      grid-template-columns: 2fr 2fr 1fr; /* Two equal columns */
+      width: 80%; /* Adjust the width of the grid */
+      margin: 10px auto 0px auto; /* Center the grid */
+      border: 0.1px solid black; /* Optional: Outer border for the grid */
+    }
+    .grid-3mod {
+      display: grid;
+      grid-template-columns: 2fr 2fr 1fr; /* Two equal columns */
+      width: 80%; /* Adjust the width of the grid */
+      margin: 0px auto; /* Center the grid */
+    }
+    .grid-3 {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr; /* Two equal columns */
+      width: 80%; /* Adjust the width of the grid */
+      margin: 0px auto; /* Center the grid */
+    }
+   .grid-small-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* Two equal columns */
       width: 25%; /* Adjust the width of the grid */
-      margin: 20px auto; /* Center the grid */
-      border: 0.3px solid black; /* Optional: Outer border for the grid */
+      border: 0.1px solid black; /* Optional: Outer border for the grid */
+      margin-left: auto; /* Push the grid container to the right */
     }
 
     /* Grid item styling */
     .grid-item {
-      border: 0.3px solid black; /* Border for each grid cell */
-      padding: 10px; /* Add spacing inside the cell */
-      text-align: center; /* Center text */
+      border: 0.1px solid black; /* Border for each grid cell */
+      text-transform: uppercase;
+      font-size:12;
+      padding: 2px; /* Add spacing inside the cell */
+      text-align: left; 
+    }
+    .grid-child-item {
+      text-transform: uppercase;
+      font-size:12;
+      text-align: left; /* Center text */
     }
         
         .boldFont{
           font-size:14;
-          font-weight:500;
-        background-color: lightgray;
-
+          font-weight:bold;
+          background-color: lightgray;
         }
         #smallFont{
           font-size:14;
@@ -247,13 +278,6 @@ export class FreightReceiptService {
           <strong id="user">${data.id}</strong>
           </div>
           
-          </br>
-
-          <div id="spanDiv">
-          <span id="smallFont">DROPPED DATE:
-            <strong id="user">${data.dateDropped}</strong>
-          </span>
-        </div>
             
     </section>
 
@@ -261,9 +285,11 @@ export class FreightReceiptService {
       <div class="grid-2-container">
         <div class="grid-item boldFont">SUPPLIER</div>
         <div class="grid-item boldFont">IMPORTER</div>
-        <div class="grid-item">${data.customerName}</div>
-        <div class="grid-item">UWAVE CORPORATE LTD</div>
-      </div>
+        </div>
+        <div class="grid-2">
+          <div class="grid-child-item">${data.customerName}</div>
+          <div class="grid-child-item">UWAVE CORPORATE LTD</div>
+        </div>
     </section>
 
     <section>
@@ -271,21 +297,27 @@ export class FreightReceiptService {
         <div class="grid-item boldFont">DROPPED DATE</div>
         <div class="grid-item boldFont">WEIGHT</div>
         <div class="grid-item boldFont">PACKAGE</div>
-        <div class="grid-item">${data.dateDropped}</div>
-        <div class="grid-item">${data.parcelWeight}</div>
-        <div class="grid-item">${data.noOfPackages}</div>
+      </div>
+      <div class="grid-3">
+        <div class="grid-child-item">${data.dateDropped}</div>
+        <div class="grid-child-item">${data.parcelWeight} KG</div>
+        <div class="grid-child-item">${data.noOfPackages}</div>
       </div>
     </section>
     <section>
-      <div class="grid-3-container">
+      <div class="grid-3mod-container">
         <div class="grid-item boldFont">ORIGIN</div>
         <div class="grid-item boldFont">DESTINATION</div>
         <div class="grid-item boldFont">ETA</div>
-        <div class="grid-item">${data.origin}</div>
-        <div class="grid-item">AUCKLAND, NEWZEALAND</div>
-        <div class="grid-item">${data.eta}</div>
       </div>
-    </section>
+
+      <div class="grid-3mod">
+        <div class="grid-child-item">${data.origin}</div>
+        <div class="grid-child-item">AUCKLAND, NEWZEALAND</div>
+        <div class="grid-child-item">${data.eta}</div>
+      </div>
+   
+      </section>
 
       <div class="grid-3-container">
         <div class="grid-item boldFont">DESCRIPTION</div>
@@ -294,11 +326,11 @@ export class FreightReceiptService {
       </div>
       <div class="grid-small-container">
         <div class="grid-item boldFont">SUBTOTAL</div>
-        <div class="grid-item boldFont">1000</div>
+        <div class="grid-item ">1000</div>
         <div class="grid-item boldFont">ADD GST</div>
-        <div class="grid-item boldFont">234</div>
+        <div class="grid-item ">234</div>
         <div class="grid-item boldFont">TOTAL NZD</div>
-        <div class="grid-item boldFont">1234</div>
+        <div class="grid-item ">1234</div>
       </div>
 
     <section style="margin:20px 0px 0px 0px;font-size:10px;">
