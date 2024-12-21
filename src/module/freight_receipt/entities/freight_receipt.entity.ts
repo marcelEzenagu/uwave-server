@@ -30,12 +30,21 @@ export class FreightReceipt {
 
     @Prop({type:Number,required:true})
     parcelWeight:Number
+    
+    @Prop({type:Number,required:true})
+    subTotal:Number
 
     @Prop({type:Number,required:true})
     noOfPackages:Number
 
     @Prop({type:String,required:true})
     origin:string
+
+    @Prop({type:Number})
+    gst:Number
+
+    @Prop({type:String,required:true})
+    tableData:string
 
     @Prop({type:String,required:true})
     customerName:string

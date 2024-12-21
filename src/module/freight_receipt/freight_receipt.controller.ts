@@ -21,6 +21,9 @@ export class FreightReceiptController {
       }
       
       console.log("body",adminCreateFreightDto)
+      // console.log("body.gst",adminCreateFreightDto.gst)
+      // return
+
        const pdfFilePath = await this.freightReceiptService.adminCreate(adminCreateFreightDto);
        const pdf = path.resolve(__dirname,pdfFilePath)
 

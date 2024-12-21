@@ -1,12 +1,9 @@
-import { Injectable, StreamableFile } from '@nestjs/common';
+import { Injectable,StreamableFile } from '@nestjs/common';
 import { CreateFreightReceiptDto } from './dto/create-freight_receipt.dto';
 import { UpdateFreightReceiptDto } from './dto/update-freight_receipt.dto';
-import {
-  FreightReceipt,
-  FreightReceiptDocument,
-} from './entities/freight_receipt.entity';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FreightReceipt, FreightReceiptDocument } from './entities/freight_receipt.entity';
+import { InjectModel } from  '@nestjs/mongoose';
+import { Model } from  'mongoose';
 import * as puppeteer from 'puppeteer';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -15,64 +12,84 @@ import { Readable } from 'stream';
 // import { Buffer } from 'buffer';
 @Injectable()
 export class FreightReceiptService {
+
   constructor(
-    @InjectModel(FreightReceipt.name)
-    private freightReceiptModel: Model<FreightReceiptDocument>,
-  ) {}
+    @InjectModel(
+      FreightReceipt.name) private freightReceiptModel: Model<FreightReceiptDocument>
+    ){}
+    
+ 
 
-  async adminCreate(createFreightDto: FreightReceipt) {
-    try {
-      const newSavedItem = await new this.freightReceiptModel(
-        createFreightDto,
-      ).save();
 
-      const resp = await this.loadPdf(newSavedItem);
-      return resp;
-    } catch (e) {
-      console.log('ERROR-creating pdf:: ', e);
-      throw e;
+  async adminCreate(createFreightDto: FreightReceipt){
+
+    try{
+  
+
+      const newSavedItem = await new this.freightReceiptModel(createFreightDto).save()
+  
+     const resp =  await this.loadPdf(newSavedItem)
+     return resp
+      }catch(e){
+        console.log("ERROR-creating pdf:: ",e)
+        throw e
+      }
+    
     }
-  }
+
+
 
   // // load receipt
   async loadPdf(data) {
     try {
-      let buildPaths = await this.makeBuildPath(data.customerName);
+      let  buildPaths = await this.makeBuildPath(data.customerName)
       const html = await this.createHtml(data);
 
-      if (this.ensureDirectoryExistence(buildPaths.buildPathHtml)) {
-        fs.writeFileSync(buildPaths.buildPathHtml, html, 'utf-8');
+     if(this.ensureDirectoryExistence(buildPaths.buildPathHtml)){
+        fs.writeFileSync(
+          buildPaths.buildPathHtml,
+          html,"utf-8"
+        )
       }
-
-      if (this.ensureDirectoryExistence(buildPaths.buildPathPdf)) {
-        fs.writeFileSync(buildPaths.buildPathPdf, '');
-      }
+      
+      if(this.ensureDirectoryExistence(buildPaths.buildPathPdf)){
+        
+        fs.writeFileSync(
+          buildPaths.buildPathPdf,
+          ""
+        )
+     }
       // Step 2: Generate PDF from the saved HTML file
-      const browser = await puppeteer.launch({ headless: 'new' });
-      console.log('HTML CREATED YET');
+      const browser = await puppeteer.launch({ headless: "new" });
+      console.log("HTML CREATED YET")
 
       // return
       const page = await browser.newPage();
       const fileUrl = 'file://' + buildPaths.buildPathHtml;
 
       if (!fs.existsSync(buildPaths.buildPathPdf)) {
-        console.log('NO PDF YET');
+        console.log("NO PDF YET")
         fs.mkdirSync(buildPaths.buildPathPdf);
       }
+     
+      await page.goto(fileUrl, 
+        { waitUntil: 'networkidle2',
+        timeout:0,
+      },
+        );
 
-      await page.goto(fileUrl, { waitUntil: 'networkidle2', timeout: 0 });
 
       const options = {
         margin: {
           // top: "20px",
           // right: "20px",
-          bottom: '30px',
+          bottom: "30px",
           // left: "20px",
         },
-        path: buildPaths.buildPathPdf,
+        path:buildPaths.buildPathPdf,
         printBackground: true,
-        timeout: 0,
-      };
+        timeout:0,
+      }
 
       await page.pdf(options);
       await browser.close();
@@ -82,24 +99,19 @@ export class FreightReceiptService {
       console.log('error loading pdf:', e);
     }
   }
+ 
+  async makeBuildPath(userPhone){
 
-  async makeBuildPath(userPhone) {
     const rootDir = process.cwd();
-    let buildPaths = {
-      buildPathHtml: path.resolve(
-        rootDir,
-        `public/receipt/html/${userPhone}receipt.html`,
-      ),
-      buildPathPdf: path.resolve(
-        rootDir,
-        `public/receipt/pdf/${userPhone}receipt.pdf`,
-      ),
-    };
+    let  buildPaths = {
+       buildPathHtml: path.resolve(rootDir, `public/receipt/html/${userPhone}receipt.html`),
+       buildPathPdf: path.resolve(rootDir, `public/receipt/pdf/${userPhone}receipt.pdf`),
+     };
+   
+     return buildPaths 
+   }
 
-    return buildPaths;
-  }
-
-  async ensureDirectoryExistence(filePath) {
+   async ensureDirectoryExistence(filePath) {
     var dirname = path.dirname(filePath);
     if (fs.existsSync(dirname)) {
       return true;
@@ -108,7 +120,8 @@ export class FreightReceiptService {
     fs.mkdirSync(dirname);
   }
 
-  async createHtml(data) {
+  async createHtml (data){ 
+    
     const htmlData = `<html>
     <head>
       <style>
@@ -135,11 +148,10 @@ export class FreightReceiptService {
       margin: 10px auto 0px auto; /* Center the grid */
       border: 0.1px solid black; /* Optional: Outer border for the grid */
     }
-   
-     .grid-3table {
+    .grid-3table {
     width: 100%;
-    border-collapse: collapse; 
-    margin: 10px 0px 0px 0px;
+    border-collapse: collapse; /* Ensures borders don't double up */
+    margin: 10px auto;
     text-align: left;
   }
 
@@ -150,21 +162,8 @@ export class FreightReceiptService {
   }
 
   .grid-3table th {
-
-  font-size:14;
-  font-weight:bold;
-  background-color: lightgray;  }
-
-  .col1 {
-    width: 60%; /* Column 1 takes 60% of the table */
+    background-color: #f2f2f2; /* Optional: Header background */
   }
-
-  .col2,
-  .col3 {
-    width: 20%; /* Columns 2 and 3 take 20% each */
-  }
-
-
     .grid-3mod-container {
       display: grid;
       grid-template-columns: 2fr 2fr 1fr; /* Two equal columns */
@@ -339,27 +338,52 @@ export class FreightReceiptService {
 
       
 
+       <div style="display:flex; flex-direction:column;justify-content:center; padding:10px 0px 0px 0px">
+    
+      <div class="grid-3table-container">
+        <div class="grid-item boldFont">DESCRIPTION</div>
+        <div class="grid-item boldFont">GST IN NZD (15%)</div>
+        <div class="grid-item boldFont">CHARGES in NZD ($)</div>
+      </div>
+
+             
+            ${JSON.parse(data.tableData)
+              .map(
+                (i) =>
+                  `
+                  <div class="grid-3table-body">
+                    <span class="grid-child-item smallFont" style="width:15%;padding-left:10px ">${i.selectedFee}</span>
+                    <span class="grid-child-item smallFont" style="width:50%">${i.gst ? i.gst : null}</span>
+                    <span class="grid-child-item smallFont"  style="padding-right:10px;width:15%">${i.charge}</span>
+                  </div>
+                  
+                  `
+                )
+                .join("")}
+                </div>
+
+
                 <table class="grid-3table">
   <thead>
     <tr>
-      <th class="col1 ">DESCRIPTION</th> <!-- Header for first column -->
-      <th class="col2 ">GST IN NZD (15%)</th> <!-- Header for second column -->
-      <th class="col3 ">CHARGES in NZD ($)</th> <!-- Header for third column -->
+      <th>DESCRIPTION</th> <!-- Header for first column -->
+      <th>GST IN NZD (15%)</th> <!-- Header for second column -->
+      <th>CHARGES in NZD ($)</th> <!-- Header for third column -->
     </tr>
   </thead>
   <tbody>
    ${JSON.parse(data.tableData)
-     .map(
-       (i) =>
-         `
+              .map(
+                (i) =>
+                  `
     <tr>
-      <td class="col1">${i.selectedFee}</td>
-      <td class="col2">${i.gst ? i.gst.toFixed(2) : null}</td>
-      <td class="col3">${i.charge.toFixed(2)}</td>
+      <td>${i.selectedFee}</td>
+      <td>${i.gst ? i.gst : null}</td>
+      <td>${i.charge}</td>
     </tr>
-      `,
-     )
-     .join('')}
+      `
+    )
+    .join("")}
    
   </tbody>
 </table>
@@ -367,25 +391,24 @@ export class FreightReceiptService {
 
       <div class="grid-small-container">
         <div class="grid-item boldFont">SUBTOTAL</div>
-        <div class="grid-item ">${data.subTotal.toFixed(2)}</div>
+        <div class="grid-item ">1000</div>
         <div class="grid-item boldFont">ADD GST</div>
-        <div class="grid-item ">${data.gst.toFixed(2)}</div>
+        <div class="grid-item ">${data.gst}</div>
         <div class="grid-item boldFont">TOTAL NZD</div>
-        <div class="grid-item ">${(data.subTotal+ data.gst).toFixed(2)}</div>
+        <div class="grid-item ">1234</div>
       </div>
 
     <section style="margin:20px 0px 0px 0px;font-size:10px;">
       <hr/>
-      <pre style="font-weight:bold" >
+      <div style="font-weight:bold" >
         Eft payments to:
-        Bank   ANZ BANK LIMITED
+        Bank   ASB BANK LIMITED
         Account   01-0286-0975830-00
         UWAVE CORPORATE LTD
         PAY Ref: ${data.customerName}  ${data.id}
-      </pre >
+      </div >
       <hr/>
-      <div style="font-weight:bold" >
-
+      <div >
         This invoice & any orders or business entered in to is subject to UWAVE CORPORATE Ltd 'Standard Trading Conditions / Conditions of Contract'. 
         Insurance is not arranged unless requested by written application prior to shipment. 
         Please contact us within 7 days should there be any discrepancies.
@@ -397,7 +420,9 @@ export class FreightReceiptService {
 
     </body>
   </html>`;
-
-    return htmlData;
+    
+  return htmlData
+    
   }
+
 }
