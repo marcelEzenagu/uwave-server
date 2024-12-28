@@ -4,8 +4,6 @@ import { CreateFreightDto } from './dto/create-freight.dto';
 import { UpdateFreightDto } from './dto/update-freight.dto';
 import { Request } from 'express';
 import { StripePayment } from 'src/helpers/stripePayment';
-
-
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('freights')

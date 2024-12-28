@@ -1,15 +1,64 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDonationDto } from './dto/create-donation.dto';
 import { UpdateDonationDto } from './dto/update-donation.dto';
+import { Donation,DonationDocument } from './entities/donation.entity';
+import { InjectModel } from  '@nestjs/mongoose';
+import { Model } from  'mongoose';
+import { StripePayment } from 'src/helpers/stripePayment';
 
 @Injectable()
 export class DonationService {
-  create(createDonationDto: CreateDonationDto) {
-    return 'This action adds a new donation';
+
+  constructor(
+       @InjectModel(Donation.name)  private  donationModel: Model<DonationDocument>,
+      private readonly stripeService: StripePayment,
+  
+      ){
+
+  }
+  async create(createDonationDto: Donation) {
+    const intentRes = await this.stripeService.createSession(createDonationDto.amount)
+    createDonationDto.paymentIntentID =intentRes.paymentIntentID
+    createDonationDto.clientSecret =intentRes.clientSecret
+    await  new this.donationModel(createDonationDto).save();
+    
+    intentRes.paymentIntentID =undefined
+    return intentRes
   }
 
-  findAll() {
-    return `This action returns all donation`;
+  async confirmDonation(dto: Donation) {
+    await this.stripeService.confirmPaymentIntent(dto.paymentIntentID)
+    const where = { paymentIntentID:dto.paymentIntentID };
+    dto.status = "SUCCESSFUL"
+    return await this.donationModel.findOneAndUpdate(where, dto,{new:true})
+  }
+
+  async findAll(page: number, limit: number,where :any) {
+    const skip = (page - 1) * limit;
+
+    const {startDate,endDate} = where
+
+    const filter: any = {
+      createdAt: {
+        $lte: endDate, // greater than or equal to startDate
+        $gte: startDate, // less than or equal to endDate
+      },
+    };
+   
+
+    const data = await this.donationModel
+      .find(filter)
+      .skip(skip)
+      .limit(limit)
+      .exec();
+    const total = await this.donationModel.countDocuments(filter);
+
+    return {
+        data,
+        total,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+      };  
   }
 
   findOne(id: number) {

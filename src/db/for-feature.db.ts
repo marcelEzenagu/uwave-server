@@ -17,6 +17,7 @@ import { Wallet,WalletSchema } from "src/module/wallet/entities/wallet.entity";
 import { Shipment,ShipmentSchema } from "src/module/shipment/entities/shipment.entity";
 import { FreightReceiptSchema ,FreightReceipt} from "src/module/freight_receipt/entities/freight_receipt.entity";
 import { Donation, DonationSchema } from "src/module/donation/entities/donation.entity";
+import { Blog, BlogSchema } from "src/module/blog/entities/blog.entity";
 
 
 export default [
@@ -38,4 +39,5 @@ export default [
   { name: FreightReceipt.name, schema: FreightReceiptSchema },
   { name: Shipment.name, schema: ShipmentSchema },
   { name: Donation.name, schema: DonationSchema },
+  { name: Blog.name, schema: BlogSchema },
 ];

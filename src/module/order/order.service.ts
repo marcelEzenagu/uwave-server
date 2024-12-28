@@ -731,6 +731,7 @@ async getOrderByStatusAndRange(page,limit :number, status:OptionType,start,end,s
         console.log("error at completeProcessing:",e)
       }
     }
+    
     async moveOrderToShipped(){
       try{
 

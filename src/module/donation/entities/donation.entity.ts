@@ -38,6 +38,16 @@ export class Donation {
 
     @Prop({type:String})
     state:string
+    
+    @Prop({type:String})
+    status:string
+
+    @Prop({type:String})
+    paymentIntentID:string
+
+    @Prop({type:String})
+    clientSecret:string
+    
     @Prop({type:Boolean})
     isAnonymous:boolean
     
