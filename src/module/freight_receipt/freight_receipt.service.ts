@@ -373,7 +373,6 @@ export class FreightReceiptService {
         <div class="grid-item boldFont">SUBTOTAL</div>
         <div class="grid-item ">${data.subTotal ? data.subTotal.toFixed(2) : null}</div>
         <div class="grid-item boldFont">ADD GST</div>
-        <div class="grid-item ">${data.gst.toFixed(2)}</div>
         <div class="grid-item ">${data.gst ? data.gst.toFixed(2) : null}</div>
         <div class="grid-item boldFont">TOTAL NZD</div>
         <div class="grid-item ">${data.subTotal && data.gst ? (data.subTotal+ data.gst).toFixed(2) : null}</div>
