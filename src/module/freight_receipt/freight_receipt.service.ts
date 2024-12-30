@@ -272,7 +272,7 @@ export class FreightReceiptService {
     <header style="padding:0px 20px 0px 20px;display:flex; justify-content:space-between;align-items:center" >
       <div id="headerLeft">
         <img style="width:60%; height:60%"
-          src="../../../public/logo/c_light.jpeg" alt="UWave logo" />
+          src="/public/logo/c_light.jpeg" alt="UWave logo" />
       </div>
   
       <div id="headerRight" >
