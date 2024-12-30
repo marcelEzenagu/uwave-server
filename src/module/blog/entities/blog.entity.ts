@@ -21,6 +21,10 @@ export class Blog {
 
   @Prop({ type: String })
   design: string;
+
+  @Prop({ type: String })
+  image: string;
+  
   @Prop({ type: String })
   createdBy: string;
 
