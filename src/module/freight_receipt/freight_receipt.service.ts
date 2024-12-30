@@ -360,7 +360,7 @@ export class FreightReceiptService {
     <tr>
       <td class="col1">${i.selectedFee}</td>
       <td class="col2">${i.gst ? i.gst.toFixed(2) : null}</td>
-      <td class="col3">${i.charge.toFixed(2)}</td>
+      <td class="col3">${i.charge ? i.charge.toFixed(2) : null}</td>
     </tr>
       `,
      )
@@ -372,11 +372,12 @@ export class FreightReceiptService {
 
       <div class="grid-small-container">
         <div class="grid-item boldFont">SUBTOTAL</div>
-        <div class="grid-item ">${data.subTotal.toFixed(2)}</div>
+        <div class="grid-item ">${data.subTotal ? data.subTotal.toFixed(2) : null}</div>
         <div class="grid-item boldFont">ADD GST</div>
         <div class="grid-item ">${data.gst.toFixed(2)}</div>
+        <div class="grid-item ">${data.gst ? data.gst.toFixed(2) : null}</div>
         <div class="grid-item boldFont">TOTAL NZD</div>
-        <div class="grid-item ">${(data.subTotal+ data.gst).toFixed(2)}</div>
+        <div class="grid-item ">${data.subTotal && data.gst ? (data.subTotal+ data.gst).toFixed(2) : null}</div>
       </div>
 
     <section style="margin:20px 0px 0px 0px;font-size:10px;">
