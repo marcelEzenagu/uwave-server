@@ -40,9 +40,10 @@ export class FreightReceiptService {
 
     try {
       let buildPaths = await this.makeBuildPath(data.customerName);
-      const html = await this.createHtml(data);
 
       console.log('at loadPdf 1:::', buildPaths);
+      const html = await this.createHtml(data);
+
 
       if (this.ensureDirectoryExistence(buildPaths.buildPathHtml)) {
         fs.writeFileSync(buildPaths.buildPathHtml, html, 'utf-8');
