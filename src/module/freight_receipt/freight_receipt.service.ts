@@ -27,6 +27,7 @@ export class FreightReceiptService {
       ).save();
 
       const resp = await this.loadPdf(newSavedItem);
+      console.log("RESP  ",)
       return resp;
     } catch (e) {
       console.log('ERROR-creating pdf:: ', e);
@@ -53,7 +54,7 @@ export class FreightReceiptService {
         fs.writeFileSync(buildPaths.buildPathPdf, '');
       }
       // Step 2: Generate PDF from the saved HTML file
-      const browser = await puppeteer.launch({ headless: 'new' });
+      const browser = await puppeteer.launch();
       console.log('HTML CREATED YET');
 
       // return

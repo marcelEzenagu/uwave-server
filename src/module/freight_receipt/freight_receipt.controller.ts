@@ -20,7 +20,7 @@ export class FreightReceiptController {
         throw new BadRequestException("unaccessible");
       }
       
-      console.log("body",adminCreateFreightDto)
+      // console.log("body",adminCreateFreightDto)
       // console.log("body.gst",adminCreateFreightDto.gst)
       // return
 
