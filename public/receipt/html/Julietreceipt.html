@@ -1,117 +1,4 @@
-import { Injectable, StreamableFile } from '@nestjs/common';
-import { CreateFreightReceiptDto } from './dto/create-freight_receipt.dto';
-import { UpdateFreightReceiptDto } from './dto/update-freight_receipt.dto';
-import {
-  FreightReceipt,
-  FreightReceiptDocument,
-} from './entities/freight_receipt.entity';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import * as puppeteer from 'puppeteer';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as moment from 'moment';
-@Injectable()
-export class FreightReceiptService {
-  constructor(
-    @InjectModel(FreightReceipt.name)
-    private freightReceiptModel: Model<FreightReceiptDocument>,
-  ) {}
-
-  async adminCreate(createFreightDto: FreightReceipt) {
-    try {
-      const newSavedItem = await new this.freightReceiptModel(
-        createFreightDto,
-      ).save();
-
-      const resp = await this.loadPdf(newSavedItem);
-      console.log("RESP  ",)
-      return resp;
-    } catch (e) {
-      console.log('ERROR-creating pdf:: ', e);
-      throw e;
-    }
-  }
-
-  // // load receipt
-  async loadPdf(data) {
-
-    try {
-      let buildPaths = await this.makeBuildPath(data.customerName);
-
-      const html = await this.createHtml(data);
-
-
-      if (this.ensureDirectoryExistence(buildPaths.buildPathHtml)) {
-        fs.writeFileSync(buildPaths.buildPathHtml, html, 'utf-8');
-      }
-
-      if (this.ensureDirectoryExistence(buildPaths.buildPathPdf)) {
-        fs.writeFileSync(buildPaths.buildPathPdf, '');
-      }
-      // Step 2: Generate PDF from the saved HTML file
-      const browser = await puppeteer.launch({headless:"new"});
-      console.log('HTML CREATED YET');
-
-      // return
-      const page = await browser.newPage();
-      const fileUrl = 'file://' + buildPaths.buildPathHtml;
-
-      if (!fs.existsSync(buildPaths.buildPathPdf)) {
-        console.log('NO PDF YET');
-        fs.mkdirSync(buildPaths.buildPathPdf);
-      }
-
-      await page.goto(fileUrl, { waitUntil: 'networkidle2', timeout: 0 });
-
-      const options = {
-        margin: {
-          // top: "20px",
-          // right: "20px",
-          bottom: '30px',
-          // left: "20px",
-        },
-        path: buildPaths.buildPathPdf,
-        printBackground: true,
-        timeout: 0,
-      };
-
-      await page.pdf(options);
-      await browser.close();
-
-      return buildPaths.buildPathPdf;
-    } catch (e) {
-      console.log('error loading pdf:', e);
-    }
-  }
-
-  async makeBuildPath(userPhone) {
-    const rootDir = process.cwd();
-    let buildPaths = {
-      buildPathHtml: path.resolve(
-        rootDir,
-        `public/receipt/html/${userPhone}receipt.html`,
-      ),
-      buildPathPdf: path.resolve(
-        rootDir,
-        `public/receipt/pdf/${userPhone}receipt.pdf`,
-      ),
-    };
-
-    return buildPaths;
-  }
-
-  async ensureDirectoryExistence(filePath) {
-    var dirname = path.dirname(filePath);
-    if (fs.existsSync(dirname)) {
-      return true;
-    }
-    this.ensureDirectoryExistence(dirname);
-    fs.mkdirSync(dirname);
-  }
-
-  async createHtml(data) {
-    const htmlData = `<html>
+<html>
     <head>
       <style>
       *{
@@ -270,9 +157,7 @@ export class FreightReceiptService {
     <header style="padding:0px 20px 0px 20px;display:flex; justify-content:space-between;align-items:center" >
       <div id="headerLeft">
         <img style="width:60%; height:60%"
-          src="/public/logo/c_light.jpeg" 
-          alt="UWave logo" 
-        />
+          src="../../../public/images/c_light.jpeg" alt="UWave logo" />
       </div>
   
       <div id="headerRight" >
@@ -297,7 +182,7 @@ export class FreightReceiptService {
     <section  >
         <div style="padding:20px 0 0 20px;margin" class="centered-div" >
           <span id="smallFont">TRACKING NUMBER:</span>
-          <strong id="user">${data.id}</strong>
+          <strong id="user">6766a3438929316a542a75b1</strong>
           </div>
           
             
@@ -309,7 +194,7 @@ export class FreightReceiptService {
         <div class="grid-item boldFont">IMPORTER</div>
         </div>
         <div class="grid-2">
-          <div class="grid-child-item">${data.customerName}</div>
+          <div class="grid-child-item">Juliet</div>
           <div class="grid-child-item">UWAVE CORPORATE LTD</div>
         </div>
     </section>
@@ -321,9 +206,9 @@ export class FreightReceiptService {
         <div class="grid-item boldFont">PACKAGE</div>
       </div>
       <div class="grid-3">
-        <div class="grid-child-item">${data.dateDropped}</div>
-        <div class="grid-child-item">${data.parcelWeight} KG</div>
-        <div class="grid-child-item">${data.noOfPackages}</div>
+        <div class="grid-child-item">2024-12-06</div>
+        <div class="grid-child-item">4 KG</div>
+        <div class="grid-child-item">5</div>
       </div>
     </section>
     <section>
@@ -334,9 +219,9 @@ export class FreightReceiptService {
       </div>
 
       <div class="grid-3mod">
-        <div class="grid-child-item">${data.origin}</div>
+        <div class="grid-child-item">Nigeria</div>
         <div class="grid-child-item">AUCKLAND, NEWZEALAND</div>
-        <div class="grid-child-item">${data.eta}</div>
+        <div class="grid-child-item">2024-12-05</div>
       </div>
    
       </section>
@@ -352,18 +237,19 @@ export class FreightReceiptService {
     </tr>
   </thead>
   <tbody>
-   ${JSON.parse(data.tableData)
-     .map(
-       (i) =>
-         `
+   
     <tr>
-      <td class="col1">${i.selectedFee}</td>
-      <td class="col2">${i.gst ? i.gst.toFixed(2) : null}</td>
-      <td class="col3">${i.charge ? i.charge.toFixed(2) : null}</td>
+      <td class="col1">Customs Clearance Fees</td>
+      <td class="col2">649.95</td>
+      <td class="col3">4333.00</td>
     </tr>
-      `,
-     )
-     .join('')}
+      
+    <tr>
+      <td class="col1">Goods and Services Tax (GST)</td>
+      <td class="col2">44.70</td>
+      <td class="col3">298.00</td>
+    </tr>
+      
    
   </tbody>
 </table>
@@ -371,12 +257,11 @@ export class FreightReceiptService {
 
       <div class="grid-small-container">
         <div class="grid-item boldFont">SUBTOTAL</div>
-        <div class="grid-item ">${data.subTotal ? data.subTotal.toFixed(2) : null}</div>
+        <div class="grid-item ">4631.00</div>
         <div class="grid-item boldFont">ADD GST</div>
-        <div class="grid-item ">${data.gst.toFixed(2)}</div>
-        <div class="grid-item ">${data.gst ? data.gst.toFixed(2) : null}</div>
+        <div class="grid-item ">694.65</div>
         <div class="grid-item boldFont">TOTAL NZD</div>
-        <div class="grid-item ">${data.subTotal && data.gst ? (data.subTotal+ data.gst).toFixed(2) : null}</div>
+        <div class="grid-item ">5325.65</div>
       </div>
 
     <section style="margin:20px 0px 0px 0px;font-size:10px;">
@@ -386,7 +271,7 @@ export class FreightReceiptService {
         Bank   ANZ BANK LIMITED
         Account   01-0286-0975830-00
         UWAVE CORPORATE LTD
-        PAY Ref: ${data.customerName}  ${data.id}
+        PAY Ref: Juliet  6766a3438929316a542a75b1
       </pre >
       <hr/>
       <div style="font-weight:bold" >
@@ -401,8 +286,4 @@ export class FreightReceiptService {
     </section>
 
     </body>
-  </html>`;
-
-    return htmlData;
-  }
-}
+  </html>
