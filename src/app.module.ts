@@ -34,6 +34,7 @@ import { AppGateway } from './app.gateway';
 import { FreightReceiptModule } from './module/freight_receipt/freight_receipt.module';
 import { DonationModule } from './module/donation/donation.module';
 import { BlogModule } from './module/blog/blog.module';
+import { AidModule } from './module/aid/aid.module';
 
 
 @Module({
@@ -72,6 +73,7 @@ import { BlogModule } from './module/blog/blog.module';
     FreightReceiptModule,
     DonationModule,
     BlogModule,
+    AidModule,
   ],
   exports:[
     AppGateway
