@@ -3,18 +3,34 @@ import { DonationService } from './donation.service';
 import { UpdateDonationDto } from './dto/update-donation.dto';
 import { Donation } from './entities/donation.entity';
 import { Frequency, UtilityService } from 'src/helpers/utils';
+import { StripePayment } from 'src/helpers/stripePayment';
 
 @Controller('donations')
 export class DonationController {
   constructor(private readonly donationService: DonationService,
-
-        private utils: UtilityService,
-    
+      private readonly stripeService: StripePayment,
+      private utils: UtilityService,
   ) {}
 
   @Post()
-  create(@Body() createDonationDto: Donation) {
-    return this.donationService.create(createDonationDto);
+  async create(
+    @Body('amount') amount: number,
+    @Body('currency') currency: string,
+    @Body('isRecurring') isRecurring: boolean,
+    @Body('successUrl') successUrl: string,
+    @Body('cancelUrl') cancelUrl: string,
+    @Body() dto: Donation,
+  
+  ) {
+
+      const session =  await this.stripeService.createPaymentSession(amount, currency, isRecurring, successUrl, cancelUrl);
+
+
+
+      dto.paymentIntentID= session.payment_intent?.toString() || null
+      dto.clientSecret= session.client_secret || null
+      
+    return this.donationService.create(dto);
   }
 
   @Post("/confirm")

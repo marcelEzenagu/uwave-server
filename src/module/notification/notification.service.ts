@@ -18,7 +18,7 @@ export class NotificationService {
     this.mailerService
       .send(emailDto)
       .then((response) => {
-        const { message_id, provider } = response;
+        const { message, provider } = response;
       })
       .catch((error) => {
         // Handle the error here

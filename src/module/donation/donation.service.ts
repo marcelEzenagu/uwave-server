@@ -17,20 +17,16 @@ export class DonationService {
 
   }
   async create(createDonationDto: Donation) {
-    const intentRes = await this.stripeService.createSession(createDonationDto.amount)
-    createDonationDto.paymentIntentID =intentRes.paymentIntentID
-    createDonationDto.clientSecret =intentRes.clientSecret
+    
     await  new this.donationModel(createDonationDto).save();
     
-    intentRes.paymentIntentID =undefined
-    return intentRes
+    createDonationDto.paymentIntentID =undefined
+    return createDonationDto
   }
 
-  async confirmDonation(dto: Donation) {
-    await this.stripeService.confirmPaymentIntent(dto.paymentIntentID)
-    const where = { paymentIntentID:dto.paymentIntentID };
-    dto.status = "SUCCESSFUL"
-    return await this.donationModel.findOneAndUpdate(where, dto,{new:true})
+  async confirmDonation(dto: {}) {
+
+
   }
 
   async findAll(page: number, limit: number,where :any) {

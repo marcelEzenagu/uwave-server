@@ -1,4 +1,4 @@
 export class SendEmailResDto {
-  message_id: string;
+  message: string;
   provider: string;
 }

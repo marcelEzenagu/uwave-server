@@ -484,7 +484,7 @@ export class AuthService {
         template: MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
       });
 
-      if (!emailResponse.message_id) {
+      if (!emailResponse.message) {
         this.agentService.remove(where);
         throw new Error('failed to send email');
       }
@@ -853,7 +853,7 @@ export class AuthService {
         template: MESSAGE_TEMPLATE.RESET_PASSWORD_EMAIL,
       });
 
-      if (!emailResponse.message_id) {
+      if (!emailResponse.message) {
         this.vendorService.remove(where);
         throw new Error('failed to send email');
       }

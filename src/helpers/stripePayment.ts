@@ -43,4 +43,29 @@ console.log("samount:::",amount)
 
   }
   
+  async createPaymentSession(amount: number, currency: string, isRecurring: boolean, successUrl: string, cancelUrl: string) {
+    const paymentOptions = {
+      mode: isRecurring ? 'subscription' : 'payment',
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency,
+            product_data: {
+              name: isRecurring ? 'Recurring Donation' : 'One-time Donation',
+            },
+            unit_amount: amount * 100, // Convert amount to cents
+            recurring: isRecurring ? { interval: 'month' } : undefined,
+          },
+          quantity: 1,
+        },
+      ],
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+    };
+
+    const session = await stripe.checkout.sessions.create(paymentOptions);
+    return session;
+  }
+  
 }
