@@ -8,3 +8,7 @@ admin-UNSATISFACTORY
 
 PAYMENT:
 weekly-say: every-friday;
+
+<!-- overview -->
+<!-- 1: list recent orders from the vendor -->
+<!-- 2: list the items-sold in order of higher quantity -->

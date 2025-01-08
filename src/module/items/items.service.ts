@@ -505,5 +505,34 @@ const itemImage = `${imagePath}/${imageName}`;
       { $count: "vendorSectionCount" }
     ]);
   }
+
+  async getVendorBestSellers(vendorID:string,daysAgo:Frequency,
+    page,
+    limit: number,){
+    const {startDate,endDate} = this.utilityService.calculatePreviousDate(daysAgo)
+    const skip = (page - 1) * limit;
+
+    const filter = {vendorID,
+      createdAt: { $gte: new Date(startDate) }
+    }
+    const res =  await this.itemModel.find(filter)
+                                     .sort({ salesCount: -1 })
+                                      .skip(skip)
+                                      .limit(limit)
+                                    //  .select(["name", "images","salesPrice","salesCount"])
+                                     .exec()
+    const total = await this.itemModel.find(filter)
+                                      .sort({ salesCount: -1 })
+                                      .countDocuments();
+
+
+    return{
+      data:res,
+      total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+    
+    }
+  }
   
 }

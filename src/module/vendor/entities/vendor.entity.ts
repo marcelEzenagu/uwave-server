@@ -10,6 +10,8 @@ export type VendorDocument = Vendor & Document & {
   vendorID: string;  
 }
 
++23
+
 export enum VendorStat {
   VERIFIED= "VERIFIED",
   PENDING= "PENDING",

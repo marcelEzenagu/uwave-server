@@ -32,7 +32,7 @@ export class UtilityService {
         break;
 
       default:
-        throw new Error('Invalid range provided');
+        throw new Error(`Invalid range provided,${range}`);
     }
 
     return {startDate: startDate.toISOString(),

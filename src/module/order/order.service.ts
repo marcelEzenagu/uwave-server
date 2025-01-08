@@ -779,4 +779,40 @@ async getOrderByStatusAndRange(page,limit :number, status:OptionType,start,end,s
   }
   }
 
+  async getVendorRecentOrders(vendorID:string,daysAgo:Frequency,
+    page,
+    limit: number){
+
+      const skip = (page - 1) * limit;
+     
+    const {startDate,endDate} = this.utilityService.calculatePreviousDate(daysAgo)
+    const filter = {"items.vendorID":vendorID,
+      createdAt: { $gte: new Date(startDate) }
+    }
+
+    const res =  await this.orderModel.aggregate([
+      { $match: { deletedAt: null , createdAt: { $gte: new Date(startDate) }},},
+      { $sort: { createdAt: -1 } },
+      { $unwind: "$items" },
+      { $match: { "items.vendorID": vendorID } },
+      { $project: { orderID: "$_id", item: "$items" } },
+      { $skip: (page - 1) * limit },
+      { $limit: limit }
+    ])
+
+    const total = await this.orderModel.find(filter)
+                                      .sort({ createdAt: -1 })
+                                      .countDocuments();
+
+
+                                      console.log(" RES",res,"total==",total)
+    return{
+      data:res,
+      total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+    
+    }
+  }
+
 }
