@@ -133,7 +133,6 @@ export class AgentController {
         throw new BadRequestException('unaccessible to non-agent');
       }
 
-      console.log("++ endter")
       return await this.shipmentService.getAgentRecentShipments(
         agentID,
         daysDifference,
