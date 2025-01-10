@@ -131,8 +131,6 @@ export class OrderService {
     });
   }
 
-  
-
   async getVendorSales(vendorID: string,daysAgo?:number,status?:OptionType) {
     const calculatedDaysAgo = new Date();
     calculatedDaysAgo.setDate(calculatedDaysAgo.getDate() - daysAgo);

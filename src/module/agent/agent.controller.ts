@@ -9,6 +9,7 @@ import { ShipmentService } from '../shipment/shipment.service';
 import { OptionType, ShipmentOptionType } from '../order/entities/order.entity';
 import { ErrorFormat } from 'src/helpers/errorFormat';
 import { FileService } from 'src/helpers/upload';
+import { Frequency } from 'src/helpers/utils';
 
 @ApiTags('agents')
 @Controller('agents')
@@ -112,4 +113,35 @@ export class AgentController {
     }
   }
 
+  @Get('/recent-shipments')
+  async recentShipments(
+    @Req() req: any,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 50,
+    @Query('daysDifference') daysDifference: Frequency,
+  ) {
+    try {
+      const agentID = req['user'].sub;
+      const role = req['user'].role;
+      page = Number(page);
+      limit = Number(limit);
+
+      if (!page) page = 1; // Page should be at least 1
+      if (!limit || limit > 100) limit = 10; // Limit should be between 1 and 100
+
+      if (role != 'agent') {
+        throw new BadRequestException('unaccessible to non-agent');
+      }
+
+      console.log("++ endter")
+      return await this.shipmentService.getAgentRecentShipments(
+        agentID,
+        daysDifference,
+        page,
+        limit,
+      );
+    } catch (e) {
+      throw new BadRequestException(this.errorFormat.formatErrors(e));
+    }
+  }
 }

@@ -225,8 +225,8 @@ export class VendorController {
       page = Number(page);
       limit = Number(limit);
 
-      if (!page ) page = 1; // Page should be at least 1
-      if (!limit  || limit > 100) limit = 10; // Limit should be between 1 and 100
+      if (!page) page = 1; // Page should be at least 1
+      if (!limit || limit > 100) limit = 10; // Limit should be between 1 and 100
 
       if (role != 'vendor') {
         throw new BadRequestException('unaccessible to non-vendors');
@@ -255,7 +255,7 @@ export class VendorController {
       limit = Number(limit);
 
       if (!page) page = 1; // Page should be at least 1
-      if (!limit  || limit > 100) limit = 10; // Limit should be between 1 and 100
+      if (!limit || limit > 100) limit = 10; // Limit should be between 1 and 100
 
       if (role != 'vendor') {
         throw new BadRequestException('unaccessible to non-vendors');
@@ -281,7 +281,6 @@ export class VendorController {
     updateVendorDto.email = undefined;
     updateVendorDto.password = undefined;
 
-    console.log('updateVendorDt==== ', updateVendorDto);
 
     const vendorID = req['user'].sub;
     const vPath = 'public/images/vendors';

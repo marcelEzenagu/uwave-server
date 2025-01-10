@@ -70,6 +70,9 @@ export class Shipment {
 
     @Prop()
     rejectReason? : string
+    
+    @Prop({ type: Date, default: null })
+    estimatedDeliveryDate? : Date
     @Prop()
     destination : string
     @Prop({ type: Date, default: null })

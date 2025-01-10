@@ -10,11 +10,12 @@ import { AdminModule } from '../admin/admin.module';
 import { ShipmentService } from '../shipment/shipment.service';
 import { AppModule } from 'src/app.module';
 import { FileService } from 'src/helpers/upload';
+import { UtilityService } from 'src/helpers/utils';
 
 @Module({
   controllers: [AgentController],
   exports: [AgentService],
-  providers: [AgentService,FileService,ErrorFormat,ShipmentService],
+  providers: [AgentService,FileService,UtilityService,ErrorFormat,ShipmentService],
   imports: [
     forwardRef(() => AuthModule),
     forwardRef(() => AppModule),
