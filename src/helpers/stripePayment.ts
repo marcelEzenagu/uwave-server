@@ -1,49 +1,73 @@
-import { Injectable, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { PaymentStatusType } from 'src/module/order/entities/order.entity';
-const stripe = require('stripe')(process.env.STRIPE_KEY)
-
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 
 @Injectable()
 export class StripePayment {
-  async createSession(amount){
-console.log("samount:::",amount)
-    try{
+  async createSession(amount) {
+    console.log('samount:::', amount);
+    try {
       const paymentIntent = await stripe.paymentIntents.create({
-            amount: amount*100,
-            currency: process.env.CURRENCY_TYPE,
-            automatic_payment_methods: {
-              enabled: true,
-            },
+        amount: amount * 100,
+        currency: process.env.CURRENCY_TYPE,
+        automatic_payment_methods: {
+          enabled: true,
+        },
       });
-      
-      
-          return {
-            dpmCheckerLink:`https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=${paymentIntent.id}`,
-            paymentIntentID:paymentIntent.id,
-            clientSecret:paymentIntent.client_secret}
 
-    }catch(e){
-      console.log("error:::",e)
-
+      return {
+        dpmCheckerLink: `https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=${paymentIntent.id}`,
+        paymentIntentID: paymentIntent.id,
+        clientSecret: paymentIntent.client_secret,
+      };
+    } catch (e) {
+      console.log('error:::', e);
     }
-    
   }
 
-  async confirmPaymentIntent(paymentIntentId){
+  async confirmPaymentIntent(paymentIntentId) {
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
-    
-     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-
-    if(paymentIntent.status != PaymentStatusType.SUCCESS ){
-       throw new BadRequestException("order not-yet paid for.");
-     }
-    return paymentIntent
-
+    if (paymentIntent.status != PaymentStatusType.SUCCESS) {
+      throw new BadRequestException('order not-yet paid for.');
+    }
+    return paymentIntent;
   }
-  
-  async createPaymentSession(amount: number, currency: string, isRecurring: boolean, successUrl: string, cancelUrl: string) {
+
+  async createPaymentSession(
+    amount: number,
+    currency: string,
+    frequency: string,
+    successUrl: string,
+    cancelUrl: string,
+  ) {
+    // Determine if the session is recurring based on the frequency
+    const isRecurring = frequency !== 'one-off';
+    let interval;
+
+    // Map the frequency to a Stripe-recognized interval
+    switch (frequency) {
+      case 'weekly':
+        interval = 'week';
+        break;
+      case 'fortnightly':
+        // Stripe doesn't natively support fortnightly; use biweekly logic or handle it differently
+        interval = 'week';
+        break;
+      case 'monthly':
+        interval = 'month';
+        break;
+      default:
+        interval = null; // One-off
+    }
+
     const paymentOptions = {
       mode: isRecurring ? 'subscription' : 'payment',
       payment_method_types: ['card'],
@@ -52,14 +76,20 @@ console.log("samount:::",amount)
           price_data: {
             currency,
             product_data: {
-              name: isRecurring ? 'Recurring Donation' : 'One-time Donation',
+              name:
+                frequency === 'one-off'
+                  ? 'One-Off Donation'
+                  : `${frequency} Donation`,
             },
-            unit_amount: amount * 100, // Convert amount to cents
-            recurring: isRecurring ? { interval: 'month' } : undefined,
+            unit_amount: amount * 100,
+            ...(isRecurring && interval ? { recurring: { interval } } : {}), // Add recurring interval only for subscriptions
           },
           quantity: 1,
         },
       ],
+      metadata: {
+        frequency,
+      },
       success_url: successUrl,
       cancel_url: cancelUrl,
     };
@@ -67,5 +97,4 @@ console.log("samount:::",amount)
     const session = await stripe.checkout.sessions.create(paymentOptions);
     return session;
   }
-  
 }

@@ -27,7 +27,7 @@ export class FreightReceiptService {
       ).save();
 
       const resp = await this.loadPdf(newSavedItem);
-      console.log("RESP  ",)
+      console.log('RESP  ');
       return resp;
     } catch (e) {
       console.log('ERROR-creating pdf:: ', e);
@@ -37,12 +37,10 @@ export class FreightReceiptService {
 
   // // load receipt
   async loadPdf(data) {
-
     try {
       let buildPaths = await this.makeBuildPath(data.customerName);
 
       const html = await this.createHtml(data);
-
 
       if (this.ensureDirectoryExistence(buildPaths.buildPathHtml)) {
         fs.writeFileSync(buildPaths.buildPathHtml, html, 'utf-8');
@@ -52,7 +50,7 @@ export class FreightReceiptService {
         fs.writeFileSync(buildPaths.buildPathPdf, '');
       }
       // Step 2: Generate PDF from the saved HTML file
-      const browser = await puppeteer.launch({headless:"new"});
+      const browser = await puppeteer.launch({ headless: 'new' });
       console.log('HTML CREATED YET');
 
       // return
@@ -358,8 +356,8 @@ export class FreightReceiptService {
          `
     <tr>
       <td class="col1">${i.selectedFee}</td>
-      <td class="col2">${i.gst ? i.gst.toFixed(2) : null}</td>
-      <td class="col3">${i.charge ? i.charge.toFixed(2) : null}</td>
+      <td class="col2">${i.gst ? i.gst.toFixed(2) : ''}</td>
+      <td class="col3">${i.charge ? i.charge.toFixed(2) : ''}</td>
     </tr>
       `,
      )
@@ -367,15 +365,13 @@ export class FreightReceiptService {
    
   </tbody>
 </table>
-
-
       <div class="grid-small-container">
         <div class="grid-item boldFont">SUBTOTAL</div>
-        <div class="grid-item ">${data.subTotal ? data.subTotal.toFixed(2) : null}</div>
+        <div class="grid-item ">${data.subTotal ? data.subTotal.toFixed(2) : 0}</div>
         <div class="grid-item boldFont">ADD GST</div>
-        <div class="grid-item ">${data.gst ? data.gst.toFixed(2) : null}</div>
+        <div class="grid-item ">${data.gst ? data.gst.toFixed(2) : 0}</div>
         <div class="grid-item boldFont">TOTAL NZD</div>
-        <div class="grid-item ">${data.subTotal && data.gst ? (data.subTotal+ data.gst).toFixed(2) : null}</div>
+        <div class="grid-item ">${(data.subTotal + data.gst).toFixed(2)}</div>
       </div>
 
     <section style="margin:20px 0px 0px 0px;font-size:10px;">

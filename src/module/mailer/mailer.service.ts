@@ -3,7 +3,7 @@ import { SendEmailDto, SendEmailResDto } from './dto/';
 import * as nodemailer from 'nodemailer';
 import * as ejs from 'ejs';
 import * as path from 'path';
-import * as sgMail from '@sendgrid/mail'
+import * as sgMail from '@sendgrid/mail';
 
 @Injectable()
 export class MailerService {
@@ -20,43 +20,38 @@ export class MailerService {
     //     user: process.env.MAIL_USER,
     //     pass: process.env.MAIL_PASS,
     //   },
-      
     // });
 
-    this.transporter = sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+    this.transporter = sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   }
 
   async send(dto: SendEmailDto): Promise<SendEmailResDto> {
-   
-      //load email template
-      let filePath = path.resolve(
-        __dirname,
-        `../../views/emails/${dto.template}.ejs`,
-      );
-      return this.transporter.send({
+    //load email template
+    let filePath = path.resolve(
+      __dirname,
+      `../../views/emails/${dto.template}.ejs`,
+    );
+    return this.transporter
+      .send({
         from: process.env.MAIL_SENDER,
         to: dto.to,
         subject: dto.subject,
         html: `<p>Your OTP for ${dto.subject} is <strong>${dto.otp}</strong></p>`,
       })
       .then(() => {
-        console.log('Email sent')
+        console.log('Email sent');
         return {
-          message: "Email sent",
+          message: 'Email sent',
           provider: this.provider,
-        };    
-      
+        };
       })
       .catch((error) => {
-        this.logger.error('email failed to sent',error);
-        throw new Error(error)
-      })
+        this.logger.error('email failed to sent', error);
+        throw new Error(error);
+      });
   }
-  
-  
+
   async d_send(dto: SendEmailDto): Promise<SendEmailResDto> {
-    
-   
     try {
       //load email template
       let filePath = path.resolve(
@@ -70,22 +65,20 @@ export class MailerService {
         subject: dto.subject,
         html: `<p>Your OTP for ${dto.subject} is <strong>${dto.otp}</strong></p>`,
       });
-      console.log("RESPOSNE== ",response)
+      console.log('RESPOSNE== ', response);
 
       return {
         message: response.messageId,
         provider: this.provider,
       };
     } catch (error) {
-
-      this.logger.error('email failed to sent',error);
-      throw new Error(error)
+      this.logger.error('email failed to sent', error);
+      throw new Error(error);
     }
   }
 
   // async scheduleMeeting(dto: any): Promise<SendEmailResDto> {
-    
-   
+
   //   try {
   //    const response = await this.transporter.sendMail({
   //       from: '"Kochure" <no-reply@kochure.com>',
@@ -119,7 +112,7 @@ export class MailerService {
   //     );
   //     const html = await ejs.renderFile(filePath, dto.data);
   //     const response = await this.transporter.sendMail({
-  //       from: dto.from || '"U-SaveMarket" <no-reply@u_saveMarket.com>',
+  // from: process.env.MAIL_SENDER,
   //       to: dto.to,
   //       subject: dto.subject,
   //       html: html,

@@ -1,10 +1,10 @@
 vendor-performance
 
 based on successful-sales;
+
 - amount sold;
 
-
-admin-UNSATISFACTORY 
+admin-UNSATISFACTORY
 
 PAYMENT:
 weekly-say: every-friday;
