@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common';
 
-export type Frequency = '7 days ago' | 'a fortnight ago' | 'a month ago' | 'a year ago';
+export type Frequency =
+  | '7 days ago'
+  | 'a fortnight ago'
+  | 'a month ago'
+  | 'a year ago';
 
 @Injectable()
 export class UtilityService {
-  
   // Method to calculate the past date based on the range
-  calculatePreviousDate(range: Frequency):{startDate:string ,endDate:string} {
-    const endDate = new Date();  // Use the current date as the starting point
-    const startDate = new Date();  // Use the current date as the starting point
-    
+  calculatePreviousDate(range: Frequency): {
+    startDate: string;
+    endDate: string;
+  } {
+    const endDate = new Date(); // Use the current date as the starting point
+    const startDate = new Date(); // Use the current date as the starting point
+
     switch (range) {
       case '7 days ago':
         startDate.setDate(startDate.getDate() - 7); // Subtract 7 days for weekly
@@ -35,9 +41,9 @@ export class UtilityService {
         throw new Error(`Invalid range provided,${range}`);
     }
 
-    return {startDate: startDate.toISOString(),
-      endDate:endDate.toISOString()
+    return {
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
     };
   }
-
 }
