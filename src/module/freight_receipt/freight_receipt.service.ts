@@ -278,9 +278,9 @@ export class FreightReceiptService {
           UWave Logistics
         </div>
         <div style="font-size:12px;"  >
-          <span >16 Nandi Lane , Ranui </span>
+          <span ></span>
           </br>
-          <span >Auckland 0612</span>
+          <span >Auckland, New Zealand</span>
           </br>
           <span >
             <strong>Tel:
@@ -374,11 +374,12 @@ export class FreightReceiptService {
         <div class="grid-item ">${(data.subTotal + data.gst).toFixed(2)}</div>
       </div>
 
-      <div>
+      <div style="font-size:12px;"  >
       <strong>
         Important Notes:
       </strong>
         <ul>
+
         <li>⁠Any charges for food testing or compliance are additional.</li>
         <li>⁠Local NZ charges subject to gst.</li>
         <li>⁠NZ customs duty and gst are additional based on the declared value of the goods.</li>
