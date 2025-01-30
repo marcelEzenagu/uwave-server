@@ -278,7 +278,7 @@ export class FreightReceiptService {
           UWave Logistics
         </div>
         <div style="font-size:12px;"  >
-          <span ></span>
+          <span >uwavelogistics@gmail.com</span>
           </br>
           <span >Auckland, New Zealand</span>
           </br>
