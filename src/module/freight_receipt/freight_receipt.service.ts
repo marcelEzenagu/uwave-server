@@ -374,6 +374,25 @@ export class FreightReceiptService {
         <div class="grid-item ">${(data.subTotal + data.gst).toFixed(2)}</div>
       </div>
 
+      <div>
+      <strong>
+        Important Notes:
+      </strong>
+        <ul>
+        <li>⁠Any charges for food testing or compliance are additional.</li>
+        <li>⁠Local NZ charges subject to gst.</li>
+        <li>⁠NZ customs duty and gst are additional based on the declared value of the goods.</li>
+     <li>
+     ⁠Any MPI / NZ Customs quarantine, testing or inspection charges are additional and will be invoiced at cost + NZD50.00 attendance fee.
+     </li>
+     <li>
+     ⁠Additional fees will be charged for heat treatment of insects-infected products.
+     </li>
+     <li>⁠ ⁠Cost of destruction of any non-compliant goods are additional. We will obtain your authorisation prior to consenting same to MPI</li>
+
+        </ul>
+      </div>
+
     <section style="margin:20px 0px 0px 0px;font-size:10px;">
       <hr/>
       <pre style="font-weight:bold" >
