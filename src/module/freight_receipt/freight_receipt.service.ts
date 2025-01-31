@@ -376,21 +376,45 @@ export class FreightReceiptService {
 
       <div style="font-size:12px;"  >
       <strong>
-        Important Notes:
+        Important Notes
       </strong>
         <ul>
-
-        <li>⁠Any charges for food testing or compliance are additional.</li>
-        <li>⁠Local NZ charges subject to gst.</li>
-        <li>⁠NZ customs duty and gst are additional based on the declared value of the goods.</li>
-     <li>
-     ⁠Any MPI / NZ Customs quarantine, testing or inspection charges are additional and will be invoiced at cost + NZD50.00 attendance fee.
-     </li>
-     <li>
-     ⁠Additional fees will be charged for heat treatment of insects-infected products.
-     </li>
-     <li>⁠ ⁠Cost of destruction of any non-compliant goods are additional. We will obtain your authorisation prior to consenting same to MPI</li>
-
+        Please note clearance fee includes the following charges:
+          <li>
+          All port charges
+          </li>
+          <li>
+          Agency fee.
+          </li>
+          <li>
+          Power and Monitoring fees
+          </li>
+          <li>
+          EDI fees
+          </li>
+          <li>
+          ATF Site fee for FCL
+          </li>
+          <li>
+          Container Wash
+          </li>
+          <li>
+          Container Devain
+          </li>
+          <li>
+          Product Palletising
+          </li>
+          <li>
+          Port to ATF site Transportation & ATF to Port
+          </li>
+          <li>
+          MPI Application fee
+          </li>
+          <li>
+          Container Dehire
+          </li>
+        
+   
         </ul>
       </div>
 
