@@ -295,7 +295,7 @@ export class FreightReceiptService {
     <section  >
         <div style="padding:20px 0 0 20px;margin" class="centered-div" >
           <span id="smallFont">TRACKING NUMBER:</span>
-          <strong id="user">${data.id}</strong>
+          <strong id="user">${data.providerTrackingID ? data.providerTrackingID : data.id}</strong>
           </div>
           
             
@@ -308,7 +308,7 @@ export class FreightReceiptService {
         </div>
         <div class="grid-2">
           <div class="grid-child-item">${data.customerName}</div>
-          <div class="grid-child-item">UWAVE CORPORATE LTD</div>
+          <div class="grid-child-item">UWAVE LOGISTICS LTD</div>
         </div>
     </section>
 
@@ -430,7 +430,7 @@ export class FreightReceiptService {
       <hr/>
       <div style="font-weight:bold" >
 
-        This invoice & any orders or business entered in to is subject to UWAVE CORPORATE Ltd 'Standard Trading Conditions / Conditions of Contract'. 
+        This invoice & any orders or business entered in to is subject to UWAVE LOGISTICS Ltd 'Standard Trading Conditions / Conditions of Contract'. 
         Insurance is not arranged unless requested by written application prior to shipment. 
         Please contact us within 7 days should there be any discrepancies.
       </div>
