@@ -437,14 +437,13 @@ export class FreightReceiptService {
         Bank   ANZ BANK LIMITED
         Account   01-0286-0975830-00
         UWAVE CORPORATE LTD
-        PAY Ref: ${data.customerName}  ${data.id}
+        PAY Ref: ${data.customerName}  ${data.providerTrackingID ? data.providerTrackingID : data.id}
       </pre >
       <hr/>
       <div style="font-weight:bold" >
-
         This invoice & any orders or business entered in to is subject to UWAVE LOGISTICS Ltd 'Standard Trading Conditions / Conditions of Contract'. 
         Insurance is not arranged unless requested by written application prior to shipment. 
-        Please contact us within 7 days should there be any discrepancies.
+        Please contact us within 7 days should there be any discrepancies. Invoice due date has been specified in this invoice; overdue invoices attract a service charge of 2% per calendar month unless prior arrangments is made. Please reach out to arrange a payment plan if not making full payment within the estimated due date.
       </div>
       <hr/>
 
