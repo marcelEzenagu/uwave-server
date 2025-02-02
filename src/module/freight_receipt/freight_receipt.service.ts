@@ -363,7 +363,13 @@ export class FreightReceiptService {
     <tr>
       <td class="col1">${i.selectedFee}</td>
       <td class="col2">${i.gst ? i.gst.toFixed(2) : ''}</td>
-      <td class="col3">${i.charge ? i.charge.toFixed(2) : ''}</td>
+      <td class="col3">${
+        i.charge
+          ? typeof i.charge == 'number'
+            ? i.charge.toFixed(2)
+            : i.charge
+          : ''
+      }</td>
     </tr>
       `,
      )
