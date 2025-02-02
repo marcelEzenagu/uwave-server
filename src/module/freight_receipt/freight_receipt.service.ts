@@ -306,12 +306,12 @@ export class FreightReceiptService {
     </section>
 
     <section>
-      <div class="grid-2-container">
+      <div class="grid-3-container">
         <div class="grid-item boldFont">SUPPLIER</div>
         <div class="grid-item boldFont">IMPORTER</div>
         <div class="grid-item boldFont">INVOICE DUE DATE</div>
         </div>
-        <div class="grid-2">
+        <div class="grid-3">
           <div class="grid-child-item">${data.customerName}</div>
           <div class="grid-child-item">UWAVE LOGISTICS LTD</div>
           <div class="grid-child-item">${data.invoiceDueDate}</div>
