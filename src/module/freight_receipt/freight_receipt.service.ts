@@ -288,6 +288,10 @@ export class FreightReceiptService {
             +642904307658 
           </span>
           </br>
+          <span >
+            <strong>GST Number: </strong>143 710 983
+          </span>
+          </br>
         </div>
       </div>
   </header> 
@@ -305,10 +309,12 @@ export class FreightReceiptService {
       <div class="grid-2-container">
         <div class="grid-item boldFont">SUPPLIER</div>
         <div class="grid-item boldFont">IMPORTER</div>
+        <div class="grid-item boldFont">IMPORTER</div>
         </div>
         <div class="grid-2">
           <div class="grid-child-item">${data.customerName}</div>
           <div class="grid-child-item">UWAVE LOGISTICS LTD</div>
+          <div class="grid-child-item">${data.invoiceDueDate}</div>
         </div>
     </section>
 
