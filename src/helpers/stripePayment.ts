@@ -68,22 +68,31 @@ export class StripePayment {
         interval = null; // One-off
     }
 
+    const price = await stripe.prices.create({
+      unit_amount: amount * 100,
+      currency,
+      recurring: interval ? { interval } : undefined, // Required for subscriptions
+      product_data: {
+        name: `${frequency} Donation`,
+      },
+    });
     const paymentOptions = {
       mode: isRecurring ? 'subscription' : 'payment',
       payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
-            currency,
-            product_data: {
-              name:
-                frequency === 'one-off'
-                  ? 'One-Off Donation'
-                  : `${frequency} Donation`,
-            },
-            unit_amount: amount * 100,
-            ...(isRecurring && interval ? { recurring: { interval } } : {}), // Add recurring interval only for subscriptions
-          },
+          // price_data: {
+          //   currency,
+          //   product_data: {
+          //     name:
+          //       frequency === 'one-off'
+          //         ? 'One-Off Donation'
+          //         : `${frequency} Donation`,
+          //   },
+          //   unit_amount: amount * 100,
+          //   ...(isRecurring && interval ? { recurring: { interval } } : {}),
+          // },
+          price: price.id,
           quantity: 1,
         },
       ],

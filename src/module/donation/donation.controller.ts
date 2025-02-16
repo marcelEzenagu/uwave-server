@@ -32,15 +32,10 @@ export class DonationController {
     @Body() dto: Donation,
   ) {
     try {
-      console.log(
-        'donation_da===',
-        amount,
-        currency,
-        frequency,
-        successUrl,
-        cancelUrl,
-        dto,
-      );
+      console.log('donation_da===', dto);
+
+      successUrl = `${successUrl}`;
+      cancelUrl = `${cancelUrl}`;
       const session = await this.stripeService.createPaymentSession(
         amount,
         currency,
@@ -49,9 +44,9 @@ export class DonationController {
         cancelUrl,
       );
 
-      dto.paymentIntentID = session.payment_intent?.toString() || null;
-      dto.clientSecret = session.client_secret || null;
-
+      // dto.paymentIntentID = session.payment_intent?.toString() || null;
+      // dto.clientSecret = session.client_secret || null;
+      dto.url = session?.url;
       return this.donationService.create(dto);
     } catch (e) {
       console.log('error', e);

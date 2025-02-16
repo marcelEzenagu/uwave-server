@@ -19,6 +19,8 @@ export class Donation {
 
   @Prop({ type: String })
   frequency: string;
+  @Prop({ type: String })
+  url: string;
 
   @Prop({ type: String })
   firstName: string;
