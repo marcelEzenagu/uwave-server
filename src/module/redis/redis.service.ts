@@ -7,15 +7,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit() {
     this.redisClient = await createClient({
-      url: `redis://default:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+      password: process.env.REDIS_PASSWORD,
       socket: {
-        tls: true, // Important for Redis Cloud
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT),
       },
-      //   password:process.env.REDIS_PASSWORD,
-      //   socket: {
-      //     host: process.env.REDIS_HOST,
-      //     port: Number(process.env.REDIS_PORT)
-      // }
     });
     this.redisClient.on('error', (err) =>
       console.log('Redis Client Error', err),
