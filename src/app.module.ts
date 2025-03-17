@@ -1,4 +1,4 @@
-import { Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './module/user/user.module';
 import { VendorModule } from './module/vendor/vendor.module';
@@ -23,6 +23,8 @@ import { CountryCurrencyModule } from './module/country_currency/country_currenc
 import { ProductCategoryModule } from './module/product-category/product-category.module';
 import { ProductSubCategoryModule } from './module/product-sub-category/product-sub-category.module';
 import { join } from 'path';
+import { RequestLoggerMiddleware } from './module/common/middleware/request-logger.middleware';
+
 
 
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -81,4 +83,8 @@ import { AidModule } from './module/aid/aid.module';
   providers: [AppGateway],
   controllers: [StatusController,HealthController,],
 })
-export class AppModule  {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+  }
+}
