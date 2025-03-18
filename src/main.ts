@@ -7,9 +7,10 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './helpers/exception';
 import * as bodyParser from 'body-parser';
+import { logger } from './config/logger.config';
 
 async function bootstrap() {
-
+  logger.info('Application starting up')
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
@@ -35,7 +36,6 @@ async function bootstrap() {
     credentials: true,
   }
   )
-
   await app.listen(process.env.PORT);
 }
 bootstrap();
